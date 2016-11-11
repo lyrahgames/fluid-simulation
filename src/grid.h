@@ -39,7 +39,7 @@ struct GridMap{
 		T node_pos(T idx) const{return min() + step()*idx;}
 		// get position to given cell (overloaded to avoid casting)
 		// T cell_pos(N idx) const{return node_pos(idx) + 0.5*step;}
-		T cell_pos(T idx) const{return node_pos(idx) + 0.5*step;}
+		T cell_pos(T idx) const{return node_pos(idx) + 0.5*step();}
 
 		// get exact node index for given point (no rounding or casting)
 		T node_idx(T in_pos) const{return (in_pos - min()) * inv_step();}

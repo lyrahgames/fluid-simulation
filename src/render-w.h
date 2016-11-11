@@ -56,8 +56,10 @@ class RenderW : public QWidget{
 
 			for (int i = 0; i < width(); i++){
 				for (int j = 0; j < height(); j++){
-					const uint idx = i*width() + j;
-					const float tmp = 255.0f * _cfs->p()[idx];
+					const float x = _pix_grid_map[0].cell_pos(i);
+					const float y = _pix_grid_map[1].cell_pos(height() - j - 1);
+
+					const float tmp = 255.0f * _cfs->p(x,y);
 					const QRgb col = qRgb(tmp,tmp,tmp);
 					map.setPixel(i,j,col);
 				}
@@ -70,10 +72,14 @@ class RenderW : public QWidget{
 		}
 
 		void resizeEvent(QResizeEvent *event){
-			const float aspect_ratio = float(width())/float(height());
+			const float ar = float(width())/float(height());
 			_pix_grid_map[0].set_cell_count(width());
 			_pix_grid_map[1].set_cell_count(height());
-			_pix_grid_map[0].set_intvl()
+			_pix_grid_map[1].set_intvl(_cfs->grid_map()[1].min(), _cfs->grid_map()[1].max());
+			const float l = _cfs->grid_map()[1].max() - _cfs->grid_map()[1].min();
+			const float mid = 0.5f * (_cfs->grid_map()[0].min() + _cfs->grid_map()[0].max());
+
+			_pix_grid_map[0].set_intvl(mid - 0.5f*ar*l, mid + 0.5f*ar*l);
 		}
 
 		// void keyPressEvent(QKeyEvent *event){

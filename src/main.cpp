@@ -9,7 +9,7 @@
 
 int main(int argc, char *argv[]){
 
-	CFS cfs;
+	CFS cfs{gridmap(0.0f, 1.0f, 100), gridmap(0.0f, 1.0f, 100)};
 
 	QApplication app(argc, argv);
 
