@@ -1,15 +1,15 @@
 /****************************************************************************
-** Meta object code from reading C++ file 'render-w.h'
+** Meta object code from reading C++ file 'main-w.h'
 **
-** Created: Mon Nov 14 12:47:45 2016
+** Created: Mon Nov 14 14:12:26 2016
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.4)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "../../../src/render-w.h"
+#include "../../../src/main-w.h"
 #if !defined(Q_MOC_OUTPUT_REVISION)
-#error "The header file 'render-w.h' doesn't include <QObject>."
+#error "The header file 'main-w.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 63
 #error "This file was generated using the moc from 4.8.4. It"
 #error "cannot be used with the include files from this version of Qt."
@@ -17,7 +17,7 @@
 #endif
 
 QT_BEGIN_MOC_NAMESPACE
-static const uint qt_meta_data_RenderW[] = {
+static const uint qt_meta_data_MainW[] = {
 
  // content:
        6,       // revision
@@ -31,55 +31,54 @@ static const uint qt_meta_data_RenderW[] = {
        0,       // signalCount
 
  // slots: signature, parameters, type, tag, flags
-       9,    8,    8,    8, 0x0a,
+       9,    7,    6,    6, 0x08,
 
        0        // eod
 };
 
-static const char qt_meta_stringdata_RenderW[] = {
-    "RenderW\0\0log()\0"
+static const char qt_meta_stringdata_MainW[] = {
+    "MainW\0\0n\0set_grid(int)\0"
 };
 
-void RenderW::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+void MainW::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
         Q_ASSERT(staticMetaObject.cast(_o));
-        RenderW *_t = static_cast<RenderW *>(_o);
+        MainW *_t = static_cast<MainW *>(_o);
         switch (_id) {
-        case 0: _t->log(); break;
+        case 0: _t->set_grid((*reinterpret_cast< int(*)>(_a[1]))); break;
         default: ;
         }
     }
-    Q_UNUSED(_a);
 }
 
-const QMetaObjectExtraData RenderW::staticMetaObjectExtraData = {
+const QMetaObjectExtraData MainW::staticMetaObjectExtraData = {
     0,  qt_static_metacall 
 };
 
-const QMetaObject RenderW::staticMetaObject = {
-    { &QWidget::staticMetaObject, qt_meta_stringdata_RenderW,
-      qt_meta_data_RenderW, &staticMetaObjectExtraData }
+const QMetaObject MainW::staticMetaObject = {
+    { &QWidget::staticMetaObject, qt_meta_stringdata_MainW,
+      qt_meta_data_MainW, &staticMetaObjectExtraData }
 };
 
 #ifdef Q_NO_DATA_RELOCATION
-const QMetaObject &RenderW::getStaticMetaObject() { return staticMetaObject; }
+const QMetaObject &MainW::getStaticMetaObject() { return staticMetaObject; }
 #endif //Q_NO_DATA_RELOCATION
 
-const QMetaObject *RenderW::metaObject() const
+const QMetaObject *MainW::metaObject() const
 {
     return QObject::d_ptr->metaObject ? QObject::d_ptr->metaObject : &staticMetaObject;
 }
 
-void *RenderW::qt_metacast(const char *_clname)
+void *MainW::qt_metacast(const char *_clname)
 {
     if (!_clname) return 0;
-    if (!strcmp(_clname, qt_meta_stringdata_RenderW))
-        return static_cast<void*>(const_cast< RenderW*>(this));
+    if (!strcmp(_clname, qt_meta_stringdata_MainW))
+        return static_cast<void*>(const_cast< MainW*>(this));
     return QWidget::qt_metacast(_clname);
 }
 
-int RenderW::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+int MainW::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
     _id = QWidget::qt_metacall(_c, _id, _a);
     if (_id < 0)

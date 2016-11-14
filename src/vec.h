@@ -3,6 +3,7 @@
 
 #include <cstring>
 #include <cmath>
+// #include <util.h>
 
 
 template <class T, std::size_t N>
@@ -25,6 +26,33 @@ struct vec{
 	// access operator as const call
 	constexpr const T& operator [](std::size_t idx) const{return v[idx];}
 };
+
+template <class T, std::size_t N>
+inline vec<T,N> operator+(const vec<T,N>& v1, const vec<T,N>& v2){
+	vec<T,N> tmp{};
+	for (uint i = 0; i < N; i++){
+		tmp[i] = v1[i] + v2[i];
+	}
+	return tmp;
+}
+
+template <class T, std::size_t N>
+inline vec<T,N> operator*(const vec<T,N>& v1, const vec<T,N>& v2){
+	vec<T,N> tmp{};
+	for (uint i = 0; i < N; i++){
+		tmp[i] = v1[i] * v2[i];
+	}
+	return tmp;
+}
+
+template <class T, std::size_t N>
+inline vec<T,N> operator*(T s, const vec<T,N>& v){
+	vec<T,N> tmp{};
+	for (uint i = 0; i < N; i++){
+		tmp[i] = s * v[i];
+	}
+	return tmp;
+}
 
 
 using vec2 = vec<float,2>;

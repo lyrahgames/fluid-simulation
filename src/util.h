@@ -26,5 +26,10 @@ inline T bilin_interp(T v00, T v10, T v01, T v11, T wx, T wy){
 	return (1-wy)*tmp1 + wy*tmp2;
 }
 
+template <class T, class N>
+inline constexpr T lin_interp(T v1, T v2, N w){
+	return (1-w)*v1 + w*v2;
+} 
+
 
 #endif // __UTIL_H__

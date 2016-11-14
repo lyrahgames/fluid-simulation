@@ -23,6 +23,8 @@ struct GridMap{
 		T min() const{return _min;}
 		// maximum of interval
 		T max() const{return _max;}
+		//
+		T length() const{return _max - _min;}
 		// size of the GridMap = cell count
 		N size() const{return _size;}
 		// get cell count

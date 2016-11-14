@@ -43,7 +43,7 @@ struct CFS{
 		// const sfield& p() const{return _p;}
 
 
-		float p(float in_x, float in_y){
+		float p(float in_x, float in_y) const{
 			if (pos_out_p_bound(in_x, in_y))
 				return 0.0f;
 
@@ -132,23 +132,23 @@ struct CFS{
 
 
 	private:
-		uint p_size(){return p_width()*p_height();}
-		uint p_width(){return _grid_map[0].cell_count();}
-		uint p_height(){return _grid_map[1].cell_count();}
-		uint vx_size(){return vx_width()*vx_height();}
-		uint vx_width(){return _grid_map[0].cell_count() - 1;}
-		uint vx_height(){return _grid_map[1].cell_count();}
-		uint vy_size(){return vy_width()*vy_height();}
-		uint vy_width(){return _grid_map[0].cell_count();}
-		uint vy_height(){return _grid_map[1].cell_count() - 1;}
+		uint p_size() const{return p_width()*p_height();}
+		uint p_width() const{return _grid_map[0].cell_count();}
+		uint p_height() const{return _grid_map[1].cell_count();}
+		uint vx_size() const{return vx_width()*vx_height();}
+		uint vx_width() const{return _grid_map[0].cell_count() - 1;}
+		uint vx_height() const{return _grid_map[1].cell_count();}
+		uint vy_size() const{return vy_width()*vy_height();}
+		uint vy_width() const{return _grid_map[0].cell_count();}
+		uint vy_height() const{return _grid_map[1].cell_count() - 1;}
 
-		uint p_memidx(uint idx_x, uint idx_y){
+		uint p_memidx(uint idx_x, uint idx_y) const{
 			return quad_rm_memidx(p_width(), idx_y, idx_x);
 		}
-		uint vx_memidx(uint idx_x, uint idx_y){
+		uint vx_memidx(uint idx_x, uint idx_y) const{
 			return quad_rm_memidx(vx_width(), idx_y, idx_x);
 		}
-		uint vy_memidx(uint idx_x, uint idx_y){
+		uint vy_memidx(uint idx_x, uint idx_y) const{
 			return quad_rm_memidx(vy_height(), idx_y, idx_x);
 		}
 
@@ -158,11 +158,11 @@ struct CFS{
 			_v[1].resize(vy_size(), 0.0f);
 		}
 
-		bool pos_out_bound(float in_x, float in_y){
+		bool pos_out_bound(float in_x, float in_y) const{
 			return (in_x < _grid_map[0].min() || in_x > _grid_map[0].max() || in_y < _grid_map[1].min() || in_y > _grid_map[1].max());
 		}
 
-		bool pos_out_p_bound(float in_x, float in_y){
+		bool pos_out_p_bound(float in_x, float in_y) const{
 			return (in_x <= _grid_map[0].cell_pos(0) || in_x >= _grid_map[0].cell_pos(p_width()-1) || in_y <= _grid_map[1].cell_pos(0) || in_y >= _grid_map[1].cell_pos(p_height()-1));
 		}
 };

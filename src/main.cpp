@@ -4,22 +4,22 @@
 #include <QApplication>
 
 #include <cfs.h>
-#include <render-w.h>
+#include <main-w.h>
 
 
 int main(int argc, char *argv[]){
 
-	CFS cfs{gridmap(0.0f, 1.0f, 100), gridmap(0.0f, 1.0f, 100)};
+	CFS cfs{gridmap(0.0f, 2.0f, 100), gridmap(0.0f, 1.0f, 100)};
 
 	QApplication app(argc, argv);
 
-	RenderW *render = new RenderW(&cfs);
-	render->resize(600, 600);
-	render->show();
+	MainW *main_w = new MainW(&cfs);
+	main_w->resize(600, 600);
+	main_w->show();
 
 	app.exec();
 	
-	delete render;
+	delete main_w;
 	
 	return 0;
 }
