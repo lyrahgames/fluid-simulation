@@ -2,7 +2,7 @@
 #define __COLMAP_H__
 
 #include <util.h>
-#include <vec.h>
+#include <xmath/vec.h>
 
 
 // template <class T>
@@ -79,7 +79,7 @@ struct colormap{
 			return seg_idx;
 		}
 
-		constexpr color_rgbf compute_interp(uint base_idx1, uint base_idx2, float w) const{
+		color_rgbf compute_interp(uint base_idx1, uint base_idx2, float w) const{
 			return (1.0f - w)*_data[base_idx1].color + w*_data[base_idx2].color;
 		}
 

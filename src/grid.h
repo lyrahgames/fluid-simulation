@@ -3,6 +3,7 @@
 
 #include <util.h>
 
+// one dimensional regular grid map
 
 template <class T, class N>
 struct GridMap{
@@ -62,6 +63,11 @@ struct GridMap{
 	private:
 		// precompute step values
 		void compute_step();
+
+
+		struct Node{
+			T operator[](T idx){}
+		};
 
 
 	private:

@@ -1,3 +1,9 @@
+notes:
+	☐	error in book: weighted derivative
+
 gui:
 	☐	add viewport to RenderW
 		(check problems with grid)
+
+computing:
+	☐	check reduction for compute_equ

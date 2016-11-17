@@ -5,9 +5,13 @@
 #include <vector>
 #include <algorithm>
 
-#include <vec.h>
+#include <xmath/vec.h>
 #include <grid.h>
 #include <util.h>
+
+using namespace xmath;
+
+using vec2 = vec<float,2>;
 
 
 // cavity fluid simulation
@@ -20,20 +24,58 @@ struct CFS{
 	};
 
 
+
 	public:
 		CFS(const gridmap& in_grid_map0, const gridmap& in_grid_map1):
 		_grid_map{in_grid_map0, in_grid_map1},
 		_p(p_size(), 0.0f),
 		_v{sfield(vx_size(), 0.0f), sfield(vy_size(), 0.0f)}{
 
-			for (int i = 0; i < p_size(); i++){
-				_p[i] = sq(sin(10.0f * float(i)/float(p_size())));
+
+
+			_reynold = 10.0f;
+			_time = 0.0f;
+			_it_step = 0;
+			_time_step_safety = 0.5f;
+			_force = vec2{};
+			_cdq_weight = 0.5f;
+			_sor_weight = 0.5f;
+			_sor_eps = 0.001f;
+			_sor_it_max = 100;
+			_vx_max_mag = _inv_vx_max_mag = 1.0f;
+			_vy_max_mag = _inv_vy_max_mag = 1.0f;
+			
+			init_field();
+			compute_time_step_bound();
+
+			// for (int i = 0; i < p_size(); i++){
+			// 	_p[i] = sq(sin(10.0f * float(i)/float(p_size())));
+			// }
+
+			for (uint i = 0; i < p_width(); i++){
+				for (uint j = 0; j < p_height(); j++){
+					const float x = _grid_map[0].cell_pos(i);
+					const float y = _grid_map[1].cell_pos(j);
+					_p[p_memidx(i,j)] = sqrt(x) * sin(3*M_PI*x) * sin(M_PI*y);
+				}
 			}
+
+			// for (int i = 0; i < vx_size(); i++){
+			// 	_v[0][i] = float(i)/float(vx_size());
+			// }
+
+			// for (int i = 0; i < vy_size(); i++){
+			// 	const float tmp = float(i)/float(vy_size());
+			// 	_v[1][i] = sqrt(tmp) * sin(3*M_PI*tmp) * sin(M_PI*tmp);
+			// 	// sq(cos(10.0f /(float(i)/float(vy_size()))));
+			// }
 		}
 
 
 		float reynold() const{return _reynold;}
 		float inv_reynold() const{return _inv_reynold;}
+		uint it_step() const{return _it_step;}
+		float time() const{return _time;}
 		float time_step() const{return _time_step;}
 		float inv_time_step() const{return _inv_time_step;}
 		float time_step_safety() const{return _time_step_safety;}
@@ -41,6 +83,12 @@ struct CFS{
 		const gridmap* grid_map() const{return _grid_map;}
 		// vec2 inv_v_max_mag() const{return _inv_v_max_mag;}
 		// const sfield& p() const{return _p;}
+		float cdq_weight() const{return _cdq_weight;}
+		float sor_weight() const{return _sor_weight;}
+		float sor_eps() const{return _sor_eps;}
+		float sor_it_max() const{return _sor_it_max;}
+		vec2 force() const{return _force;}
+
 
 
 		float p(float in_x, float in_y) const{
@@ -61,12 +109,81 @@ struct CFS{
 			return bilin_interp(_p[idx1], _p[idx1+1], _p[idx2], _p[idx2+1], w_x, w_y);
 		}
 
+		float p_save(float in_x, float in_y) const{
+			const float x = _grid_map[0].cell_idx(in_x);
+			const float y = _grid_map[1].cell_idx(in_y);
+			const float fidx_x = floor(x);
+			const float fidx_y = floor(y);
+			const uint idx_x = static_cast<uint>(fidx_x);
+			const uint idx_y = static_cast<uint>(fidx_y);
+			const float w_x = x - fidx_x;
+			const float w_y = y - fidx_y;
+			const uint idx1 = p_memidx(idx_x, idx_y);
+			const uint idx2 = p_memidx(idx_x, idx_y+1);
 
-		// void compute_time_it();
+			return bilin_interp(_p[idx1], _p[idx1+1], _p[idx2], _p[idx2+1], w_x, w_y);
+		}
+
+
+		float vx(float in_x, float in_y) const{
+			if (pos_out_vx_bound(in_x, in_y))
+				return 0.0f;
+
+			const float x = _grid_map[0].node_idx(in_x) - 1;
+			const float y = _grid_map[1].cell_idx(in_y);
+			const float fidx_x = floor(x);
+			const float fidx_y = floor(y);
+			const uint idx_x = static_cast<uint>(fidx_x);
+			const uint idx_y = static_cast<uint>(fidx_y);
+			const float w_x = x - fidx_x;
+			const float w_y = y - fidx_y;
+			const uint idx1 = vx_memidx(idx_x, idx_y);
+			const uint idx2 = vx_memidx(idx_x, idx_y+1);
+
+			return bilin_interp(_v[0][idx1], _v[0][idx1+1], _v[0][idx2], _v[0][idx2+1], w_x, w_y);
+		}
+
+		float vx_tmp(float in_x, float in_y) const{
+			if (pos_out_vx_bound(in_x, in_y))
+				return 0.0f;
+
+			const float x = _grid_map[0].node_idx(in_x) - 1;
+			const float y = _grid_map[1].cell_idx(in_y);
+			const float fidx_x = floor(x);
+			const float fidx_y = floor(y);
+			const uint idx_x = static_cast<uint>(fidx_x);
+			const uint idx_y = static_cast<uint>(fidx_y);
+			const float w_x = x - fidx_x;
+			const float w_y = y - fidx_y;
+			const uint idx1 = vx_memidx(idx_x, idx_y);
+			const uint idx2 = vx_memidx(idx_x, idx_y+1);
+
+			return bilin_interp(_tmp[0][idx1], _tmp[0][idx1+1], _tmp[0][idx2], _tmp[0][idx2+1], w_x, w_y);
+		}
+
+		float vy(float in_x, float in_y) const{
+			if (pos_out_vy_bound(in_x, in_y))
+				return 0.0f;
+
+			const float x = _grid_map[0].cell_idx(in_x);
+			const float y = _grid_map[1].node_idx(in_y) - 1;
+			const float fidx_x = floor(x);
+			const float fidx_y = floor(y);
+			const uint idx_x = static_cast<uint>(fidx_x);
+			const uint idx_y = static_cast<uint>(fidx_y);
+			const float w_x = x - fidx_x;
+			const float w_y = y - fidx_y;
+			const uint idx1 = vy_memidx(idx_x, idx_y);
+			const uint idx2 = vy_memidx(idx_x, idx_y+1);
+
+			return bilin_interp(_v[1][idx1], _v[1][idx1+1], _v[1][idx2], _v[1][idx2+1], w_x, w_y);
+		}
+
+
 
 		void compute_time_step(){
-			const float tmp1 = _grid_map[0].step() * _inv_v_max_mag[0];
-			const float tmp2 = _grid_map[1].step() * _inv_v_max_mag[1];
+			const float tmp1 = _grid_map[0].step() * _inv_vx_max_mag;
+			const float tmp2 = _grid_map[1].step() * _inv_vy_max_mag;
 
 			_time_step = std::min(tmp1, tmp2);
 			_time_step = std::min(_time_step_bound, time_step_safety() * _time_step);
@@ -82,12 +199,16 @@ struct CFS{
 		}
 
 		void compute_time_step_bound(){
-			const float tmp = (1.0f / sq(_grid_map[0].step())) + (1.0f / sq(_grid_map[1].step()));
+			const float tmp = (sq(_grid_map[0].inv_step())) + (sq(_grid_map[1].inv_step()));
 			_time_step_bound = 0.5f * time_step_safety() * reynold() / tmp;
 		}
 
 
-		// void compute_equ();
+		void compute_time_it();
+		void compute_equ();
+		void compute_poisson();
+		void compute_v();
+		void set_v_bound();
 
 		void set_grid_map(const gridmap& in_grid_map0, const gridmap& in_grid_map1){
 			_grid_map[0] = in_grid_map0;
@@ -105,10 +226,14 @@ struct CFS{
 		// velocity (structure of arrays)
 		sfield _v[2];
 
+		sfield _tmp[3];
+
 
 		// parameters
 		// reynold number
 		float _reynold;
+		float _time;
+		uint _it_step;
 		// 
 		float _time_step;
 		// time step safety factor
@@ -117,11 +242,17 @@ struct CFS{
 		vec2 _force;
 		// weight for donor-cell discretization
 		float _donor_cell_weight;
+		// weight for central difference quotient
+		float _cdq_weight;
+
+		float _sor_weight;
+		float _sor_eps;
+		float _sor_it_max;
 
 
 		// temporary variables
 		// maximum magnitude of velocity field
-		vec2 _v_max_mag, _inv_v_max_mag;
+		float _vx_max_mag, _vy_max_mag, _inv_vx_max_mag, _inv_vy_max_mag;
 		// inverse reynold number
 		float _inv_reynold;
 		// inverse time step
@@ -131,7 +262,8 @@ struct CFS{
 
 
 
-	private:
+	// private:
+	public:
 		uint p_size() const{return p_width()*p_height();}
 		uint p_width() const{return _grid_map[0].cell_count();}
 		uint p_height() const{return _grid_map[1].cell_count();}
@@ -145,26 +277,79 @@ struct CFS{
 		uint p_memidx(uint idx_x, uint idx_y) const{
 			return quad_rm_memidx(p_width(), idx_y, idx_x);
 		}
+		uint p_memidx_u(uint idx) const{
+			return idx + p_width();
+		}
+		uint p_memidx_d(uint idx) const{
+			return idx - p_width();
+		}
+		uint p_memidx_r(uint idx) const{
+			return idx + 1;
+		}
+		uint p_memidx_l(uint idx) const{
+			return idx - 1;
+		}
+
 		uint vx_memidx(uint idx_x, uint idx_y) const{
 			return quad_rm_memidx(vx_width(), idx_y, idx_x);
 		}
+		uint vx_memidx_u(uint idx) const{
+			return idx + vx_width();
+		}
+		uint vx_memidx_d(uint idx) const{
+			return idx - vx_width();
+		}
+		uint vx_memidx_r(uint idx) const{
+			return idx + 1;
+		}
+		uint vx_memidx_l(uint idx) const{
+			return idx - 1;
+		}
+
 		uint vy_memidx(uint idx_x, uint idx_y) const{
 			return quad_rm_memidx(vy_height(), idx_y, idx_x);
+		}
+		uint vy_memidx_u(uint idx) const{
+			return idx + vy_width();
+		}
+		uint vy_memidx_d(uint idx) const{
+			return idx - vy_width();
+		}
+		uint vy_memidx_r(uint idx) const{
+			return idx + 1;
+		}
+		uint vy_memidx_l(uint idx) const{
+			return idx - 1;
 		}
 
 		void init_field(){
 			_p.resize(p_size(), 0.0f);
+			_tmp[2].resize(p_size(), 0.0f);
 			_v[0].resize(vx_size(), 0.0f);
+			_tmp[0].resize(vx_size(), 0.0f);
 			_v[1].resize(vy_size(), 0.0f);
+			_tmp[1].resize(vy_size(), 0.0f);
+		}
+
+		bool pos_out_bound_strip(float in_x, float in_y) const{
+			return (in_x < _grid_map[0].min() || in_x > _grid_map[0].max() || in_y < _grid_map[1].min() || in_y > _grid_map[1].max());
 		}
 
 		bool pos_out_bound(float in_x, float in_y) const{
-			return (in_x < _grid_map[0].min() || in_x > _grid_map[0].max() || in_y < _grid_map[1].min() || in_y > _grid_map[1].max());
+			return (in_x <= _grid_map[0].node_pos(1) || in_x >= _grid_map[0].node_pos(_grid_map[0].size()-1) || in_y <= _grid_map[1].node_pos(1) || in_y >= _grid_map[1].cell_pos(_grid_map[1].size()-1));
 		}
 
 		bool pos_out_p_bound(float in_x, float in_y) const{
 			return (in_x <= _grid_map[0].cell_pos(0) || in_x >= _grid_map[0].cell_pos(p_width()-1) || in_y <= _grid_map[1].cell_pos(0) || in_y >= _grid_map[1].cell_pos(p_height()-1));
 		}
+
+		bool pos_out_vx_bound(float in_x, float in_y) const{
+			return (in_x <= _grid_map[0].node_pos(1) || in_x >= _grid_map[0].node_pos(vx_width()) || in_y <= _grid_map[1].cell_pos(0) || in_y >= _grid_map[1].cell_pos(vx_height()-1));
+		}
+
+		bool pos_out_vy_bound(float in_x, float in_y) const{
+			return (in_x <= _grid_map[0].cell_pos(0) || in_x >= _grid_map[0].cell_pos(vy_width()-1) || in_y <= _grid_map[1].node_pos(1) || in_y >= _grid_map[1].node_pos(vy_height()));
+		}		
 };
 
 
