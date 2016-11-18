@@ -2,7 +2,7 @@
 #define __COLMAP_H__
 
 #include <util.h>
-#include <xmath/vec.h>
+// #include <xmath/vec.h>
 
 
 // template <class T>

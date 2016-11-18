@@ -61,12 +61,6 @@ struct vec{
 	T v[N];
 };
 
-template <std::size_t N>
-using vecf = vec<float,N>;
-using vecf2 = vec<float,2>;
-
-
-
 
 
 template <std::size_t M, class Op, class T, std::size_t N>

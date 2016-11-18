@@ -1,4 +1,3 @@
-
 #ifndef __INTVL_H__
 #define __INTVL_H__
 
@@ -13,8 +12,6 @@ struct intvl{
 		struct{T inf, sup;};
 	};
 };
-
-using intvlf = intvl<float>;
 
 
 template <class T>

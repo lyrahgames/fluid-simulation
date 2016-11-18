@@ -2,10 +2,25 @@
 #define __UTIL_H__
 
 #include <cstring>
+#include <vector>
+
+#include <xmath/intvl.h>
+#include <xmath/linmap.h>
+#include <xmath/vec.h>
 
 
 using uint = unsigned int;
 using sint = std::size_t;
+
+using vectorf = std::vector<float>;
+
+using vecf2 = xmath::vec<float,2>;
+using vecu2 = xmath::vec<uint,2>; 
+using intvlf = xmath::intvl<float>;
+using intvlv = xmath::intvl<vecf2>;
+using linmapf = xmath::linmap<float>;
+using linmapv = xmath::linmap<vecf2>;
+
 
 
 template <class T>

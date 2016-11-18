@@ -30,11 +30,11 @@ struct linmap{
 	T slope, intercept;
 };
 
-using linmapf = linmap<float>;
-
 
 template <class T>
-inline constexpr linmap<T> inv(const linmap<T>& lm){return linmap<T>{T(1)/lm.slope, -lm.intercept/lm.slope};}
+inline constexpr linmap<T> inv(const linmap<T>& lm){
+	return linmap<T>{T(1)/lm.slope, -lm.intercept/lm.slope};
+}
 
 
 } // xmath
