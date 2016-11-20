@@ -67,7 +67,7 @@ struct CFS{
 
 	public:
 		CFS(uint width, uint height, const intvlv& range):
-			space(range), p(field(width, height, range)){}
+			space(range), p(field(width, height, range)), p_old(p.v){}
 
 
 		void poisson_jacobi(){
@@ -127,10 +127,55 @@ struct CFS{
 			}
 		}
 
+		void wave(){
+			tmp.resize(p.v.size(), 0.0f);
+
+
+			const float damp = 10.0f;
+			const float c = 2.0f;
+			const float dt = 0.001f;
+			const float inv_dt = 1.0f / dt;
+			const float sq_inv_dt = xmath::op::sq(inv_dt);
+			const float factor = 1.0f / (sq_inv_dt + 0.5f * damp * inv_dt);
+			
+			const vecf2 sq_inv_step = sq(p.stoi.slope);
+
+			for (uint j = 1; j < p.size[1]-1; j++){
+				for (uint i = 1; i < p.size[0]-1; i++){
+					tmp[p.memidx(i,j)] = 
+						factor * (
+							c * ( sq_inv_step.x * ( p(i+1,j) - 2.0f*p(i,j) + p(i-1,j) ) + 
+							sq_inv_step.y * ( p(i,j+1) - 2.0f*p(i,j) + p(i,j-1) ) ) +
+							sq_inv_dt * ( 2.0f*p(i,j) - p_old[p.memidx(i,j)] ) +
+							0.5f * damp * inv_dt * ( p_old[p.memidx(i,j)] )
+						);
+				}
+			}
+
+			// for (uint j = 1; j < p.size[1]-1; j++){
+			// 	tmp[p.memidx(0,j)] = 
+			// 		tmp[p.memidx(1,j)];
+			// 		// tmp[p.memidx(p.size[0]-2,j)];
+				
+			// 	tmp[p.memidx(p.size[0]-1,j)] =
+			// 		tmp[p.memidx(p.size[0]-2,j)];
+			// 		// tmp[p.memidx(1,j)];
+			// }
+
+			// for (uint i = 1; i < p.size[0]-1; i++){
+			// 	tmp[p.memidx(i,0)] = tmp[p.memidx(i,p.size[1]-2)];
+				
+			// 	tmp[p.memidx(i,p.size[1]-1)] = tmp[p.memidx(i,1)];
+			// }
+
+			p_old.swap(p.v);
+			p.v.swap(tmp);
+		}
+
 	public:
 		intvlv space;
 		field p;
-		vectorf tmp;
+		vectorf tmp, p_old;
 		uint jacobi_it_max;
 		uint sor_it_max;
 		float sor_weight;

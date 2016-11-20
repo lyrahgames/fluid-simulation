@@ -29,7 +29,9 @@ QWidget(parent), ready(true), mouse(veci2{}), mouse_press(Qt::NoButton), cfs(cfs
 	colormap.add_base({0.33f, {1.0f,1.0f,0.0f}});
 	colormap.add_base({0.0f, {1,1,1}});
 	colormap.add_base({1.0f, {1,0,0}});
+	colormap.add_base({2.0f, {1,0,1}});
 	colormap.add_base({-1.0f, {0,0,1}});
+	colormap.add_base({-2.0f, {0,1,0}});
 
 
 	// init_rand_pos();
@@ -86,7 +88,8 @@ void MainW::loop_slot(){
 		}
 	}
 
-	cfs->poisson_jacobi();
+	// cfs->poisson_jacobi();
+	cfs->wave();
 	set_ready();
 }
 
