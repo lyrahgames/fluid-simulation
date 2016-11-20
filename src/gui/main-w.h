@@ -19,6 +19,7 @@
 #include <util.h>
 #include <cfs.h>
 #include <colmap.h>
+#include <io/term-out.h>
 
 
 class MainW : public QWidget{
@@ -27,11 +28,13 @@ class MainW : public QWidget{
 
 	static constexpr uint _fps_ = 60;
 	static constexpr uint _refresh_time_ = 1000 / _fps_;
+
 	static constexpr uint _rand_pos_size_max_ = 1 << 15;
 	
 
+
 	public:
-		MainW(CFS* in_cfs = nullptr, QWidget *parent = nullptr);
+		MainW(CFS* cfs_src = nullptr, QWidget *parent = nullptr);
 		~MainW();
 
 
@@ -48,27 +51,28 @@ class MainW : public QWidget{
 			public:
 				RenderW(MainW *parent = nullptr);
 
-				const CFS& cfs() const{return *(main_w->_cfs);}
-				const colormap& color_map() const{return main_w->_colormap;}
-
 
 			protected:
 				void paintEvent(QPaintEvent *event);
 				void resizeEvent(QResizeEvent *event);
-				void mouseMoveEvent(QMouseEvent *event){mouse_x = event->x(); mouse_y = event->y();ready() = true;event->ignore();}
+				void mouseMoveEvent(QMouseEvent *event){event->ignore();}
+				void mouseReleaseEvent(QMouseEvent *event){event->ignore();}
+				void mousePressEvent(QMouseEvent *event){event->ignore();}
+
 
 			private:
 				const bool& ready() const{return main_w->ready;}
-				bool& ready(){return main_w->ready;}
+				void set_ready(bool a = true){main_w->ready = true;}
+				const CFS& cfs() const{return *(main_w->cfs);}
+				const colormap& colormap() const{return main_w->colormap;}
 
 
-			private:
+			// private:
+			public:
 				MainW *main_w;
 
-				gridmap _pix_grid_map[2];
-				float path_step;
-
-				int mouse_x, mouse_y;
+				linmapv pix_itos; // pixel index to space
+				linmapv pix_stoi; // pixel space to index
 		};
 
 
@@ -88,8 +92,19 @@ class MainW : public QWidget{
 
 
 	protected:
-		void mouseMoveEvent(QMouseEvent *event){mouse_x = event->x(); mouse_y = event->y();}
-		void resizeEvent(QResizeEvent *event){set_ready();}
+		void mouseMoveEvent(QMouseEvent *event){
+			mouse[0] = event->x() - render_w->pos().x();
+			mouse[1] = event->y() - render_w->pos().y();
+		}
+		void mouseReleaseEvent(QMouseEvent *event){
+			mouse_press = event->buttons();
+		}
+		void mousePressEvent(QMouseEvent *event){
+			mouse_press = event->buttons();
+		}
+		void resizeEvent(QResizeEvent *event){
+			set_ready();
+		}
 
 
 	private:
@@ -99,18 +114,23 @@ class MainW : public QWidget{
 		bool ready;
 		QTimer *timer;
 
-		int mouse_x, mouse_y;
+		veci2 mouse;
+		Qt::MouseButtons mouse_press;
 
 
 	private:
-		CFS *_cfs;
-		colormap _colormap;
+		CFS *cfs;
+		intvlv view;
 
-		vec2 *rand_pos;
+		colormap colormap;
+
+		vecf2 *rand_pos;
 		uint rand_pos_size;
 
 
 	private slots:
+		void loop_slot();
+
 		void set_grid(int n){
 			// *_cfs = CFS{gridmap(0.0f, 2.0f, n), gridmap(0.0f, 1.0f, n)};
 			set_ready();

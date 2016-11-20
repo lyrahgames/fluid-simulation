@@ -10,8 +10,8 @@
 // 	T r,g,b;
 // };
 
-using color_rgbf = vec<float,3>;
-using color_rgbaf = vec<float,4>;
+using color_rgbf = xmath::vec<float,3>;
+using color_rgbaf = xmath::vec<float,4>;
 
 
 struct colormap{

@@ -54,6 +54,11 @@ inline constexpr T sq(const T& x){
 	return x*x;
 }
 
+// template <class T>
+// inline constexpr floor(const T& x){
+// 	return floor
+// }
+
 } // op
 } // xmath
 

@@ -1,13 +1,13 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'main-w.h'
 **
-** Created: Thu Nov 17 14:24:12 2016
+** Created: Sun Nov 20 01:38:22 2016
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.4)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "../../../src/main-w.h"
+#include "../../../src/gui/main-w.h"
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'main-w.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 63
@@ -23,7 +23,7 @@ static const uint qt_meta_data_MainW[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-       8,   14, // methods
+       9,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -36,9 +36,10 @@ static const uint qt_meta_data_MainW[] = {
       36,    6,    6,    6, 0x2a,
       48,    6,    6,    6, 0x0a,
       64,    6,    6,    6, 0x0a,
-      81,   79,    6,    6, 0x08,
-      97,   95,    6,    6, 0x08,
-     125,    6,    6,    6, 0x08,
+      79,    6,    6,    6, 0x08,
+      93,   91,    6,    6, 0x08,
+     109,  107,    6,    6, 0x08,
+     137,    6,    6,    6, 0x08,
 
        0        // eod
 };
@@ -46,7 +47,8 @@ static const uint qt_meta_data_MainW[] = {
 static const char qt_meta_stringdata_MainW[] = {
     "MainW\0\0repaint()\0in\0set_ready(bool)\0"
     "set_ready()\0init_rand_pos()\0gen_rand_pos()\0"
-    "n\0set_grid(int)\0i\0set_rand_pos_size_slot(int)\0"
+    "loop_slot()\0n\0set_grid(int)\0i\0"
+    "set_rand_pos_size_slot(int)\0"
     "gen_rand_pos_slot()\0"
 };
 
@@ -61,9 +63,10 @@ void MainW::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
         case 2: _t->set_ready(); break;
         case 3: _t->init_rand_pos(); break;
         case 4: _t->gen_rand_pos(); break;
-        case 5: _t->set_grid((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 6: _t->set_rand_pos_size_slot((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 7: _t->gen_rand_pos_slot(); break;
+        case 5: _t->loop_slot(); break;
+        case 6: _t->set_grid((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 7: _t->set_rand_pos_size_slot((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 8: _t->gen_rand_pos_slot(); break;
         default: ;
         }
     }
@@ -101,9 +104,9 @@ int MainW::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 8)
+        if (_id < 9)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 8;
+        _id -= 9;
     }
     return _id;
 }
