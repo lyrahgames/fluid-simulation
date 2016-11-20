@@ -70,13 +70,70 @@ struct CFS{
 			space(range), p(field(width, height, range)){}
 
 
-		// void poisson_sor(){
-			
-		// }
+		void poisson_jacobi(){
+			tmp.resize(p.v.size(), 0.0f);
+
+			const vecf2 sq_inv_step = sq(p.stoi.slope);
+
+			const float lambda = -2.0f;
+			const float bound = 1.0f;
+			const float factor = 1.0f / ( 2.0f*(sq_inv_step.x + sq_inv_step.y) - lambda );
+			const float factor_x = 1.0f / (sq_inv_step.x + 2.0f*sq_inv_step.y - lambda);
+			const float factor_y = 1.0f / (2.0f*sq_inv_step.x + sq_inv_step.y - lambda);
+
+			for	(uint it = 0; it < jacobi_it_max; it++){
+				for (uint j = 1; j < p.size[1]-1; j++){
+					tmp[p.memidx(0,j)] = 
+					// bound * sin(0.1f*j);
+					factor_x * (
+						sq_inv_step.x * p(1,j) +
+						sq_inv_step.y * ( p(0,j+1) + p(0,j-1) )
+					);
+					
+					tmp[p.memidx(p.size[0]-1,j)] = 
+					// bound * sin(0.1f*j);
+					factor_x * (
+						sq_inv_step.x * p(p.size[0]-2,j) +
+						sq_inv_step.y * ( p(p.size[0]-1,j+1) + p(p.size[0]-1,j-1) )
+					);
+				}
+
+				for (uint i = 1; i < p.size[0]-1; i++){
+					tmp[p.memidx(i,0)] = 
+					// bound * cos(i);
+					factor_y * (
+						sq_inv_step.x * ( p(i+1,0) + p(i-1,0) ) +
+						sq_inv_step.y * p(i,1)
+					);
+					
+					tmp[p.memidx(i,p.size[1]-1)] = 
+					// -bound * cos(i);
+					factor_y * (
+						sq_inv_step.x * ( p(i+1,p.size[1]-1) + p(i-1,p.size[1]-1) ) +
+						sq_inv_step.y * p(i,p.size[1]-2)
+					);
+				}
+
+				for (uint j = 1; j < p.size[1]-1; j++){
+					for (uint i = 1; i < p.size[0]-1; i++){
+						tmp[p.memidx(i,j)] = factor * (
+							sq_inv_step.x * (p(i+1,j) + p(i-1,j)) +
+							sq_inv_step.y * (p(i,j+1) + p(i,j-1))
+						);
+					}
+				}
+
+				p.v.swap(tmp);
+			}
+		}
 
 	public:
 		intvlv space;
 		field p;
+		vectorf tmp;
+		uint jacobi_it_max;
+		uint sor_it_max;
+		float sor_weight;
 };
 
 

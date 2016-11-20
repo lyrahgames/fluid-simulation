@@ -23,13 +23,13 @@ QWidget(parent), ready(true), mouse(veci2{}), mouse_press(Qt::NoButton), cfs(cfs
 	layout->addWidget(ctrl_w);
 
 
-	colormap.add_base({0.0f, {0.0f,0.5f,1.0f}});
-	colormap.add_base({1.0f, {1.0f,0.5f,0.0f}});
-	colormap.add_base({0.33f, {0.0f,1.0f,1.0f}});
-	colormap.add_base({0.66f, {1.0f,1.0f,0.0f}});
-	colormap.add_base({0.5f, {1,1,1}});
-	colormap.add_base({1.1f, {1,0,0}});
-	colormap.add_base({-0.1f, {0,0,1}});
+	colormap.add_base({-0.66f, {0.0f,0.5f,1.0f}});
+	colormap.add_base({0.66f, {1.0f,0.5f,0.0f}});
+	colormap.add_base({-0.33f, {0.0f,1.0f,1.0f}});
+	colormap.add_base({0.33f, {1.0f,1.0f,0.0f}});
+	colormap.add_base({0.0f, {1,1,1}});
+	colormap.add_base({1.0f, {1,0,0}});
+	colormap.add_base({-1.0f, {0,0,1}});
 
 
 	// init_rand_pos();
@@ -52,20 +52,42 @@ void MainW::loop_slot(){
 		const vecf2 pos = render_w->pix_itos(mouse);
 		const vecf2 tmp = cfs->p.stoi(pos);
 		const vecu2 idx = fl(tmp);
+		const float scale = 0.01f;
 
 		if (!cfs->p.out_bound(idx)){
-			cfs->p(idx) += 0.005f * static_cast<float>(_refresh_time_);
+			cfs->p(idx) += scale * static_cast<float>(_refresh_time_);
 		}
 		if (!cfs->p.out_bound(idx + vecu2{1,0})){
-			cfs->p(idx + vecu2{1,0}) += 0.005f * static_cast<float>(_refresh_time_);
+			cfs->p(idx + vecu2{1,0}) += scale * static_cast<float>(_refresh_time_);
 		}
 		if (!cfs->p.out_bound(idx + vecu2{0,1})){
-			cfs->p(idx + vecu2{0,1}) += 0.005f * static_cast<float>(_refresh_time_);
+			cfs->p(idx + vecu2{0,1}) += scale * static_cast<float>(_refresh_time_);
 		}
 		if (!cfs->p.out_bound(idx + vecu2{1,1})){
-			cfs->p(idx + vecu2{1,1}) += 0.005f * static_cast<float>(_refresh_time_);
+			cfs->p(idx + vecu2{1,1}) += scale * static_cast<float>(_refresh_time_);
+		}
+	}else if(mouse_press == Qt::RightButton){
+		const vecf2 pos = render_w->pix_itos(mouse);
+		const vecf2 tmp = cfs->p.stoi(pos);
+		const vecu2 idx = fl(tmp);
+		const float scale = -0.01f;
+
+		if (!cfs->p.out_bound(idx)){
+			cfs->p(idx) += scale * static_cast<float>(_refresh_time_);
+		}
+		if (!cfs->p.out_bound(idx + vecu2{1,0})){
+			cfs->p(idx + vecu2{1,0}) += scale * static_cast<float>(_refresh_time_);
+		}
+		if (!cfs->p.out_bound(idx + vecu2{0,1})){
+			cfs->p(idx + vecu2{0,1}) += scale * static_cast<float>(_refresh_time_);
+		}
+		if (!cfs->p.out_bound(idx + vecu2{1,1})){
+			cfs->p(idx + vecu2{1,1}) += scale * static_cast<float>(_refresh_time_);
 		}
 	}
+
+	cfs->poisson_jacobi();
+	set_ready();
 }
 
 void MainW::init_rand_pos(){
@@ -82,6 +104,8 @@ void MainW::gen_rand_pos(){
 	// 	rand_pos[i][0] = (float(rand())/float(RAND_MAX)) * cfs->grid_map()[0].length() + cfs->grid_map()[0].min();
 	// 	rand_pos[i][1] = (float(rand())/float(RAND_MAX)) * cfs->grid_map()[1].length() + cfs->grid_map()[1].min();
 	// }
+
+	cfs->poisson_jacobi();
 }
 
 void MainW::set_rand_pos_size_slot(int i){

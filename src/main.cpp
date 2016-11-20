@@ -46,11 +46,10 @@ int main(int argc, char *argv[]){
 
 
 	CFS cfs(100, 100, {vecf2(), vecf2{1,1}});
+	cfs.jacobi_it_max = 1;
 
 	for (uint i = 0; i < cfs.p.size[0]; i++){
 		for (uint j = 0; j < cfs.p.size[1]; j++){
-			// const float x = _grid_map[0].cell_pos(i);
-			// const float y = _grid_map[1].cell_pos(j);
 			const vecf2 pos = cfs.p.itos(vecf2{(float)i,(float)j});
 			cfs.p(i,j) = sqrt(pos[0]) * sin(3*M_PI*pos[0]) * sin(M_PI*pos[1]);
 		}
