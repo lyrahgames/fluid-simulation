@@ -62,23 +62,22 @@ void CFS::wave_it(){
 	tmp.resize(p.v.size(), 0.0f);
 
 
-	const float damp = 0.0f;
-	const float c = 2.0f;
-	const float dt = 0.001f;
+	// const float damp = 10.0f;
+	// const float c = 2.0f;
+	const float dt = wave_dt;
 	const float inv_dt = 1.0f / dt;
 	const float sq_inv_dt = xmath::op::sq(inv_dt);
-	const float factor = 1.0f / (sq_inv_dt + 0.5f * damp * inv_dt);
-	
+	const float factor = 1.0f / (sq_inv_dt + 0.5f * wave_damp * inv_dt);
 	const vecf2 sq_inv_step = sq(p.stoi.slope);
 
 	for (uint j = 1; j < p.size[1]-1; j++){
 		for (uint i = 1; i < p.size[0]-1; i++){
 			tmp[p.memidx(i,j)] = 
 				factor * (
-					c * ( sq_inv_step.x * ( p(i+1,j) - 2.0f*p(i,j) + p(i-1,j) ) + 
+					wave_c * ( sq_inv_step.x * ( p(i+1,j) - 2.0f*p(i,j) + p(i-1,j) ) + 
 					sq_inv_step.y * ( p(i,j+1) - 2.0f*p(i,j) + p(i,j-1) ) ) +
 					sq_inv_dt * ( 2.0f*p(i,j) - p_old[p.memidx(i,j)] ) +
-					0.5f * damp * inv_dt * ( p_old[p.memidx(i,j)] )
+					0.5f * wave_damp * inv_dt * ( p_old[p.memidx(i,j)] )
 				);
 		}
 	}

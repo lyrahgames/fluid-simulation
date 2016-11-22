@@ -54,7 +54,7 @@ void MainW::loop_slot(){
 		const vecf2 pos = render_w->pix_itos(mouse);
 		const vecf2 tmp = cfs->p.stoi(pos);
 		const vecu2 idx = fl(tmp);
-		const float scale = 0.1f;
+		const float scale = 0.01f;
 
 		if (!cfs->p.out_bound(idx)){
 			cfs->p(idx) += scale * static_cast<float>(_refresh_time_);
@@ -76,7 +76,7 @@ void MainW::loop_slot(){
 		const vecf2 pos = render_w->pix_itos(mouse);
 		const vecf2 tmp = cfs->p.stoi(pos);
 		const vecu2 idx = fl(tmp);
-		const float scale = -0.1f;
+		const float scale = -0.01f;
 
 		if (!cfs->p.out_bound(idx)){
 			cfs->p(idx) += scale * static_cast<float>(_refresh_time_);
@@ -133,6 +133,14 @@ void MainW::set_rand_pos_size_slot(int i){
 void MainW::gen_rand_pos_slot(){
 	gen_rand_pos();
 	set_ready();
+}
+
+void MainW::set_wave_damp_slot(double val){
+	cfs->wave_damp = val;
+}
+
+void MainW::set_wave_c_slot(double val){
+	cfs->wave_c = val;
 }
 
 MainW::RenderW::RenderW(MainW *parent): QWidget(parent), main_w(parent){
@@ -267,6 +275,14 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	clear_pb = new QPushButton("clear", this);
 	main_gb_layout->addWidget(clear_pb);
 	connect(clear_pb, SIGNAL(clicked()), main_w, SLOT(clear_slot()));
+
+	wave_damp_dsb = new QDoubleSpinBox(this);
+	main_gb_layout->addWidget(wave_damp_dsb);
+	connect(wave_damp_dsb, SIGNAL(valueChanged(double)), main_w, SLOT(set_wave_damp_slot(double)));
+
+	wave_c_dsb = new QDoubleSpinBox(this);
+	main_gb_layout->addWidget(wave_c_dsb);
+	connect(wave_c_dsb, SIGNAL(valueChanged(double)), main_w, SLOT(set_wave_c_slot(double)));
 
 
 	render_gb = new QGroupBox("render:", this);

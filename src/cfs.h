@@ -76,7 +76,8 @@ struct CFS{
 			reynold(10.0f), deriv_weight(0.5f),
 			force(vecf2(0.0f, 0.0f)),
 			dt(0.001f),
-			time(0.0f), it_step(0){}
+			time(0.0f), it_step(0),
+			wave_damp(10.0f), wave_c(2.0f), wave_dt(0.001f){}
 
 
 		void clear(){
@@ -118,6 +119,10 @@ struct CFS{
 		float dt;
 		float time;
 		uint it_step;
+
+		float wave_damp;
+		float wave_c;
+		float wave_dt;
 };
 
 
