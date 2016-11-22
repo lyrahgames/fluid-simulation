@@ -34,8 +34,8 @@ QWidget(parent), ready(true), mouse(veci2{}), mouse_press(Qt::NoButton), cfs(cfs
 	colormap.add_base({-2.0f, {0,1,0}});
 
 
-	// init_rand_pos();
-	// rand_pos_size = 100;
+	init_rand_pos();
+	rand_pos_size = 100;
 }
 
 MainW::~MainW(){
@@ -54,61 +54,75 @@ void MainW::loop_slot(){
 		const vecf2 pos = render_w->pix_itos(mouse);
 		const vecf2 tmp = cfs->p.stoi(pos);
 		const vecu2 idx = fl(tmp);
-		const float scale = 0.01f;
+		const float scale = 0.1f;
 
 		if (!cfs->p.out_bound(idx)){
 			cfs->p(idx) += scale * static_cast<float>(_refresh_time_);
+			// cfs->rhs[cfs->p.memidx(idx)] += scale * static_cast<float>(_refresh_time_);
 		}
 		if (!cfs->p.out_bound(idx + vecu2{1,0})){
 			cfs->p(idx + vecu2{1,0}) += scale * static_cast<float>(_refresh_time_);
+
 		}
 		if (!cfs->p.out_bound(idx + vecu2{0,1})){
 			cfs->p(idx + vecu2{0,1}) += scale * static_cast<float>(_refresh_time_);
+
 		}
 		if (!cfs->p.out_bound(idx + vecu2{1,1})){
 			cfs->p(idx + vecu2{1,1}) += scale * static_cast<float>(_refresh_time_);
+
 		}
 	}else if(mouse_press == Qt::RightButton){
 		const vecf2 pos = render_w->pix_itos(mouse);
 		const vecf2 tmp = cfs->p.stoi(pos);
 		const vecu2 idx = fl(tmp);
-		const float scale = -0.01f;
+		const float scale = -0.1f;
 
 		if (!cfs->p.out_bound(idx)){
 			cfs->p(idx) += scale * static_cast<float>(_refresh_time_);
+			// cfs->rhs[cfs->p.memidx(idx)] += scale * static_cast<float>(_refresh_time_);
 		}
 		if (!cfs->p.out_bound(idx + vecu2{1,0})){
 			cfs->p(idx + vecu2{1,0}) += scale * static_cast<float>(_refresh_time_);
+
 		}
 		if (!cfs->p.out_bound(idx + vecu2{0,1})){
 			cfs->p(idx + vecu2{0,1}) += scale * static_cast<float>(_refresh_time_);
+
 		}
 		if (!cfs->p.out_bound(idx + vecu2{1,1})){
 			cfs->p(idx + vecu2{1,1}) += scale * static_cast<float>(_refresh_time_);
+
 		}
 	}
 
-	// cfs->poisson_jacobi();
-	cfs->wave();
+	// cfs->poisson_test_jacobi_it();
+	cfs->wave_it();
+	// cfs->poisson_p_sor_it();
+	// cfs->poisson_p_jacobi_it();
+	// cfs->compute_time_it();
 	set_ready();
 }
 
 void MainW::init_rand_pos(){
-	// if (rand_pos != nullptr)
-	// 	delete[] rand_pos;
+	if (rand_pos != nullptr)
+		delete[] rand_pos;
 
-	// rand_pos = new vec2[_rand_pos_size_max_];
+	rand_pos = new vecf2[_rand_pos_size_max_];
 
-	// gen_rand_pos();
+	gen_rand_pos();
 }
 
 void MainW::gen_rand_pos(){
-	// for (uint i = 0; i < _rand_pos_size_max_; i++){
-	// 	rand_pos[i][0] = (float(rand())/float(RAND_MAX)) * cfs->grid_map()[0].length() + cfs->grid_map()[0].min();
-	// 	rand_pos[i][1] = (float(rand())/float(RAND_MAX)) * cfs->grid_map()[1].length() + cfs->grid_map()[1].min();
-	// }
+	for (uint i = 0; i < _rand_pos_size_max_; i++){
+		rand_pos[i][0] = (float(rand())/float(RAND_MAX)) * len(cfs->vx.space).x + cfs->vx.space.min.x;
+		rand_pos[i][1] = (float(rand())/float(RAND_MAX)) * len(cfs->vy.space).y + cfs->vy.space.min.y;
+	}
+}
 
-	cfs->poisson_jacobi();
+void MainW::clear_slot(){
+	cfs->clear();
+	set_ready();
 }
 
 void MainW::set_rand_pos_size_slot(int i){
@@ -158,35 +172,43 @@ void MainW::RenderW::paintEvent(QPaintEvent *event){
 	painter.drawImage(rect, map, rect);
 
 
-	// for (int i = 0; i < main_w->rand_pos_size; i++){
-	// 	// float pos_x = _pix_grid_map[0].cell_pos(mouse_x);
-	// 	// float pos_y = _pix_grid_map[1].cell_pos(height()-mouse_y);
-	// 	// QPainterPath path(QPointF(mouse_x, mouse_y));
-	// 	float pos_x = main_w->rand_pos[i][0];
-	// 	float pos_y = main_w->rand_pos[i][1];
-	// 	const float idxx = _pix_grid_map[0].cell_idx(pos_x);
-	// 	const float idxy = _pix_grid_map[1].cell_idx(pos_y);
-	// 	QPainterPath path(QPointF(idxx,height()-idxy));
+	const float path_step = 0.1f;
 
-	// 	for (int t = 0; t < 1000; t++){
-	// 		const float tmp_pos_x = pos_x + path_step * cfs().vx(pos_x, pos_y);
-	// 		const float tmp_pos_y = pos_y + path_step * cfs().vy(pos_x, pos_y);
+	for (int i = 0; i < main_w->rand_pos_size; i++){
+		// float pos_x = _pix_grid_map[0].cell_pos(mouse_x);
+		// float pos_y = _pix_grid_map[1].cell_pos(height()-mouse_y);
+		// QPainterPath path(QPointF(mouse_x, mouse_y));
+		// float pos_x = main_w->rand_pos[i][0];
+		// float pos_y = main_w->rand_pos[i][1];
+		// const float idxx = _pix_grid_map[0].cell_idx(pos_x);
+		// const float idxy = _pix_grid_map[1].cell_idx(pos_y);
+		vecf2 pos = main_w->rand_pos[i];
+		vecf2 idx = pix_stoi(pos);
+		QPainterPath path(QPointF(idx[0],idx[1]));
+
+		for (int t = 0; t < 1000; t++){
+			// const float tmp_pos_x = pos_x + path_step * cfs().vx(pos_x, pos_y);
+			// const float tmp_pos_y = pos_y + path_step * cfs().vy(pos_x, pos_y);
+			const vecf2 tmp_pos = pos + path_step * vecf2(cfs().vx(pos), cfs().vy(pos));
 		
-	// 		if (cfs().pos_out_vx_bound(tmp_pos_x, tmp_pos_y) || cfs().pos_out_vy_bound(tmp_pos_x, tmp_pos_y))
-	// 			break;
+			if (cfs().vx.out_bound(tmp_pos) || cfs().vy.out_bound(tmp_pos))
+				break;
 
-	// 		pos_x = tmp_pos_x;
-	// 		pos_y = tmp_pos_y;
+			// pos_x = tmp_pos_x;
+			// pos_y = tmp_pos_y;
 
-	// 		const float idxx = _pix_grid_map[0].cell_idx(pos_x);
-	// 		const float idxy = _pix_grid_map[1].cell_idx(pos_y);
+			pos = tmp_pos;
 
-	// 		path.lineTo(idxx, height()-idxy);
-	// 	}
+			// const float idxx = _pix_grid_map[0].cell_idx(pos_x);
+			// const float idxy = _pix_grid_map[1].cell_idx(pos_y);
+			const vecf2 idx = pix_stoi(pos);
 
-	// 	painter.setBrush(Qt::NoBrush);
-	// 	painter.drawPath(path);
-	// }
+			path.lineTo(idx.x, idx.y);
+		}
+
+		painter.setBrush(Qt::NoBrush);
+		painter.drawPath(path);
+	}
 
 
 	painter.end();
@@ -241,6 +263,10 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	grid_sb->setValue(100);
 	main_gb_layout->addWidget(grid_sb);
 	connect(grid_sb, SIGNAL(valueChanged(int)), main_w, SLOT(set_grid(int)));
+
+	clear_pb = new QPushButton("clear", this);
+	main_gb_layout->addWidget(clear_pb);
+	connect(clear_pb, SIGNAL(clicked()), main_w, SLOT(clear_slot()));
 
 
 	render_gb = new QGroupBox("render:", this);

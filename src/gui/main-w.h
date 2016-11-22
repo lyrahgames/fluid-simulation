@@ -86,6 +86,8 @@ class MainW : public QWidget{
 				QGroupBox *main_gb, *render_gb;
 				QSpinBox *grid_sb;
 
+				QPushButton * clear_pb;
+
 				QSpinBox *rand_pos_size_sb;
 				QPushButton *gen_rand_pos_pb;
 		};
@@ -136,6 +138,7 @@ class MainW : public QWidget{
 			set_ready();
 		}
 
+		void clear_slot();
 		void set_rand_pos_size_slot(int i);
 		void gen_rand_pos_slot();
 };

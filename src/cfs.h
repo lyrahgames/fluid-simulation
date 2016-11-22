@@ -5,7 +5,7 @@
 
 
 struct CFS{
-	struct field{
+	struct field{ // public for debugging
 		vectorf v;
 		vecu2 size;
 		intvlv space;
@@ -67,118 +67,57 @@ struct CFS{
 
 	public:
 		CFS(uint width, uint height, const intvlv& range):
-			space(range), p(field(width, height, range)), p_old(p.v){}
+			space(range), p(field(width, height, range)),
+			tmp(p.v), p_old(p.v), rhs(p.v),
+			jacobi_it_max(100), sor_it_max(1), sor_relax(1.5f),
+			vx(field(width-1, height, intvlv{p.space.min + vecf2{0.5f * p.itos.slope.x, 0.0f}, p.space.max - vecf2{0.5f * p.itos.slope.x, 0.0f}})),
+			vy(field(width, height-1, intvlv{p.space.min + vecf2{0.0f, 0.5f * p.itos.slope.y}, p.space.max - vecf2{0.0f, 0.5f * p.itos.slope.y}})),
+			vx_tmp(vx.v), vy_tmp(vy.v),
+			reynold(10.0f), deriv_weight(0.5f),
+			force(vecf2(0.0f, 0.0f)),
+			dt(0.001f),
+			time(0.0f), it_step(0){}
 
 
-		void poisson_jacobi(){
-			tmp.resize(p.v.size(), 0.0f);
-
-			const vecf2 sq_inv_step = sq(p.stoi.slope);
-
-			const float lambda = -2.0f;
-			const float bound = 1.0f;
-			const float factor = 1.0f / ( 2.0f*(sq_inv_step.x + sq_inv_step.y) - lambda );
-			const float factor_x = 1.0f / (sq_inv_step.x + 2.0f*sq_inv_step.y - lambda);
-			const float factor_y = 1.0f / (2.0f*sq_inv_step.x + sq_inv_step.y - lambda);
-
-			for	(uint it = 0; it < jacobi_it_max; it++){
-				for (uint j = 1; j < p.size[1]-1; j++){
-					tmp[p.memidx(0,j)] = 
-					// bound * sin(0.1f*j);
-					factor_x * (
-						sq_inv_step.x * p(1,j) +
-						sq_inv_step.y * ( p(0,j+1) + p(0,j-1) )
-					);
-					
-					tmp[p.memidx(p.size[0]-1,j)] = 
-					// bound * sin(0.1f*j);
-					factor_x * (
-						sq_inv_step.x * p(p.size[0]-2,j) +
-						sq_inv_step.y * ( p(p.size[0]-1,j+1) + p(p.size[0]-1,j-1) )
-					);
-				}
-
-				for (uint i = 1; i < p.size[0]-1; i++){
-					tmp[p.memidx(i,0)] = 
-					// bound * cos(i);
-					factor_y * (
-						sq_inv_step.x * ( p(i+1,0) + p(i-1,0) ) +
-						sq_inv_step.y * p(i,1)
-					);
-					
-					tmp[p.memidx(i,p.size[1]-1)] = 
-					// -bound * cos(i);
-					factor_y * (
-						sq_inv_step.x * ( p(i+1,p.size[1]-1) + p(i-1,p.size[1]-1) ) +
-						sq_inv_step.y * p(i,p.size[1]-2)
-					);
-				}
-
-				for (uint j = 1; j < p.size[1]-1; j++){
-					for (uint i = 1; i < p.size[0]-1; i++){
-						tmp[p.memidx(i,j)] = factor * (
-							sq_inv_step.x * (p(i+1,j) + p(i-1,j)) +
-							sq_inv_step.y * (p(i,j+1) + p(i,j-1))
-						);
-					}
-				}
-
-				p.v.swap(tmp);
-			}
+		void clear(){
+			std::fill(p.v.begin(), p.v.end(), 0.0f);
+			std::fill(tmp.begin(), tmp.end(), 0.0f);
+			std::fill(p_old.begin(), p_old.end(), 0.0f);
+			std::fill(rhs.begin(), rhs.end(), 0.0f);
 		}
+		
+		void poisson_test_jacobi_it(); // Δp = -λp
+		void wave_it(); // c^2 Δp = ∂^2 p / ∂t^2 + γ∂p/∂t
 
-		void wave(){
-			tmp.resize(p.v.size(), 0.0f);
+		void compute_dt();
+		void set_v_bound();
+		void compute_poisson_rhs();
+		void poisson_p_sor_it(); // Δp = rhs
+		void poisson_p_jacobi_it();
+		void compute_v();
+		void compute_time_it();
 
-
-			const float damp = 10.0f;
-			const float c = 2.0f;
-			const float dt = 0.001f;
-			const float inv_dt = 1.0f / dt;
-			const float sq_inv_dt = xmath::op::sq(inv_dt);
-			const float factor = 1.0f / (sq_inv_dt + 0.5f * damp * inv_dt);
-			
-			const vecf2 sq_inv_step = sq(p.stoi.slope);
-
-			for (uint j = 1; j < p.size[1]-1; j++){
-				for (uint i = 1; i < p.size[0]-1; i++){
-					tmp[p.memidx(i,j)] = 
-						factor * (
-							c * ( sq_inv_step.x * ( p(i+1,j) - 2.0f*p(i,j) + p(i-1,j) ) + 
-							sq_inv_step.y * ( p(i,j+1) - 2.0f*p(i,j) + p(i,j-1) ) ) +
-							sq_inv_dt * ( 2.0f*p(i,j) - p_old[p.memidx(i,j)] ) +
-							0.5f * damp * inv_dt * ( p_old[p.memidx(i,j)] )
-						);
-				}
-			}
-
-			// for (uint j = 1; j < p.size[1]-1; j++){
-			// 	tmp[p.memidx(0,j)] = 
-			// 		tmp[p.memidx(1,j)];
-			// 		// tmp[p.memidx(p.size[0]-2,j)];
-				
-			// 	tmp[p.memidx(p.size[0]-1,j)] =
-			// 		tmp[p.memidx(p.size[0]-2,j)];
-			// 		// tmp[p.memidx(1,j)];
-			// }
-
-			// for (uint i = 1; i < p.size[0]-1; i++){
-			// 	tmp[p.memidx(i,0)] = tmp[p.memidx(i,p.size[1]-2)];
-				
-			// 	tmp[p.memidx(i,p.size[1]-1)] = tmp[p.memidx(i,1)];
-			// }
-
-			p_old.swap(p.v);
-			p.v.swap(tmp);
-		}
 
 	public:
 		intvlv space;
+		
 		field p;
 		vectorf tmp, p_old;
+		vectorf rhs;
+
 		uint jacobi_it_max;
 		uint sor_it_max;
-		float sor_weight;
+		float sor_relax;
+
+		field vx, vy;
+		vectorf vx_tmp, vy_tmp;
+
+		float reynold;
+		float deriv_weight;
+		vecf2 force;
+		float dt;
+		float time;
+		uint it_step;
 };
 
 
