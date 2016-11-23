@@ -97,7 +97,8 @@ void MainW::loop_slot(){
 	}
 
 	// cfs->poisson_test_jacobi_it();
-	cfs->wave_it();
+	if (play)
+		cfs->wave_it();
 	// cfs->poisson_p_sor_it();
 	// cfs->poisson_p_jacobi_it();
 	// cfs->compute_time_it();
@@ -118,6 +119,10 @@ void MainW::gen_rand_pos(){
 		rand_pos[i][0] = (float(rand())/float(RAND_MAX)) * len(cfs->vx.space).x + cfs->vx.space.min.x;
 		rand_pos[i][1] = (float(rand())/float(RAND_MAX)) * len(cfs->vy.space).y + cfs->vy.space.min.y;
 	}
+}
+
+void MainW::play_slot(){
+	play = !play;
 }
 
 void MainW::clear_slot(){
@@ -141,6 +146,10 @@ void MainW::set_wave_damp_slot(double val){
 
 void MainW::set_wave_c_slot(double val){
 	cfs->wave_c = val;
+}
+
+void MainW::set_wave_dt_slot(double val){
+	cfs->wave_dt = val;
 }
 
 MainW::RenderW::RenderW(MainW *parent): QWidget(parent), main_w(parent){
@@ -272,17 +281,46 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	main_gb_layout->addWidget(grid_sb);
 	connect(grid_sb, SIGNAL(valueChanged(int)), main_w, SLOT(set_grid(int)));
 
+
+	play_pb = new QPushButton("play/pause", this);
+	main_gb_layout->addWidget(play_pb);
+	connect(play_pb, SIGNAL(clicked()), main_w, SLOT(play_slot()));
+
 	clear_pb = new QPushButton("clear", this);
 	main_gb_layout->addWidget(clear_pb);
 	connect(clear_pb, SIGNAL(clicked()), main_w, SLOT(clear_slot()));
 
+
+
+	wave_gb = new QGroupBox("wave equation", this);
+	QVBoxLayout *wave_gb_layout = new QVBoxLayout(wave_gb);
+
+
+	wave_damp_l = new QLabel("damping", this);
+	wave_gb_layout->addWidget(wave_damp_l);
+
 	wave_damp_dsb = new QDoubleSpinBox(this);
-	main_gb_layout->addWidget(wave_damp_dsb);
+	wave_gb_layout->addWidget(wave_damp_dsb);
 	connect(wave_damp_dsb, SIGNAL(valueChanged(double)), main_w, SLOT(set_wave_damp_slot(double)));
 
+	wave_c_l = new QLabel("velocity");
+	wave_gb_layout->addWidget(wave_c_l);
+
 	wave_c_dsb = new QDoubleSpinBox(this);
-	main_gb_layout->addWidget(wave_c_dsb);
+	wave_gb_layout->addWidget(wave_c_dsb);
 	connect(wave_c_dsb, SIGNAL(valueChanged(double)), main_w, SLOT(set_wave_c_slot(double)));
+
+	wave_dt_l = new QLabel("time step");
+	wave_gb_layout->addWidget(wave_dt_l);
+
+	wave_dt_dsb = new QDoubleSpinBox(this);
+	wave_dt_dsb->setDecimals(6);
+	wave_dt_dsb->setRange(0.000001, 0.1);
+	wave_dt_dsb->setSingleStep(0.00001);
+	wave_gb_layout->addWidget(wave_dt_dsb);
+	connect(wave_dt_dsb, SIGNAL(valueChanged(double)), main_w, SLOT(set_wave_dt_slot(double)));
+
+	main_gb_layout->addWidget(wave_gb);
 
 
 	render_gb = new QGroupBox("render:", this);

@@ -16,6 +16,7 @@
 #include <QMouseEvent>
 #include <QPushButton>
 #include <QDoubleSpinBox>
+#include <QLabel>
 
 #include <util.h>
 #include <cfs.h>
@@ -87,13 +88,21 @@ class MainW : public QWidget{
 				QGroupBox *main_gb, *render_gb;
 				QSpinBox *grid_sb;
 
-				QPushButton * clear_pb;
+				QPushButton *play_pb;
+				QPushButton *clear_pb;
 
 				QSpinBox *rand_pos_size_sb;
 				QPushButton *gen_rand_pos_pb;
 
+
+				QGroupBox *wave_gb;
+
+				QLabel *wave_damp_l;
 				QDoubleSpinBox *wave_damp_dsb;
+				QLabel *wave_c_l;
 				QDoubleSpinBox *wave_c_dsb;
+				QLabel *wave_dt_l;
+				QDoubleSpinBox *wave_dt_dsb;
 		};
 
 
@@ -133,6 +142,8 @@ class MainW : public QWidget{
 		vecf2 *rand_pos;
 		uint rand_pos_size;
 
+		bool play;
+
 
 	private slots:
 		void loop_slot();
@@ -146,8 +157,11 @@ class MainW : public QWidget{
 		void set_rand_pos_size_slot(int i);
 		void gen_rand_pos_slot();
 
+		void play_slot();
+
 		void set_wave_damp_slot(double val);
 		void set_wave_c_slot(double val);
+		void set_wave_dt_slot(double val);
 };
 
 
