@@ -54,54 +54,57 @@ void MainW::loop_slot(){
 		const vecf2 pos = render_w->pix_itos(mouse);
 		const vecf2 tmp = cfs->p.stoi(pos);
 		const vecu2 idx = fl(tmp);
-		const float scale = 0.01f;
+		const float scale = 10.01f;
 
 		if (!cfs->p.out_bound(idx)){
 			cfs->p(idx) += scale * static_cast<float>(_refresh_time_);
 			// cfs->rhs[cfs->p.memidx(idx)] += scale * static_cast<float>(_refresh_time_);
 		}
-		if (!cfs->p.out_bound(idx + vecu2{1,0})){
-			cfs->p(idx + vecu2{1,0}) += scale * static_cast<float>(_refresh_time_);
+		// if (!cfs->p.out_bound(idx + vecu2{1,0})){
+		// 	cfs->p(idx + vecu2{1,0}) += scale * static_cast<float>(_refresh_time_);
 
-		}
-		if (!cfs->p.out_bound(idx + vecu2{0,1})){
-			cfs->p(idx + vecu2{0,1}) += scale * static_cast<float>(_refresh_time_);
+		// }
+		// if (!cfs->p.out_bound(idx + vecu2{0,1})){
+		// 	cfs->p(idx + vecu2{0,1}) += scale * static_cast<float>(_refresh_time_);
 
-		}
-		if (!cfs->p.out_bound(idx + vecu2{1,1})){
-			cfs->p(idx + vecu2{1,1}) += scale * static_cast<float>(_refresh_time_);
+		// }
+		// if (!cfs->p.out_bound(idx + vecu2{1,1})){
+		// 	cfs->p(idx + vecu2{1,1}) += scale * static_cast<float>(_refresh_time_);
 
-		}
+		// }
 	}else if(mouse_press == Qt::RightButton){
 		const vecf2 pos = render_w->pix_itos(mouse);
 		const vecf2 tmp = cfs->p.stoi(pos);
 		const vecu2 idx = fl(tmp);
-		const float scale = -0.01f;
+		const float scale = -10.01f;
 
 		if (!cfs->p.out_bound(idx)){
 			cfs->p(idx) += scale * static_cast<float>(_refresh_time_);
 			// cfs->rhs[cfs->p.memidx(idx)] += scale * static_cast<float>(_refresh_time_);
 		}
-		if (!cfs->p.out_bound(idx + vecu2{1,0})){
-			cfs->p(idx + vecu2{1,0}) += scale * static_cast<float>(_refresh_time_);
+		// if (!cfs->p.out_bound(idx + vecu2{1,0})){
+		// 	cfs->p(idx + vecu2{1,0}) += scale * static_cast<float>(_refresh_time_);
 
-		}
-		if (!cfs->p.out_bound(idx + vecu2{0,1})){
-			cfs->p(idx + vecu2{0,1}) += scale * static_cast<float>(_refresh_time_);
+		// }
+		// if (!cfs->p.out_bound(idx + vecu2{0,1})){
+		// 	cfs->p(idx + vecu2{0,1}) += scale * static_cast<float>(_refresh_time_);
 
-		}
-		if (!cfs->p.out_bound(idx + vecu2{1,1})){
-			cfs->p(idx + vecu2{1,1}) += scale * static_cast<float>(_refresh_time_);
+		// }
+		// if (!cfs->p.out_bound(idx + vecu2{1,1})){
+		// 	cfs->p(idx + vecu2{1,1}) += scale * static_cast<float>(_refresh_time_);
 
-		}
+		// }
 	}
 
-	// cfs->poisson_test_jacobi_it();
-	if (play)
-		cfs->wave_it();
+	if (play){
+		// cfs->poisson_test_jacobi_it();
+		// cfs->wave_it();
+		// cfs->poisson_p_jacobi_it();
+		// cfs->grad();
+		cfs->compute_time_it();
+		printf("step:%i\ttime:%f\n", cfs->it_step, cfs->time);
+	}
 	// cfs->poisson_p_sor_it();
-	// cfs->poisson_p_jacobi_it();
-	// cfs->compute_time_it();
 	set_ready();
 }
 
@@ -189,7 +192,7 @@ void MainW::RenderW::paintEvent(QPaintEvent *event){
 	painter.drawImage(rect, map, rect);
 
 
-	const float path_step = 0.1f;
+	const float path_step = 0.01f;
 
 	for (int i = 0; i < main_w->rand_pos_size; i++){
 		// float pos_x = _pix_grid_map[0].cell_pos(mouse_x);

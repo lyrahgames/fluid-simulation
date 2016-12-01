@@ -102,6 +102,22 @@ void CFS::wave_it(){
 	p.v.swap(tmp);
 }
 
+void CFS::grad(){
+	for (uint i = 0; i < vx.size[0]; i++){
+		for (uint j = 0; j < vx.size[1]; j++){
+			const vecf2 pos = vx.itos(vecf2{(float)i,(float)j});
+			vx(i,j) = p.stoi.slope.x * ( p(i+1,j) - p(i,j) );
+		}
+	}
+
+	for (uint i = 0; i < vy.size[0]; i++){
+		for (uint j = 0; j < vy.size[1]; j++){
+			const vecf2 pos = vy.itos(vecf2{(float)i,(float)j});
+			vy(i,j) = p.stoi.slope.y * ( p(i,j+1) - p(i,j) );
+		}
+	}
+}
+
 void CFS::compute_dt(){
 	dt = 0.001f;
 }

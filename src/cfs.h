@@ -85,10 +85,15 @@ struct CFS{
 			std::fill(tmp.begin(), tmp.end(), 0.0f);
 			std::fill(p_old.begin(), p_old.end(), 0.0f);
 			std::fill(rhs.begin(), rhs.end(), 0.0f);
+			std::fill(vx.v.begin(), vx.v.end(), 0.0f);
+			std::fill(vx_tmp.begin(), vx_tmp.end(), 0.0f);
+			std::fill(vy.v.begin(), vy.v.end(), 0.0f);
+			std::fill(vy_tmp.begin(), vy_tmp.end(), 0.0f);
 		}
 		
 		void poisson_test_jacobi_it(); // Δp = -λp
 		void wave_it(); // c^2 Δp = ∂^2 p / ∂t^2 + γ∂p/∂t
+		void grad();
 
 		void compute_dt();
 		void set_v_bound();

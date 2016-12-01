@@ -55,6 +55,20 @@ int main(int argc, char *argv[]){
 		}
 	}
 
+	for (uint i = 0; i < cfs.vx.size[0]; i++){
+		for (uint j = 0; j < cfs.vx.size[1]; j++){
+			const vecf2 pos = cfs.vx.itos(vecf2{(float)i,(float)j});
+			cfs.vx(i,j) = sqrt(pos[0]) * sin(3*M_PI*pos[0]) * sin(M_PI*pos[1]);
+		}
+	}
+
+	for (uint i = 0; i < cfs.vy.size[0]; i++){
+		for (uint j = 0; j < cfs.vy.size[1]; j++){
+			const vecf2 pos = cfs.vy.itos(vecf2{(float)i,(float)j});
+			cfs.vy(i,j) = pos.x;
+		}
+	}
+
 	QApplication app(argc, argv);
 
 	MainW *main_w = new MainW(&cfs);
