@@ -119,7 +119,8 @@ void CFS::grad(){
 }
 
 void CFS::compute_dt(){
-	dt = 0.001f;
+	const vecf2 sq_inv_step = sq(p.stoi.slope);
+	dt = 0.5f * time_safe * reynold / (sq_inv_step.x + sq_inv_step.y);
 }
 
 void CFS::set_v_bound(){
@@ -130,7 +131,7 @@ void CFS::set_v_bound(){
 		vy(i,vy.size[1]-1) = 0.0f;
 
 		vx(i,0) = 2.0f*w - vx(i,1);
-		vx(i,vx.size[1]-1) = -vx(i,vx.size[1]-2);
+		vx(i,vx.size[1]-1)= -vx(i,vx.size[1]-2);
 	}
 
 	vy(vy.size[0]-1,0) = 0.0f;
@@ -138,7 +139,7 @@ void CFS::set_v_bound(){
 
 	for (uint j = 1; j < vy.size[1]-1; j++){
 		vx(0,j) = 0.0f;
-		vx[(vx.size[0]-1,j)] = 0.0f;
+		vx(vx.size[0]-1,j) = 0.0f;
 
 		vy(0,j) = -vy(1,j);
 		vy(vy.size[0]-1,j) = -vy(vy.size[0]-2,j);
@@ -227,7 +228,7 @@ void CFS::compute_poisson_rhs(){
 	for (uint j = 1; j < p.size[1]-1; j++){
 		for (uint i = 1; i < p.size[0]-1; i++){
 			rhs[p.memidx(i,j)] = inv_dt * (
-				inv_dx * ( vx_tmp[vx.memidx(i,j)] - vx_tmp[vx.memidx(i-1,j)] ) -
+				inv_dx * ( vx_tmp[vx.memidx(i,j)] - vx_tmp[vx.memidx(i-1,j)] ) +
 				inv_dy * ( vy_tmp[vy.memidx(i,j)] - vy_tmp[vy.memidx(i,j-1)] )
 			);
 		}
@@ -400,7 +401,9 @@ void CFS::compute_time_it(){
 	compute_dt();
 	set_v_bound();
 	compute_poisson_rhs();
-	poisson_p_jacobi_it();
+	// poisson_p_jacobi_it();
+	poisson_p_sor_it();
+	compute_v();
 
 	time += dt;
 	it_step++;

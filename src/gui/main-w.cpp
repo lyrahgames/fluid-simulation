@@ -29,9 +29,9 @@ QWidget(parent), ready(true), mouse(veci2{}), mouse_press(Qt::NoButton), cfs(cfs
 	colormap.add_base({0.33f, {1.0f,1.0f,0.0f}});
 	colormap.add_base({0.0f, {1,1,1}});
 	colormap.add_base({1.0f, {1,0,0}});
-	colormap.add_base({2.0f, {1,0,1}});
+	// colormap.add_base({2.0f, {1,0,1}});
 	colormap.add_base({-1.0f, {0,0,1}});
-	colormap.add_base({-2.0f, {0,1,0}});
+	// colormap.add_base({-2.0f, {0,1,0}});
 
 
 	init_rand_pos();
@@ -54,10 +54,11 @@ void MainW::loop_slot(){
 		const vecf2 pos = render_w->pix_itos(mouse);
 		const vecf2 tmp = cfs->p.stoi(pos);
 		const vecu2 idx = fl(tmp);
-		const float scale = 10.01f;
+		const float scale = 0.01f;
 
 		if (!cfs->p.out_bound(idx)){
-			cfs->p(idx) += scale * static_cast<float>(_refresh_time_);
+			// cfs->p(idx) += scale * static_cast<float>(_refresh_time_);
+			cfs->vx(idx) += scale * static_cast<float>(_refresh_time_);
 			// cfs->rhs[cfs->p.memidx(idx)] += scale * static_cast<float>(_refresh_time_);
 		}
 		// if (!cfs->p.out_bound(idx + vecu2{1,0})){
@@ -174,11 +175,11 @@ void MainW::RenderW::paintEvent(QPaintEvent *event){
 	// const int j_min = 0;
 	// const int j_max = height()-1;
 
-	const vecu2 bound0 = fl(pix_stoi(cfs().p.space.min + vecf2(0.01, 0.01)));
-	const vecu2 bound1 = cl(pix_stoi(cfs().p.space.max - vecf2(0.01, 0.01)));
+	// const vecu2 bound0 = fl(pix_stoi(cfs().p.space.min + vecf2(0.01, 0.01)));
+	// const vecu2 bound1 = cl(pix_stoi(cfs().p.space.max - vecf2(0.01, 0.01)));
 
-	for (int i = bound0[0]; i <= bound1[0]; i++){
-		for (int j = bound1[1]; j <= bound0[1]; j++){
+	for (int i = 0; i < width(); i++){
+		for (int j = 0; j < height(); j++){
 			const vecf2 idx{static_cast<float>(i), static_cast<float>(j)};
 			const vecf2 pos = pix_itos(idx);
 

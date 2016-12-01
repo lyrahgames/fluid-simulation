@@ -53,6 +53,9 @@ struct CFS{
 			const uint idx1 = memidx(idx[0], idx[1]);
 			const uint idx2 = memidx(idx[0], idx[1]+1);
 
+			if (idx1 >= v.size()-1 || idx2 >= v.size()-1)
+				return 0.0f;
+
 			return bilin_interp(v[idx1], v[idx1+1], v[idx2], v[idx2+1], w[0], w[1]);
 		}
 
@@ -73,9 +76,9 @@ struct CFS{
 			vx(field(width-1, height, intvlv{p.space.min + vecf2{0.5f * p.itos.slope.x, 0.0f}, p.space.max - vecf2{0.5f * p.itos.slope.x, 0.0f}})),
 			vy(field(width, height-1, intvlv{p.space.min + vecf2{0.0f, 0.5f * p.itos.slope.y}, p.space.max - vecf2{0.0f, 0.5f * p.itos.slope.y}})),
 			vx_tmp(vx.v), vy_tmp(vy.v),
-			reynold(10.0f), deriv_weight(0.5f),
+			reynold(1.0f), deriv_weight(0.5f),
 			force(vecf2(0.0f, 0.0f)),
-			dt(0.001f),
+			dt(0.001f), time_safe(0.5f),
 			time(0.0f), it_step(0),
 			wave_damp(10.0f), wave_c(2.0f), wave_dt(0.001f){}
 
@@ -124,6 +127,7 @@ struct CFS{
 		float dt;
 		float time;
 		uint it_step;
+		float time_safe;
 
 		float wave_damp;
 		float wave_c;

@@ -45,8 +45,11 @@ int main(int argc, char *argv[]){
 
 
 
-	CFS cfs(100, 100, {vecf2(), vecf2{1,1}});
-	cfs.jacobi_it_max = 1;
+	CFS cfs(200, 400, {vecf2(), vecf2{1,2}});
+	cfs.jacobi_it_max = 100;
+	cfs.sor_it_max = 100;
+	cfs.reynold = 1200;
+	cfs.force = vecf2{0.5f, -0.5f};
 
 	for (uint i = 0; i < cfs.p.size[0]; i++){
 		for (uint j = 0; j < cfs.p.size[1]; j++){
