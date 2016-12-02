@@ -106,6 +106,22 @@ struct CFS{
 		void compute_v();
 		void compute_time_it();
 
+		void add_vx_persis(uint i, uint j, float val){
+			const uint idx = vx.memidx(i,j);
+			int tmp = -1;
+			for (uint i = 0; i < vx_idx_persis.size(); i++){
+				if (idx == vx_idx_persis[i])
+					tmp = i;
+			}
+			
+			if (tmp == -1){
+				vx_idx_persis.push_back(idx);
+				vx_persis.push_back(val);
+			}else{
+				vx_persis[tmp] += val;
+			}
+		}
+
 
 	public:
 		intvlv space;
@@ -120,6 +136,9 @@ struct CFS{
 
 		field vx, vy;
 		vectorf vx_tmp, vy_tmp;
+
+		vectoru vx_idx_persis;
+		vectorf vx_persis;
 
 		float reynold;
 		float deriv_weight;

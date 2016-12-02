@@ -124,29 +124,34 @@ void CFS::compute_dt(){
 }
 
 void CFS::set_v_bound(){
-	const float w = 1.0f;
+	// const float w = 1.0f;
 
-	for (uint i = 0; i < vx.size[0]; i++){
-		vy(i,0) = 0.0f;
-		vy(i,vy.size[1]-1) = 0.0f;
+	// for (uint i = 0; i < vx.size[0]; i++){
+	// 	vy(i,0) = 0.0f;
+	// 	vy(i,vy.size[1]-1) = 0.0f;
 
-		vx(i,0) = 2.0f*w - vx(i,1);
-		vx(i,vx.size[1]-1)= -vx(i,vx.size[1]-2);
+	// 	vx(i,0) = 2.0f*w - vx(i,1);
+	// 	vx(i,vx.size[1]-1)= -vx(i,vx.size[1]-2);
+	// }
+
+	// vy(vy.size[0]-1,0) = 0.0f;
+	// vy(vy.size[0]-1,vy.size[1]-1) = 0.0f;
+
+	// for (uint j = 1; j < vy.size[1]-1; j++){
+	// 	vx(0,j) = 0.0f;
+	// 	vx(vx.size[0]-1,j) = 0.0f;
+
+	// 	vy(0,j) = -vy(1,j);
+	// 	vy(vy.size[0]-1,j) = -vy(vy.size[0]-2,j);
+	// }
+
+	// vx(0,vx.size[1]-1) = 0.0f;
+	// vx(vx.size[0]-1, vx.size[1]-1) = 0.0f;
+
+
+	for (uint i = 0; i < vx_idx_persis.size(); i++){
+		vx.v[vx_idx_persis[i]] = vx_persis[i];
 	}
-
-	vy(vy.size[0]-1,0) = 0.0f;
-	vy(vy.size[0]-1,vy.size[1]-1) = 0.0f;
-
-	for (uint j = 1; j < vy.size[1]-1; j++){
-		vx(0,j) = 0.0f;
-		vx(vx.size[0]-1,j) = 0.0f;
-
-		vy(0,j) = -vy(1,j);
-		vy(vy.size[0]-1,j) = -vy(vy.size[0]-2,j);
-	}
-
-	vx(0,vx.size[1]-1) = 0.0f;
-	vx(vx.size[0]-1, vx.size[1]-1) = 0.0f;
 }
 
 void CFS::compute_poisson_rhs(){

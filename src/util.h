@@ -13,6 +13,7 @@ using uint = unsigned int;
 using sint = std::size_t;
 
 using vectorf = std::vector<float>;
+using vectoru = std::vector<uint>;
 
 using vecf2 = xmath::vec<float,2>;
 using vecu2 = xmath::vec<uint,2>; 
