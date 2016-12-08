@@ -45,32 +45,32 @@ int main(int argc, char *argv[]){
 
 
 
-	CFS cfs(400, 200, {vecf2(), vecf2{2,1}});
+	CFS cfs(200, 400, {vecf2(), vecf2{1,2}});
 	cfs.jacobi_it_max = 100;
 	cfs.sor_it_max = 100;
 	cfs.reynold = 1000;
 	// cfs.force = vecf2{0.5f, -0.5f};
 
-	for (uint i = 0; i < cfs.p.size[0]; i++){
-		for (uint j = 0; j < cfs.p.size[1]; j++){
-			const vecf2 pos = cfs.p.itos(vecf2{(float)i,(float)j});
-			cfs.p(i,j) = sqrt(pos[0]) * sin(3*M_PI*pos[0]) * sin(M_PI*pos[1]);
-		}
-	}
+	// for (uint i = 0; i < cfs.p.size[0]; i++){
+	// 	for (uint j = 0; j < cfs.p.size[1]; j++){
+	// 		const vecf2 pos = cfs.p.itos(vecf2{(float)i,(float)j});
+	// 		cfs.p(i,j) = sqrt(pos[0]) * sin(3*M_PI*pos[0]) * sin(M_PI*pos[1]);
+	// 	}
+	// }
 
-	for (uint i = 0; i < cfs.vx.size[0]; i++){
-		for (uint j = 0; j < cfs.vx.size[1]; j++){
-			const vecf2 pos = cfs.vx.itos(vecf2{(float)i,(float)j});
-			cfs.vx(i,j) = sqrt(pos[0]) * sin(3*M_PI*pos[0]) * sin(M_PI*pos[1]);
-		}
-	}
+	// for (uint i = 0; i < cfs.vx.size[0]; i++){
+	// 	for (uint j = 0; j < cfs.vx.size[1]; j++){
+	// 		const vecf2 pos = cfs.vx.itos(vecf2{(float)i,(float)j});
+	// 		cfs.vx(i,j) = sqrt(pos[0]) * sin(3*M_PI*pos[0]) * sin(M_PI*pos[1]);
+	// 	}
+	// }
 
-	for (uint i = 0; i < cfs.vy.size[0]; i++){
-		for (uint j = 0; j < cfs.vy.size[1]; j++){
-			const vecf2 pos = cfs.vy.itos(vecf2{(float)i,(float)j});
-			cfs.vy(i,j) = pos.x;
-		}
-	}
+	// for (uint i = 0; i < cfs.vy.size[0]; i++){
+	// 	for (uint j = 0; j < cfs.vy.size[1]; j++){
+	// 		const vecf2 pos = cfs.vy.itos(vecf2{(float)i,(float)j});
+	// 		cfs.vy(i,j) = pos.x;
+	// 	}
+	// }
 
 	QApplication app(argc, argv);
 

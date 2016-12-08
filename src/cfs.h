@@ -92,6 +92,9 @@ struct CFS{
 			std::fill(vx_tmp.begin(), vx_tmp.end(), 0.0f);
 			std::fill(vy.v.begin(), vy.v.end(), 0.0f);
 			std::fill(vy_tmp.begin(), vy_tmp.end(), 0.0f);
+
+			std::fill(vx_persis.begin(), vx_persis.end(), 0.0f);
+			std::fill(vx_idx_persis.begin(), vx_idx_persis.end(), 0.0f);
 		}
 		
 		void poisson_test_jacobi_it(); // Δp = -λp

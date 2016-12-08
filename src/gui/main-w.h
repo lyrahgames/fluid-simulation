@@ -32,6 +32,7 @@ class MainW : public QWidget{
 	static constexpr uint _refresh_time_ = 1000 / _fps_;
 
 	static constexpr uint _rand_pos_size_max_ = 1 << 15;
+	static constexpr uint _part_count_max_ = 1<<18;
 	
 
 
@@ -46,6 +47,8 @@ class MainW : public QWidget{
 
 		void init_rand_pos();
 		void gen_rand_pos();
+		void init_part_pos();
+		void gen_part_pos();
 
 
 	public:
@@ -93,6 +96,9 @@ class MainW : public QWidget{
 
 				QSpinBox *rand_pos_size_sb;
 				QPushButton *gen_rand_pos_pb;
+
+				QSpinBox *part_count_sb;
+				QPushButton *gen_part_pos_pb;
 
 
 				QGroupBox *wave_gb;
@@ -142,6 +148,9 @@ class MainW : public QWidget{
 		vecf2 *rand_pos;
 		uint rand_pos_size;
 
+		vecf2 *part_pos;
+		uint part_count;
+
 		bool play;
 
 
@@ -154,8 +163,12 @@ class MainW : public QWidget{
 		}
 
 		void clear_slot();
+
 		void set_rand_pos_size_slot(int i);
 		void gen_rand_pos_slot();
+
+		void set_part_count_slot(int i);
+		void gen_part_pos_slot();
 
 		void play_slot();
 

@@ -9,7 +9,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 }
 
 DEFINES += 
-QMAKE_CXXFLAGS  += -O2 -fPIC -static -std=c++14 -Wall -g -fpermissive
+# -Wall
+QMAKE_CXXFLAGS  += -O2 -fPIC -static -std=c++14 -g -fpermissive
 QMAKE_LFLAGS    +=
 
 INCLUDEPATH += ../../src
