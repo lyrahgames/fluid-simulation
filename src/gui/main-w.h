@@ -17,6 +17,7 @@
 #include <QPushButton>
 #include <QDoubleSpinBox>
 #include <QLabel>
+#include <QScrollArea>
 
 #include <util.h>
 #include <cfs.h>
@@ -88,7 +89,13 @@ class MainW : public QWidget{
 			private:
 				MainW *main_w;
 
-				QGroupBox *main_gb, *render_gb;
+				QGroupBox *main_gb;
+
+				QScrollArea *main_sa;
+				QWidget *main_sw;
+
+
+				QGroupBox *render_gb;
 				QSpinBox *grid_sb;
 
 				QPushButton *play_pb;
@@ -109,6 +116,13 @@ class MainW : public QWidget{
 				QDoubleSpinBox *wave_c_dsb;
 				QLabel *wave_dt_l;
 				QDoubleSpinBox *wave_dt_dsb;
+
+				QGroupBox *nse_gb;
+				QLabel *reynold_l;
+				QDoubleSpinBox *reynold_dsb;
+
+			protected:
+				void resizeEvent(QResizeEvent *event);
 		};
 
 

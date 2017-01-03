@@ -2,7 +2,8 @@
 
 
 MainW::MainW(CFS* cfs_src, QWidget *parent):
-QWidget(parent), ready(true), mouse(veci2{}), mouse_press(Qt::NoButton), cfs(cfs_src), view(cfs_src->space), rand_pos(nullptr), rand_pos_size(0){
+QWidget(parent), ready(true), mouse(veci2{}), mouse_press(Qt::NoButton), cfs(cfs_src), view(cfs_src->space), 
+rand_pos(nullptr), rand_pos_size(0), part_pos(nullptr){
 
 	init_rand_pos();
 	rand_pos_size = 100;
@@ -328,11 +329,19 @@ void MainW::RenderW::resizeEvent(QResizeEvent *event){
 }
 
 MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
+
 	main_gb = new QGroupBox("controls:", this);
 	main_gb->setFixedWidth(200);
 	// main_gb->setFlat(false);
 
-	QVBoxLayout *main_gb_layout = new QVBoxLayout(main_gb);
+	QVBoxLayout *tmp_layout = new QVBoxLayout(main_gb);
+
+	main_sa = new QScrollArea(main_gb);
+	main_sa->setBackgroundRole(QPalette::Dark);
+
+	main_sw = new QWidget(main_sa);
+
+	QVBoxLayout *main_gb_layout = new QVBoxLayout(main_sw);
 
 	grid_sb = new QSpinBox(this);
 	grid_sb->setMinimum(3);
@@ -412,5 +421,26 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	main_gb_layout->addWidget(render_gb);
 	
 
+	nse_gb = new QGroupBox("navier-stokes-equation:", this);
+	QVBoxLayout *nse_gb_layout = new QVBoxLayout(nse_gb);
+
+	reynold_l = new QLabel("reynold number");
+	nse_gb_layout->addWidget(reynold_l);
+
+	reynold_dsb = new QDoubleSpinBox(this);
+	nse_gb_layout->addWidget(reynold_dsb);
+
+	nse_gb->adjustSize();
+	main_gb_layout->addWidget(nse_gb);
+
+
+	main_sw->adjustSize();
+	main_sa->setWidget(main_sw);
+	tmp_layout->addWidget(main_sa);
+	main_sa->adjustSize();
 	main_gb->adjustSize();
+}
+
+void MainW::CtrlW::resizeEvent(QResizeEvent* event){
+	main_gb->setFixedSize(width(), height());
 }
