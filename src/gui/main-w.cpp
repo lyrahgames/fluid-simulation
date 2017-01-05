@@ -33,14 +33,14 @@ rand_pos(nullptr), rand_pos_size(0), part_pos(nullptr){
 
 
 	ctrl_w = new CtrlW(this);
-	ctrl_w->setFixedWidth(200);
+	ctrl_w->setFixedWidth(250);
 
 
 	QHBoxLayout *layout = new QHBoxLayout(this);
 	layout->addWidget(render_w);
 	layout->addWidget(ctrl_w);
 
-
+	resize(width(), height());
 }
 
 MainW::~MainW(){
@@ -337,9 +337,12 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	QVBoxLayout *tmp_layout = new QVBoxLayout(main_gb);
 
 	main_sa = new QScrollArea(main_gb);
-	main_sa->setBackgroundRole(QPalette::Dark);
+	main_sa->setBackgroundRole(QPalette::Midlight);
+	main_sa->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	main_sa->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
 	main_sw = new QWidget(main_sa);
+
 
 	QVBoxLayout *main_gb_layout = new QVBoxLayout(main_sw);
 
@@ -434,13 +437,17 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	main_gb_layout->addWidget(nse_gb);
 
 
-	main_sw->adjustSize();
+	// main_sw->setFixedWidth(width()-20);
+	// main_sw->adjustSize();
 	main_sa->setWidget(main_sw);
 	tmp_layout->addWidget(main_sa);
-	main_sa->adjustSize();
-	main_gb->adjustSize();
+	// main_sa->adjustSize();
+	// main_gb->adjustSize();
+
+	// adjustSize();
 }
 
 void MainW::CtrlW::resizeEvent(QResizeEvent* event){
 	main_gb->setFixedSize(width(), height());
+	main_sw->setFixedWidth(main_sa->width()-20);
 }

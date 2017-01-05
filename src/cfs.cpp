@@ -198,7 +198,9 @@ void CFS::compute_poisson_rhs(){
 				)
 			);
 
-			vx_tmp[vx.memidx(i,j)] = vx(i,j) + dt * (inv_reynold * tmp1 - tmp2 - tmp3 + force.x);
+			// vx_tmp[vx.memidx(i,j)] = vx(i,j) + dt * (inv_reynold * tmp1 - tmp2 - tmp3 + force.x);
+			vx_tmp[vx.memidx(i,j)] = vx(i,j) + dt * (- tmp2 - tmp3 + force.x);
+			
 		}
 	}
 
@@ -233,7 +235,8 @@ void CFS::compute_poisson_rhs(){
 
 			);
 
-			vy_tmp[vy.memidx(i,j)] = vy(i,j) + dt * (inv_reynold * tmp1 - tmp2 - tmp3 + force.y);
+			// vy_tmp[vy.memidx(i,j)] = vy(i,j) + dt * (inv_reynold * tmp1 - tmp2 - tmp3 + force.y);
+			vy_tmp[vy.memidx(i,j)] = vy(i,j) + dt * (- tmp2 - tmp3 + force.y);
 		}
 	}
 
