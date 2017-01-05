@@ -1,13 +1,4 @@
-notes:
-	☐	error in book: weighted derivative
+	☐	add all the needed elements for the gui and make it nice-looking
+		first reconfigure width and height settings for the ctrl-widget
 
-gui:
-	✘	add viewport to RenderW @cancelled (16-11-19 13:01)
-		(check problems with grid)
-
-computing:
-	☐	check reduction for compute_equ
-
-misc:
-	☐	vec2 with x,y
-	☐	casting constructor for vec
+	☐	test out the paper proposal of setting laplace dirctly to zero
