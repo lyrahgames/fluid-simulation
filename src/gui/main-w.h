@@ -189,6 +189,8 @@ class MainW : public QWidget{
 		void set_wave_damp_slot(double val);
 		void set_wave_c_slot(double val);
 		void set_wave_dt_slot(double val);
+
+		void set_reynold_slot(double val);
 };
 
 

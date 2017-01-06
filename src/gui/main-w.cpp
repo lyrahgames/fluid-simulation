@@ -17,9 +17,9 @@ rand_pos(nullptr), rand_pos_size(0), part_pos(nullptr){
 	colormap.add_base({-0.05f, {0.0f,1.0f,1.0f}});
 	colormap.add_base({0.05f, {1.0f,1.0f,0.0f}});
 	colormap.add_base({0.0f, {1,1,1}});
-	colormap.add_base({0.3f, {1,0,0}});
+	colormap.add_base({100.0f, {1,0,0}});
 	// colormap.add_base({2.0f, {1,0,1}});
-	colormap.add_base({-0.3f, {0,0,1}});
+	colormap.add_base({-100.0f, {0,0,1}});
 	// colormap.add_base({-2.0f, {0,1,0}});
 
 
@@ -189,6 +189,10 @@ void MainW::set_wave_c_slot(double val){
 
 void MainW::set_wave_dt_slot(double val){
 	cfs->wave_dt = val;
+}
+
+void MainW::set_reynold_slot(double val){
+	cfs->set_reynold(val);
 }
 
 MainW::RenderW::RenderW(MainW *parent): QWidget(parent), main_w(parent){
@@ -417,9 +421,13 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	// nse group box
 	nse_gb = new QGroupBox("navier-stokes-equation:", this);
 
-	reynold_l = new QLabel("reynold number");
+	reynold_l = new QLabel("reynold number", this);
 
 	reynold_dsb = new QDoubleSpinBox(this);
+	reynold_dsb->setRange(0.0, 10000.0);
+	reynold_dsb->setSingleStep(10.0);
+	reynold_dsb->setValue(main_w->cfs->reynold);
+	connect(reynold_dsb, SIGNAL(valueChanged()), main_w, SLOT(set_reynold_slot()));
 
 	QVBoxLayout *nse_gb_layout = new QVBoxLayout(nse_gb);
 	nse_gb_layout->addWidget(reynold_l);

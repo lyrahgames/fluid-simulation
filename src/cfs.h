@@ -125,6 +125,10 @@ struct CFS{
 			}
 		}
 
+		void set_reynold(float val){
+			reynold = val;
+		}
+
 
 	public:
 		intvlv space;

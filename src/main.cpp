@@ -45,7 +45,7 @@ int main(int argc, char *argv[]){
 
 
 
-	CFS cfs(200, 400, {vecf2(), vecf2{1,2}});
+	CFS cfs(900, 300, {vecf2(), vecf2{3,1}});
 	cfs.jacobi_it_max = 100;
 	cfs.sor_it_max = 100;
 	cfs.reynold = 1000;
@@ -58,12 +58,13 @@ int main(int argc, char *argv[]){
 	// 	}
 	// }
 
-	// for (uint i = 0; i < cfs.vx.size[0]; i++){
-	// 	for (uint j = 0; j < cfs.vx.size[1]; j++){
-	// 		const vecf2 pos = cfs.vx.itos(vecf2{(float)i,(float)j});
-	// 		cfs.vx(i,j) = sqrt(pos[0]) * sin(3*M_PI*pos[0]) * sin(M_PI*pos[1]);
-	// 	}
-	// }
+	for (uint i = 0; i < cfs.vx.size[0]; i++){
+		for (uint j = 0; j < cfs.vx.size[1]; j++){
+			const vecf2 pos = cfs.vx.itos(vecf2{(float)i,(float)j});
+			// cfs.vx(i,j) = sqrt(pos[0]) * sin(3*M_PI*pos[0]) * sin(M_PI*pos[1]);
+			cfs.vx(i,j) = 1.0f;
+		}
+	}
 
 	// for (uint i = 0; i < cfs.vy.size[0]; i++){
 	// 	for (uint j = 0; j < cfs.vy.size[1]; j++){

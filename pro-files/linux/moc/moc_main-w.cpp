@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_MainW_t {
-    QByteArrayData data[23];
-    char stringdata[261];
+    QByteArrayData data[24];
+    char stringdata[278];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -51,7 +51,8 @@ QT_MOC_LITERAL(18, 195, 9),
 QT_MOC_LITERAL(19, 205, 18),
 QT_MOC_LITERAL(20, 224, 3),
 QT_MOC_LITERAL(21, 228, 15),
-QT_MOC_LITERAL(22, 244, 16)
+QT_MOC_LITERAL(22, 244, 16),
+QT_MOC_LITERAL(23, 261, 16)
     },
     "MainW\0repaint\0\0set_ready\0in\0init_rand_pos\0"
     "gen_rand_pos\0init_part_pos\0gen_part_pos\0"
@@ -59,7 +60,8 @@ QT_MOC_LITERAL(22, 244, 16)
     "set_rand_pos_size_slot\0i\0gen_rand_pos_slot\0"
     "set_part_count_slot\0gen_part_pos_slot\0"
     "play_slot\0set_wave_damp_slot\0val\0"
-    "set_wave_c_slot\0set_wave_dt_slot"
+    "set_wave_c_slot\0set_wave_dt_slot\0"
+    "set_reynold_slot"
 };
 #undef QT_MOC_LITERAL
 
@@ -69,7 +71,7 @@ static const uint qt_meta_data_MainW[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      18,   14, // methods
+      19,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -77,24 +79,25 @@ static const uint qt_meta_data_MainW[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,  104,    2, 0x0a /* Public */,
-       3,    1,  105,    2, 0x0a /* Public */,
-       3,    0,  108,    2, 0x2a /* Public | MethodCloned */,
-       5,    0,  109,    2, 0x0a /* Public */,
-       6,    0,  110,    2, 0x0a /* Public */,
-       7,    0,  111,    2, 0x0a /* Public */,
-       8,    0,  112,    2, 0x0a /* Public */,
-       9,    0,  113,    2, 0x08 /* Private */,
-      10,    1,  114,    2, 0x08 /* Private */,
-      12,    0,  117,    2, 0x08 /* Private */,
-      13,    1,  118,    2, 0x08 /* Private */,
-      15,    0,  121,    2, 0x08 /* Private */,
-      16,    1,  122,    2, 0x08 /* Private */,
-      17,    0,  125,    2, 0x08 /* Private */,
-      18,    0,  126,    2, 0x08 /* Private */,
-      19,    1,  127,    2, 0x08 /* Private */,
-      21,    1,  130,    2, 0x08 /* Private */,
-      22,    1,  133,    2, 0x08 /* Private */,
+       1,    0,  109,    2, 0x0a /* Public */,
+       3,    1,  110,    2, 0x0a /* Public */,
+       3,    0,  113,    2, 0x2a /* Public | MethodCloned */,
+       5,    0,  114,    2, 0x0a /* Public */,
+       6,    0,  115,    2, 0x0a /* Public */,
+       7,    0,  116,    2, 0x0a /* Public */,
+       8,    0,  117,    2, 0x0a /* Public */,
+       9,    0,  118,    2, 0x08 /* Private */,
+      10,    1,  119,    2, 0x08 /* Private */,
+      12,    0,  122,    2, 0x08 /* Private */,
+      13,    1,  123,    2, 0x08 /* Private */,
+      15,    0,  126,    2, 0x08 /* Private */,
+      16,    1,  127,    2, 0x08 /* Private */,
+      17,    0,  130,    2, 0x08 /* Private */,
+      18,    0,  131,    2, 0x08 /* Private */,
+      19,    1,  132,    2, 0x08 /* Private */,
+      21,    1,  135,    2, 0x08 /* Private */,
+      22,    1,  138,    2, 0x08 /* Private */,
+      23,    1,  141,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -112,6 +115,7 @@ static const uint qt_meta_data_MainW[] = {
     QMetaType::Void, QMetaType::Int,   14,
     QMetaType::Void,
     QMetaType::Void,
+    QMetaType::Void, QMetaType::Double,   20,
     QMetaType::Void, QMetaType::Double,   20,
     QMetaType::Void, QMetaType::Double,   20,
     QMetaType::Void, QMetaType::Double,   20,
@@ -142,6 +146,7 @@ void MainW::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
         case 15: _t->set_wave_damp_slot((*reinterpret_cast< double(*)>(_a[1]))); break;
         case 16: _t->set_wave_c_slot((*reinterpret_cast< double(*)>(_a[1]))); break;
         case 17: _t->set_wave_dt_slot((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 18: _t->set_reynold_slot((*reinterpret_cast< double(*)>(_a[1]))); break;
         default: ;
         }
     }
@@ -172,13 +177,13 @@ int MainW::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 18)
+        if (_id < 19)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 18;
+        _id -= 19;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 18)
+        if (_id < 19)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 18;
+        _id -= 19;
     }
     return _id;
 }

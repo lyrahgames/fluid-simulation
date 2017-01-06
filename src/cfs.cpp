@@ -124,13 +124,16 @@ void CFS::compute_dt(){
 }
 
 void CFS::set_v_bound(){
-	const float w = 1.0f;
+	const float w = 0.5f;
 
 	for (uint i = 0; i < vx.size[0]; i++){
 		vy(i,0) = 0.0f;
 		vy(i,vy.size[1]-1) = 0.0f;
 
-		vx(i,0) = 2.0f*w - vx(i,1);
+		// vx(i,0) = 2.0f*w - vx(i,1);
+		// vx(i,vx.size[1]-1)= -vx(i,vx.size[1]-2);
+
+		vx(i,0) = -vx(i,1);
 		vx(i,vx.size[1]-1)= -vx(i,vx.size[1]-2);
 	}
 
@@ -138,27 +141,41 @@ void CFS::set_v_bound(){
 	vy(vy.size[0]-1,vy.size[1]-1) = 0.0f;
 
 	for (uint j = 1; j < vy.size[1]-1; j++){
-		vx(0,j) = 0.0f;
-		vx(vx.size[0]-1,j) = 0.0f;
+		// vx(0,j) = 0.0f;
+		// vx(vx.size[0]-1,j) = 0.0f;
 
-		vy(0,j) = -vy(1,j);
-		vy(vy.size[0]-1,j) = -vy(vy.size[0]-2,j);
+		vx(0,j) = w;
+		vx(vx.size[0]-1,j) = vx(vx.size[0]-2,j);
 
+		// vy(0,j) = -vy(1,j);
+		// vy(vy.size[0]-1,j) = -vy(vy.size[0]-2,j);
+
+		vy(0,j) = 0.0f;
+		vy(vy.size[0]-1,j) = 0.0f;
 	}
 
-	vx(0,vx.size[1]-1) = 0.0f;
-	vx(vx.size[0]-1, vx.size[1]-1) = 0.0f;
+	// vx(0,vx.size[1]-1) = 0.0f;
+	// vx(vx.size[0]-1, vx.size[1]-1) = 0.0f;
 
-	for (uint j = 80; j < 160; j++){
-		for (uint i = 80; i < 120; i++){
+	vx(0,vx.size[1]-1) = w;
+	vx(vx.size[0]-1, vx.size[1]-1) = vx(vx.size[0]-1, vx.size[1]-2);
+
+
+
+
+	for (uint j = 50; j < 250; j++){
+		for (uint i = 100; i < 180; i++){
 			vx(i,j) = 0.0f;
-			vy(j,j) = 0.0f;
+			vy(i,j) = 0.0f;
 		}
 	} 
 
 	for (uint i = 0; i < vx_idx_persis.size(); i++){
 		vx.v[vx_idx_persis[i]] = vx_persis[i];
 	}
+
+	vx_tmp = vx.v;
+	vy_tmp = vy.v;
 }
 
 void CFS::compute_poisson_rhs(){
@@ -198,8 +215,8 @@ void CFS::compute_poisson_rhs(){
 				)
 			);
 
-			// vx_tmp[vx.memidx(i,j)] = vx(i,j) + dt * (inv_reynold * tmp1 - tmp2 - tmp3 + force.x);
-			vx_tmp[vx.memidx(i,j)] = vx(i,j) + dt * (- tmp2 - tmp3 + force.x);
+			vx_tmp[vx.memidx(i,j)] = vx(i,j) + dt * (inv_reynold * tmp1 - tmp2 - tmp3 + force.x);
+			// vx_tmp[vx.memidx(i,j)] = vx(i,j) + dt * (- tmp2 - tmp3 + force.x);
 			
 		}
 	}
@@ -235,8 +252,8 @@ void CFS::compute_poisson_rhs(){
 
 			);
 
-			// vy_tmp[vy.memidx(i,j)] = vy(i,j) + dt * (inv_reynold * tmp1 - tmp2 - tmp3 + force.y);
-			vy_tmp[vy.memidx(i,j)] = vy(i,j) + dt * (- tmp2 - tmp3 + force.y);
+			vy_tmp[vy.memidx(i,j)] = vy(i,j) + dt * (inv_reynold * tmp1 - tmp2 - tmp3 + force.y);
+			// vy_tmp[vy.memidx(i,j)] = vy(i,j) + dt * (- tmp2 - tmp3 + force.y);
 		}
 	}
 
@@ -414,11 +431,11 @@ void CFS::compute_v(){
 
 void CFS::compute_time_it(){
 	compute_dt();
-	set_v_bound();
 	compute_poisson_rhs();
 	// poisson_p_jacobi_it();
 	poisson_p_sor_it();
 	compute_v();
+	set_v_bound();
 
 	time += dt;
 	it_step++;
