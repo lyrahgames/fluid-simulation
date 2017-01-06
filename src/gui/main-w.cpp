@@ -33,14 +33,16 @@ rand_pos(nullptr), rand_pos_size(0), part_pos(nullptr){
 
 
 	ctrl_w = new CtrlW(this);
-	ctrl_w->setFixedWidth(250);
 
 
 	QHBoxLayout *layout = new QHBoxLayout(this);
 	layout->addWidget(render_w);
 	layout->addWidget(ctrl_w);
 
-	resize(width(), height());
+	ctrl_w->setFixedWidth(250);
+	// ctrl_w->adjustSize();
+
+	// resize(width(), height());
 }
 
 MainW::~MainW(){
@@ -329,12 +331,8 @@ void MainW::RenderW::resizeEvent(QResizeEvent *event){
 }
 
 MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
-
+	// main group box and scroll area with scroll widget
 	main_gb = new QGroupBox("controls:", this);
-	main_gb->setFixedWidth(200);
-	// main_gb->setFlat(false);
-
-	QVBoxLayout *tmp_layout = new QVBoxLayout(main_gb);
 
 	main_sa = new QScrollArea(main_gb);
 	main_sa->setBackgroundRole(QPalette::Midlight);
@@ -342,112 +340,110 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	main_sa->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
 	main_sw = new QWidget(main_sa);
+	
 
-
-	QVBoxLayout *main_gb_layout = new QVBoxLayout(main_sw);
-
+	// main controls
 	grid_sb = new QSpinBox(this);
 	grid_sb->setMinimum(3);
 	grid_sb->setMaximum(10000);
 	grid_sb->setValue(100);
-	main_gb_layout->addWidget(grid_sb);
 	connect(grid_sb, SIGNAL(valueChanged(int)), main_w, SLOT(set_grid(int)));
 
-
 	play_pb = new QPushButton("play/pause", this);
-	main_gb_layout->addWidget(play_pb);
 	connect(play_pb, SIGNAL(clicked()), main_w, SLOT(play_slot()));
 
 	clear_pb = new QPushButton("clear", this);
-	main_gb_layout->addWidget(clear_pb);
 	connect(clear_pb, SIGNAL(clicked()), main_w, SLOT(clear_slot()));
 
 
-
+	// wave group box
 	wave_gb = new QGroupBox("wave equation", this);
-	QVBoxLayout *wave_gb_layout = new QVBoxLayout(wave_gb);
-
 
 	wave_damp_l = new QLabel("damping", this);
-	wave_gb_layout->addWidget(wave_damp_l);
 
 	wave_damp_dsb = new QDoubleSpinBox(this);
-	wave_gb_layout->addWidget(wave_damp_dsb);
 	connect(wave_damp_dsb, SIGNAL(valueChanged(double)), main_w, SLOT(set_wave_damp_slot(double)));
 
 	wave_c_l = new QLabel("velocity");
-	wave_gb_layout->addWidget(wave_c_l);
 
 	wave_c_dsb = new QDoubleSpinBox(this);
-	wave_gb_layout->addWidget(wave_c_dsb);
 	connect(wave_c_dsb, SIGNAL(valueChanged(double)), main_w, SLOT(set_wave_c_slot(double)));
 
 	wave_dt_l = new QLabel("time step");
-	wave_gb_layout->addWidget(wave_dt_l);
 
 	wave_dt_dsb = new QDoubleSpinBox(this);
 	wave_dt_dsb->setDecimals(6);
 	wave_dt_dsb->setRange(0.000001, 0.1);
 	wave_dt_dsb->setSingleStep(0.00001);
-	wave_gb_layout->addWidget(wave_dt_dsb);
 	connect(wave_dt_dsb, SIGNAL(valueChanged(double)), main_w, SLOT(set_wave_dt_slot(double)));
 
-	main_gb_layout->addWidget(wave_gb);
+	QVBoxLayout *wave_gb_layout = new QVBoxLayout(wave_gb);
+	wave_gb_layout->addWidget(wave_damp_l);
+	wave_gb_layout->addWidget(wave_damp_dsb);
+	wave_gb_layout->addWidget(wave_c_l);
+	wave_gb_layout->addWidget(wave_c_dsb);
+	wave_gb_layout->addWidget(wave_dt_l);
+	wave_gb_layout->addWidget(wave_dt_dsb);
 
 
+	// render group box
 	render_gb = new QGroupBox("render:", this);
-	QVBoxLayout *render_gb_layout = new QVBoxLayout(render_gb);
 
 	rand_pos_size_sb = new QSpinBox(this);
 	rand_pos_size_sb->setMinimum(0);
 	rand_pos_size_sb->setMaximum(MainW::_rand_pos_size_max_);
 	rand_pos_size_sb->setValue(main_w->rand_pos_size);
-	render_gb_layout->addWidget(rand_pos_size_sb);
 	connect(rand_pos_size_sb, SIGNAL(valueChanged(int)), main_w, SLOT(set_rand_pos_size_slot(int)));
 
 	gen_rand_pos_pb = new QPushButton("gen rand pos", this);
-	render_gb_layout->addWidget(gen_rand_pos_pb);
 	connect(gen_rand_pos_pb, SIGNAL(clicked()), main_w, SLOT(gen_rand_pos_slot()));
 
 	part_count_sb = new QSpinBox(this);
 	part_count_sb->setMinimum(0);
 	part_count_sb->setMaximum(MainW::_part_count_max_);
 	part_count_sb->setValue(main_w->part_count);
-	render_gb_layout->addWidget(part_count_sb);
 	connect(part_count_sb, SIGNAL(valueChanged(int)), main_w, SLOT(set_part_count_slot(int)));
 
 	gen_part_pos_pb = new QPushButton("gen part pos", this);
-	render_gb_layout->addWidget(gen_part_pos_pb);
 	connect(gen_part_pos_pb, SIGNAL(clicked()), main_w, SLOT(gen_part_pos_slot()));
 
-	render_gb->adjustSize();
-	main_gb_layout->addWidget(render_gb);
+	QVBoxLayout *render_gb_layout = new QVBoxLayout(render_gb);
+	render_gb_layout->addWidget(rand_pos_size_sb);
+	render_gb_layout->addWidget(gen_rand_pos_pb);
+	render_gb_layout->addWidget(part_count_sb);
+	render_gb_layout->addWidget(gen_part_pos_pb);
 	
 
+	// nse group box
 	nse_gb = new QGroupBox("navier-stokes-equation:", this);
-	QVBoxLayout *nse_gb_layout = new QVBoxLayout(nse_gb);
 
 	reynold_l = new QLabel("reynold number");
-	nse_gb_layout->addWidget(reynold_l);
 
 	reynold_dsb = new QDoubleSpinBox(this);
+
+	QVBoxLayout *nse_gb_layout = new QVBoxLayout(nse_gb);
+	nse_gb_layout->addWidget(reynold_l);
 	nse_gb_layout->addWidget(reynold_dsb);
 
-	nse_gb->adjustSize();
-	main_gb_layout->addWidget(nse_gb);
+	
+	// main layouts
+	QVBoxLayout *main_sw_layout = new QVBoxLayout(main_sw);
+	main_sw_layout->addWidget(grid_sb);
+	main_sw_layout->addWidget(play_pb);
+	main_sw_layout->addWidget(clear_pb);
+	main_sw_layout->addWidget(wave_gb);
+	main_sw_layout->addWidget(render_gb);
+	main_sw_layout->addWidget(nse_gb);
 
-
-	// main_sw->setFixedWidth(width()-20);
-	// main_sw->adjustSize();
 	main_sa->setWidget(main_sw);
-	tmp_layout->addWidget(main_sa);
-	// main_sa->adjustSize();
-	// main_gb->adjustSize();
 
-	// adjustSize();
+	QVBoxLayout *main_gb_layout = new QVBoxLayout(main_gb);
+	main_gb_layout->addWidget(main_sa);
+
+	QVBoxLayout *layout = new QVBoxLayout(this);
+	layout->addWidget(main_gb);
 }
 
 void MainW::CtrlW::resizeEvent(QResizeEvent* event){
-	main_gb->setFixedSize(width(), height());
-	main_sw->setFixedWidth(main_sa->width()-20);
+	
 }
