@@ -165,8 +165,8 @@ void CFS::set_v_bound(){
 
 	for (uint j = 50; j < 250; j++){
 		for (uint i = 100; i < 180; i++){
-			vx(i,j) = 0.0f;
-			vy(i,j) = 0.0f;
+			vx(i+j,j) = 0.0f;
+			vy(i+j,j) = 0.0f;
 		}
 	} 
 
