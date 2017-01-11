@@ -5,3 +5,13 @@
 	☐	test out the paper proposal of setting laplace dirctly to zero
 	
 	☐	add preprocessing steps to cfs: begin with calculating adaptive dt
+
+	☐	velocity color mapping
+
+	☐	precomputed obstacles with boundaries
+
+	☐	mouse interaction + infobox
+	
+	☐	persistence field for non-changeable values
+
+	☐	parallel support
