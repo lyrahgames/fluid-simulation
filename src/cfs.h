@@ -158,6 +158,9 @@ struct CFS{
 		float wave_damp;
 		float wave_c;
 		float wave_dt;
+
+		// mens changes
+		
 };
 
 

@@ -133,8 +133,8 @@ void CFS::set_v_bound(){
 		// vx(i,0) = 2.0f*w - vx(i,1);
 		// vx(i,vx.size[1]-1)= -vx(i,vx.size[1]-2);
 
-		vx(i,0) = -vx(i,1);
-		vx(i,vx.size[1]-1)= -vx(i,vx.size[1]-2);
+		vx(i,0) = vx(i,1);
+		vx(i,vx.size[1]-1)= vx(i,vx.size[1]-2);
 	}
 
 	vy(vy.size[0]-1,0) = 0.0f;
@@ -145,7 +145,8 @@ void CFS::set_v_bound(){
 		// vx(vx.size[0]-1,j) = 0.0f;
 
 		vx(0,j) = w;
-		vx(vx.size[0]-1,j) = vx(vx.size[0]-2,j);
+		// vx(vx.size[0]-1,j) = vx(vx.size[0]-2,j);
+		vx(vx.size[0]-1,j) = w;
 
 		// vy(0,j) = -vy(1,j);
 		// vy(vy.size[0]-1,j) = -vy(vy.size[0]-2,j);
@@ -158,15 +159,17 @@ void CFS::set_v_bound(){
 	// vx(vx.size[0]-1, vx.size[1]-1) = 0.0f;
 
 	vx(0,vx.size[1]-1) = w;
-	vx(vx.size[0]-1, vx.size[1]-1) = vx(vx.size[0]-1, vx.size[1]-2);
+	// vx(vx.size[0]-1, vx.size[1]-1) = vx(vx.size[0]-1, vx.size[1]-2);
+	vx(vx.size[0]-1, vx.size[1]-1) = w;
 
 
 
 
-	for (uint j = 50; j < 250; j++){
+
+	for (uint j = 50; j < 150; j++){
 		for (uint i = 100; i < 180; i++){
-			vx(i+j,j) = 0.0f;
-			vy(i+j,j) = 0.0f;
+			vx(i+float((j-100)*(j-100))*0.07f,j) = 0.0f;
+			vy(i+float((j-100)*(j-100))*0.07f,j) = 0.0f;
 		}
 	} 
 
@@ -352,7 +355,27 @@ void CFS::poisson_p_sor_it(){
 				sq_inv_step.y * p(p.size[0]-1, p.size[1]-2) -
 				rhs[p.memidx(p.size[0]-1, p.size[1]-1)]
 			);
-	}	
+
+		// for (uint j = 51; j < 149; j++){
+		// 	for (uint i = 101; i < 179; i++){
+		// 		p(i+float((j-100)*(j-100))*0.07f,j) = 0.0f;
+		// 		// vy(i+float((j-100)*(j-100))*0.07f,j) = 0.0f;
+		// 	}
+		// }
+	}
+
+	// correct mean of p to zero
+	float p_err = 0.0f;
+
+	for (uint i = 0; i < p.v.size(); i++){
+		p_err += p.v[i];
+	}
+
+	p_err *= 1.0f/float(p.v.size());
+
+	for (uint i = 0; i < p.v.size(); i++){
+		p.v[i] -= p_err;
+	}
 }
 
 void CFS::poisson_p_jacobi_it(){

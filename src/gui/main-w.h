@@ -18,6 +18,8 @@
 #include <QDoubleSpinBox>
 #include <QLabel>
 #include <QScrollArea>
+#include <QComboBox>
+#include <QCheckBox>
 
 #include <util.h>
 #include <cfs.h>
@@ -117,9 +119,21 @@ class MainW : public QWidget{
 				QLabel *wave_dt_l;
 				QDoubleSpinBox *wave_dt_dsb;
 
+				// mens changes
 				QGroupBox *nse_gb;
 				QLabel *reynold_l;
 				QDoubleSpinBox *reynold_dsb;
+
+				QLabel *border_l;
+				QPushButton *border_pb;
+				QComboBox *down_cb;
+				QComboBox *up_cb;
+				QComboBox *left_cb;
+				QComboBox *right_cb;
+
+				QCheckBox *p_render_chb;
+				// mens changes end
+
 
 			protected:
 				void resizeEvent(QResizeEvent *event);
@@ -166,6 +180,7 @@ class MainW : public QWidget{
 		uint part_count;
 
 		bool play;
+		bool p_render;
 
 
 	private slots:
@@ -190,7 +205,13 @@ class MainW : public QWidget{
 		void set_wave_c_slot(double val);
 		void set_wave_dt_slot(double val);
 
+		// mens changes
 		void set_reynold_slot(double val);
+
+		// mens changes end
+		void border_pb_slot();
+		void set_p_render_slot(int val);
+
 };
 
 

@@ -191,9 +191,19 @@ void MainW::set_wave_dt_slot(double val){
 	cfs->wave_dt = val;
 }
 
+// mens changes
 void MainW::set_reynold_slot(double val){
-	cfs->set_reynold(val);
+	cfs->reynold = val;
 }
+
+void MainW::border_pb_slot(){
+	
+}
+
+void MainW::set_p_render_slot(int val){
+	p_render = val;
+}
+// mens changes end
 
 MainW::RenderW::RenderW(MainW *parent): QWidget(parent), main_w(parent){
 	setMouseTracking(true);
@@ -214,27 +224,29 @@ void MainW::RenderW::paintEvent(QPaintEvent *event){
 	// const int j_min = 0;
 	// const int j_max = height()-1;
 
-	const vecf2 bound0 = pix_stoi( cfs().p.itos(vecf2(1,1)) );
-	const vecf2 bound1 = pix_stoi( cfs().p.itos(vecf2(cfs().p.size[0]-1, cfs().p.size[1]-1)) );
+	if (main_w->p_render){
+		const vecf2 bound0 = pix_stoi( cfs().p.itos(vecf2(1,1)) );
+		const vecf2 bound1 = pix_stoi( cfs().p.itos(vecf2(cfs().p.size[0]-1, cfs().p.size[1]-1)) );
 
-	const int i_min = ceilf(bound0.x);
-	const int i_max = floorf(bound1.x);
-	const int j_min = ceilf(bound1.y);
-	const int j_max = floorf(bound0.y);
+		const int i_min = ceilf(bound0.x);
+		const int i_max = floorf(bound1.x);
+		const int j_min = ceilf(bound1.y);
+		const int j_max = floorf(bound0.y);
 
-	for (int i = i_min; i <= i_max; i++){
-		for (int j = j_min; j <= j_max; j++){
-			const vecf2 idx{static_cast<float>(i), static_cast<float>(j)};
-			const vecf2 pos = pix_itos(idx);
+		for (int i = i_min; i <= i_max; i++){
+			for (int j = j_min; j <= j_max; j++){
+				const vecf2 idx{static_cast<float>(i), static_cast<float>(j)};
+				const vecf2 pos = pix_itos(idx);
 
-			const color_rgbf tmp = 255.0f * colormap()(cfs().p(pos));
-			const QRgb col = qRgb(tmp[0],tmp[1],tmp[2]);
-			map.setPixel(i,j,col);
+				const color_rgbf tmp = 255.0f * colormap()(cfs().p(pos));
+				const QRgb col = qRgb(tmp[0],tmp[1],tmp[2]);
+				map.setPixel(i,j,col);
+			}
 		}
-	}
 
-	const QRect rect = QRect(0, 0, width(), height());
-	painter.drawImage(rect, map, rect);
+		const QRect rect = QRect(0, 0, width(), height());
+		painter.drawImage(rect, map, rect);
+	}
 
 
 	const float path_step = 0.01f;
@@ -411,13 +423,18 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	gen_part_pos_pb = new QPushButton("gen part pos", this);
 	connect(gen_part_pos_pb, SIGNAL(clicked()), main_w, SLOT(gen_part_pos_slot()));
 
+	p_render_chb = new QCheckBox("render p", this);
+	connect(p_render_chb, SIGNAL(stateChanged(int)), main_w, SLOT(set_p_render_slot(int)));
+
 	QVBoxLayout *render_gb_layout = new QVBoxLayout(render_gb);
 	render_gb_layout->addWidget(rand_pos_size_sb);
 	render_gb_layout->addWidget(gen_rand_pos_pb);
 	render_gb_layout->addWidget(part_count_sb);
 	render_gb_layout->addWidget(gen_part_pos_pb);
+	render_gb_layout->addWidget(p_render_chb);
 	
 
+	// mens changes
 	// nse group box
 	nse_gb = new QGroupBox("navier-stokes-equation:", this);
 
@@ -427,11 +444,27 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	reynold_dsb->setRange(0.0, 10000.0);
 	reynold_dsb->setSingleStep(10.0);
 	reynold_dsb->setValue(main_w->cfs->reynold);
-	connect(reynold_dsb, SIGNAL(valueChanged()), main_w, SLOT(set_reynold_slot()));
+	connect(reynold_dsb, SIGNAL(valueChanged(double)), main_w, SLOT(set_reynold_slot(double)));
 
 	QVBoxLayout *nse_gb_layout = new QVBoxLayout(nse_gb);
 	nse_gb_layout->addWidget(reynold_l);
 	nse_gb_layout->addWidget(reynold_dsb);
+
+	border_l = new QLabel("border cond [DULR]", this);
+	nse_gb_layout->addWidget(border_l);
+
+	down_cb = new QComboBox(this);
+	down_cb->addItem("Haftbedingung");
+	down_cb->addItem("p stream +");
+	down_cb->addItem("p stream -");
+	down_cb->addItem("einström +");
+	down_cb->addItem("einström -");
+
+	border_pb = new QPushButton("commit border cond", this);
+
+	nse_gb_layout->addWidget(down_cb);
+	nse_gb_layout->addWidget(border_pb);
+	// mens changes end
 
 	
 	// main layouts
