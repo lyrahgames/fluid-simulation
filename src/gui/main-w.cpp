@@ -197,7 +197,7 @@ void MainW::set_reynold_slot(double val){
 }
 
 void MainW::border_pb_slot(){
-	
+	// cfs->down_bound = down_cb.currentIndex();
 }
 
 void MainW::set_p_render_slot(int val){
@@ -455,10 +455,11 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 
 	down_cb = new QComboBox(this);
 	down_cb->addItem("Haftbedingung");
+	down_cb->addItem("slip");
 	down_cb->addItem("p stream +");
 	down_cb->addItem("p stream -");
-	down_cb->addItem("einström +");
-	down_cb->addItem("einström -");
+	down_cb->addItem("o stream +");
+	down_cb->addItem("o stream -");
 
 	border_pb = new QPushButton("commit border cond", this);
 

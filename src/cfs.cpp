@@ -118,68 +118,95 @@ void CFS::grad(){
 	}
 }
 
+
 void CFS::compute_dt(){
 	const vecf2 sq_inv_step = sq(p.stoi.slope);
 	dt = 0.5f * time_safe * reynold / (sq_inv_step.x + sq_inv_step.y);
 }
 
+
 void CFS::set_v_bound(){
 	const float w = 0.5f;
 
-	for (uint i = 0; i < vx.size[0]; i++){
-		vy(i,0) = 0.0f;
-		vy(i,vy.size[1]-1) = 0.0f;
+		switch (down_bound){
+			case 1:
+			for (uint i = 0; i < vx.size[0]; i++){
+				// no o stream, down up
+				// vy(i,0) = 0.0f;
+				// vy(i,vy.size[1]-1) = 0.0f;
 
-		// vx(i,0) = 2.0f*w - vx(i,1);
-		// vx(i,vx.size[1]-1)= -vx(i,vx.size[1]-2);
+				// Haftbedingung, down up
+				vx(i,0) = 
+				-vx(i,1);
+				vx(i,vx.size[1]-1)= -vx(i,vx.size[1]-2);
 
-		vx(i,0) = vx(i,1);
-		vx(i,vx.size[1]-1)= vx(i,vx.size[1]-2);
-	}
+				// slip cond down up
+				vx(i,0) = vx(i,1);
+				vx(i,vx.size[1]-1)= vx(i,vx.size[1]-2);
 
-	vy(vy.size[0]-1,0) = 0.0f;
-	vy(vy.size[0]-1,vy.size[1]-1) = 0.0f;
+
+			}
+			break;
+
+			case 2:
+			break;
+		}
+			
+		// corner vy right =0, down up
+		vy(vy.size[0]-1,0) = 0.0f;
+		vy(vy.size[0]-1,vy.size[1]-1) = 0.0f;
+
+		
 
 	for (uint j = 1; j < vy.size[1]-1; j++){
+		// no o stream, left right
 		// vx(0,j) = 0.0f;
 		// vx(vx.size[0]-1,j) = 0.0f;
 
+		// o stream w, left right
 		vx(0,j) = w;
-		// vx(vx.size[0]-1,j) = vx(vx.size[0]-2,j);
 		vx(vx.size[0]-1,j) = w;
 
-		// vy(0,j) = -vy(1,j);
-		// vy(vy.size[0]-1,j) = -vy(vy.size[0]-2,j);
+		// no o border, right
+		// vx(vx.size[0]-1,j) = vx(vx.size[0]-2,j);
 
-		vy(0,j) = 0.0f;
-		vy(vy.size[0]-1,j) = 0.0f;
+		// Haftbedingung, left right
+		vy(0,j) = -vy(1,j);
+		vy(vy.size[0]-1,j) = -vy(vy.size[0]-2,j);
+
+		// falsche no p stream cond, left right
+		// vy(0,j) = 0.0f;
+		// vy(vy.size[0]-1,j) = 0.0f;
 	}
 
+	// corner vx up = 0, left right
 	// vx(0,vx.size[1]-1) = 0.0f;
 	// vx(vx.size[0]-1, vx.size[1]-1) = 0.0f;
 
+	// corner vx up = w, left right
 	vx(0,vx.size[1]-1) = w;
-	// vx(vx.size[0]-1, vx.size[1]-1) = vx(vx.size[0]-1, vx.size[1]-2);
 	vx(vx.size[0]-1, vx.size[1]-1) = w;
 
+	// halbe corner cond
+	// vx(vx.size[0]-1, vx.size[1]-1) = vx(vx.size[0]-1, vx.size[1]-2);
 
 
+	// los obstaclos
+	// for (uint j = 50; j < 150; j++){
+	// 	for (uint i = 100; i < 180; i++){
+	// 		vx(i+float((j-100)*(j-100))*0.07f,j) = 0.0f;
+	// 		vy(i+float((j-100)*(j-100))*0.07f,j) = 0.0f;
+	// 	}
+	// } 
 
-
-	for (uint j = 50; j < 150; j++){
-		for (uint i = 100; i < 180; i++){
-			vx(i+float((j-100)*(j-100))*0.07f,j) = 0.0f;
-			vy(i+float((j-100)*(j-100))*0.07f,j) = 0.0f;
-		}
-	} 
-
-	for (uint i = 0; i < vx_idx_persis.size(); i++){
-		vx.v[vx_idx_persis[i]] = vx_persis[i];
-	}
+	// for (uint i = 0; i < vx_idx_persis.size(); i++){
+	// 	vx.v[vx_idx_persis[i]] = vx_persis[i];
+	// }
 
 	vx_tmp = vx.v;
 	vy_tmp = vy.v;
 }
+
 
 void CFS::compute_poisson_rhs(){
 	const float inv_reynold = 1.0f/reynold;
@@ -218,6 +245,7 @@ void CFS::compute_poisson_rhs(){
 				)
 			);
 
+			vx_tmp2[vx.memidx(i,j)] = vx(i,j) + dt * (- tmp2 - tmp3 + force.x);
 			vx_tmp[vx.memidx(i,j)] = vx(i,j) + dt * (inv_reynold * tmp1 - tmp2 - tmp3 + force.x);
 			// vx_tmp[vx.memidx(i,j)] = vx(i,j) + dt * (- tmp2 - tmp3 + force.x);
 			
@@ -255,6 +283,7 @@ void CFS::compute_poisson_rhs(){
 
 			);
 
+			vy_tmp2[vy.memidx(i,j)] = vy(i,j) + dt * (- tmp2 - tmp3 + force.y);
 			vy_tmp[vy.memidx(i,j)] = vy(i,j) + dt * (inv_reynold * tmp1 - tmp2 - tmp3 + force.y);
 			// vy_tmp[vy.memidx(i,j)] = vy(i,j) + dt * (- tmp2 - tmp3 + force.y);
 		}
@@ -266,6 +295,10 @@ void CFS::compute_poisson_rhs(){
 				inv_dx * ( vx_tmp[vx.memidx(i,j)] - vx_tmp[vx.memidx(i-1,j)] ) +
 				inv_dy * ( vy_tmp[vy.memidx(i,j)] - vy_tmp[vy.memidx(i,j-1)] )
 			);
+			// rhs[p.memidx(i,j)] = inv_dt * (
+			// 	inv_dx * ( vx_tmp2[vx.memidx(i,j)] - vx_tmp2[vx.memidx(i-1,j)] ) +
+			// 	inv_dy * ( vy_tmp2[vy.memidx(i,j)] - vy_tmp2[vy.memidx(i,j-1)] )
+			// );
 		}
 	}
 }

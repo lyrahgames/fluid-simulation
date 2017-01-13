@@ -76,6 +76,7 @@ struct CFS{
 			vx(field(width-1, height, intvlv{p.space.min + vecf2{0.5f * p.itos.slope.x, 0.0f}, p.space.max - vecf2{0.5f * p.itos.slope.x, 0.0f}})),
 			vy(field(width, height-1, intvlv{p.space.min + vecf2{0.0f, 0.5f * p.itos.slope.y}, p.space.max - vecf2{0.0f, 0.5f * p.itos.slope.y}})),
 			vx_tmp(vx.v), vy_tmp(vy.v),
+			vx_tmp2(vx.v), vy_tmp2(vy.v),
 			reynold(1.0f), deriv_weight(0.5f),
 			force(vecf2(0.0f, 0.0f)),
 			dt(0.001f), time_safe(0.5f),
@@ -90,8 +91,10 @@ struct CFS{
 			std::fill(rhs.begin(), rhs.end(), 0.0f);
 			std::fill(vx.v.begin(), vx.v.end(), 0.0f);
 			std::fill(vx_tmp.begin(), vx_tmp.end(), 0.0f);
+			std::fill(vx_tmp2.begin(), vx_tmp2.end(), 0.0f);
 			std::fill(vy.v.begin(), vy.v.end(), 0.0f);
 			std::fill(vy_tmp.begin(), vy_tmp.end(), 0.0f);
+			std::fill(vy_tmp2.begin(), vy_tmp2.end(), 0.0f);
 
 			std::fill(vx_persis.begin(), vx_persis.end(), 0.0f);
 			std::fill(vx_idx_persis.begin(), vx_idx_persis.end(), 0.0f);
@@ -142,7 +145,7 @@ struct CFS{
 		float sor_relax;
 
 		field vx, vy;
-		vectorf vx_tmp, vy_tmp;
+		vectorf vx_tmp, vy_tmp, vx_tmp2, vy_tmp2; 
 
 		vectoru vx_idx_persis;
 		vectorf vx_persis;
@@ -159,8 +162,8 @@ struct CFS{
 		float wave_c;
 		float wave_dt;
 
-		// mens changes
-		
+		uint down_bound = 1;
+
 };
 
 

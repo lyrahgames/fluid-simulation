@@ -4,6 +4,22 @@
 		"selected_items":
 		[
 			[
+				"render",
+				"render_gb_layout"
+			],
+			[
+				"p_re",
+				"p_render_chb"
+			],
+			[
+				"bord",
+				"border_pb"
+			],
+			[
+				"bor",
+				"border_pb\t(main-w.h)"
+			],
+			[
 				"setM",
 				"setMinimum"
 			],
@@ -38,10 +54,6 @@
 			[
 				"mous",
 				"mouseclick_cb\t(main-w.h)"
-			],
-			[
-				"bor",
-				"border_l"
 			],
 			[
 				"nse_gb",
@@ -407,7 +419,7 @@
 			"file": "src/gui/main-w.h",
 			"settings":
 			{
-				"buffer_size": 3671,
+				"buffer_size": 4053,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -416,8 +428,16 @@
 			"file": "src/gui/main-w.cpp",
 			"settings":
 			{
-				"buffer_size": 12942,
+				"buffer_size": 13772,
 				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "tmp-src/render-w.h",
+			"settings":
+			{
+				"buffer_size": 4364,
 				"line_ending": "Unix"
 			}
 		},
@@ -425,7 +445,7 @@
 			"file": "src/cfs.cpp",
 			"settings":
 			{
-				"buffer_size": 11665,
+				"buffer_size": 12199,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -434,19 +454,17 @@
 			"file": "src/cfs.h",
 			"settings":
 			{
-				"buffer_size": 4240,
+				"buffer_size": 4262,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"contents": "#ifndef __CFS_H__\n#define __CFS_H__\n\n#include <cstring>\n#include <vector>\n#include <algorithm>\n\n#include <vec.h>\n#include <grid.h>\n#include <util.h>\n\n\n// cavity fluid simulation\nstruct CFS{\n\tusing sfield = std::vector<float>;\n\n\n\tenum AXIS{\n\t\tX = 0, Y = 1\n\t};\n\n\n\n\tpublic:\n\t\tCFS(const gridmap& in_grid_map0, const gridmap& in_grid_map1):\n\t\t_grid_map{in_grid_map0, in_grid_map1},\n\t\t_p(p_size(), 0.0f),\n\t\t_v{sfield(vx_size(), 0.0f), sfield(vy_size(), 0.0f)}{\n\n\n\n\t\t\t_reynold = 10.0f;\n\t\t\t_time = 0.0f;\n\t\t\t_it_step = 0;\n\t\t\t_time_step_safety = 0.5f;\n\t\t\t_force = vec2{};\n\t\t\t_cdq_weight = 0.5f;\n\t\t\t_sor_weight = 0.5f;\n\t\t\t_sor_eps = 0.001f;\n\t\t\t_sor_it_max = 100;\n\t\t\t_vx_max_mag = _inv_vx_max_mag = 1.0f;\n\t\t\t_vy_max_mag = _inv_vy_max_mag = 1.0f;\n\t\t\t\n\t\t\tinit_field();\n\t\t\tcompute_time_step_bound();\n\n\t\t\t// for (int i = 0; i < p_size(); i++){\n\t\t\t// \t_p[i] = sq(sin(10.0f * float(i)/float(p_size())));\n\t\t\t// }\n\n\t\t\t// for (uint i = 0; i < p_width(); i++){\n\t\t\t// \tfor (uint j = 0; j < p_height(); j++){\n\t\t\t// \t\tconst float x = _grid_map[0].cell_pos(i);\n\t\t\t// \t\tconst float y = _grid_map[1].cell_pos(j);\n\t\t\t// \t\t_p[p_memidx(i,j)] = sqrt(x) * sin(3*M_PI*x) * sin(M_PI*y);\n\t\t\t// \t}\n\t\t\t// }\n\n\t\t\t// for (int i = 0; i < vx_size(); i++){\n\t\t\t// \t_v[0][i] = float(i)/float(vx_size());\n\t\t\t// }\n\n\t\t\t// for (int i = 0; i < vy_size(); i++){\n\t\t\t// \tconst float tmp = float(i)/float(vy_size());\n\t\t\t// \t_v[1][i] = sqrt(tmp) * sin(3*M_PI*tmp) * sin(M_PI*tmp);\n\t\t\t// \t// sq(cos(10.0f /(float(i)/float(vy_size()))));\n\t\t\t// }\n\t\t}\n\n\n\t\tfloat reynold() const{return _reynold;}\n\t\tfloat inv_reynold() const{return _inv_reynold;}\n\t\tuint it_step() const{return _it_step;}\n\t\tfloat time() const{return _time;}\n\t\tfloat time_step() const{return _time_step;}\n\t\tfloat inv_time_step() const{return _inv_time_step;}\n\t\tfloat time_step_safety() const{return _time_step_safety;}\n\t\tfloat time_step_bound() const{return _time_step_bound;}\n\t\tconst gridmap* grid_map() const{return _grid_map;}\n\t\t// vec2 inv_v_max_mag() const{return _inv_v_max_mag;}\n\t\t// const sfield& p() const{return _p;}\n\t\tfloat cdq_weight() const{return _cdq_weight;}\n\t\tfloat sor_weight() const{return _sor_weight;}\n\t\tfloat sor_eps() const{return _sor_eps;}\n\t\tfloat sor_it_max() const{return _sor_it_max;}\n\t\tvec2 force() const{return _force;}\n\n\n\n\t\tfloat p(float in_x, float in_y) const{\n\t\t\tif (pos_out_p_bound(in_x, in_y))\n\t\t\t\treturn 0.0f;\n\n\t\t\tconst float x = _grid_map[0].cell_idx(in_x);\n\t\t\tconst float y = _grid_map[1].cell_idx(in_y);\n\t\t\tconst float fidx_x = floor(x);\n\t\t\tconst float fidx_y = floor(y);\n\t\t\tconst uint idx_x = static_cast<uint>(fidx_x);\n\t\t\tconst uint idx_y = static_cast<uint>(fidx_y);\n\t\t\tconst float w_x = x - fidx_x;\n\t\t\tconst float w_y = y - fidx_y;\n\t\t\tconst uint idx1 = p_memidx(idx_x, idx_y);\n\t\t\tconst uint idx2 = p_memidx(idx_x, idx_y+1);\n\n\t\t\treturn bilin_interp(_p[idx1], _p[idx1+1], _p[idx2], _p[idx2+1], w_x, w_y);\n\t\t}\n\n\t\tfloat p_save(float in_x, float in_y) const{\n\t\t\tconst float x = _grid_map[0].cell_idx(in_x);\n\t\t\tconst float y = _grid_map[1].cell_idx(in_y);\n\t\t\tconst float fidx_x = floor(x);\n\t\t\tconst float fidx_y = floor(y);\n\t\t\tconst uint idx_x = static_cast<uint>(fidx_x);\n\t\t\tconst uint idx_y = static_cast<uint>(fidx_y);\n\t\t\tconst float w_x = x - fidx_x;\n\t\t\tconst float w_y = y - fidx_y;\n\t\t\tconst uint idx1 = p_memidx(idx_x, idx_y);\n\t\t\tconst uint idx2 = p_memidx(idx_x, idx_y+1);\n\n\t\t\treturn bilin_interp(_p[idx1], _p[idx1+1], _p[idx2], _p[idx2+1], w_x, w_y);\n\t\t}\n\n\n\t\tfloat vx(float in_x, float in_y) const{\n\t\t\tif (pos_out_vx_bound(in_x, in_y))\n\t\t\t\treturn 0.0f;\n\n\t\t\tconst float x = _grid_map[0].node_idx(in_x) - 1;\n\t\t\tconst float y = _grid_map[1].cell_idx(in_y);\n\t\t\tconst float fidx_x = floor(x);\n\t\t\tconst float fidx_y = floor(y);\n\t\t\tconst uint idx_x = static_cast<uint>(fidx_x);\n\t\t\tconst uint idx_y = static_cast<uint>(fidx_y);\n\t\t\tconst float w_x = x - fidx_x;\n\t\t\tconst float w_y = y - fidx_y;\n\t\t\tconst uint idx1 = vx_memidx(idx_x, idx_y);\n\t\t\tconst uint idx2 = vx_memidx(idx_x, idx_y+1);\n\n\t\t\treturn bilin_interp(_v[0][idx1], _v[0][idx1+1], _v[0][idx2], _v[0][idx2+1], w_x, w_y);\n\t\t}\n\n\t\tfloat vx_tmp(float in_x, float in_y) const{\n\t\t\tif (pos_out_vx_bound(in_x, in_y))\n\t\t\t\treturn 0.0f;\n\n\t\t\tconst float x = _grid_map[0].node_idx(in_x) - 1;\n\t\t\tconst float y = _grid_map[1].cell_idx(in_y);\n\t\t\tconst float fidx_x = floor(x);\n\t\t\tconst float fidx_y = floor(y);\n\t\t\tconst uint idx_x = static_cast<uint>(fidx_x);\n\t\t\tconst uint idx_y = static_cast<uint>(fidx_y);\n\t\t\tconst float w_x = x - fidx_x;\n\t\t\tconst float w_y = y - fidx_y;\n\t\t\tconst uint idx1 = vx_memidx(idx_x, idx_y);\n\t\t\tconst uint idx2 = vx_memidx(idx_x, idx_y+1);\n\n\t\t\treturn bilin_interp(_tmp[0][idx1], _tmp[0][idx1+1], _tmp[0][idx2], _tmp[0][idx2+1], w_x, w_y);\n\t\t}\n\n\t\tfloat vy(float in_x, float in_y) const{\n\t\t\tif (pos_out_vy_bound(in_x, in_y))\n\t\t\t\treturn 0.0f;\n\n\t\t\tconst float x = _grid_map[0].cell_idx(in_x);\n\t\t\tconst float y = _grid_map[1].node_idx(in_y) - 1;\n\t\t\tconst float fidx_x = floor(x);\n\t\t\tconst float fidx_y = floor(y);\n\t\t\tconst uint idx_x = static_cast<uint>(fidx_x);\n\t\t\tconst uint idx_y = static_cast<uint>(fidx_y);\n\t\t\tconst float w_x = x - fidx_x;\n\t\t\tconst float w_y = y - fidx_y;\n\t\t\tconst uint idx1 = vy_memidx(idx_x, idx_y);\n\t\t\tconst uint idx2 = vy_memidx(idx_x, idx_y+1);\n\n\t\t\treturn bilin_interp(_v[1][idx1], _v[1][idx1+1], _v[1][idx2], _v[1][idx2+1], w_x, w_y);\n\t\t}\n\n\n\n\t\tvoid compute_time_step(){\n\t\t\tconst float tmp1 = _grid_map[0].step() * _inv_vx_max_mag;\n\t\t\tconst float tmp2 = _grid_map[1].step() * _inv_vy_max_mag;\n\n\t\t\t_time_step = std::min(tmp1, tmp2);\n\t\t\t_time_step = std::min(_time_step_bound, time_step_safety() * _time_step);\n\t\t\t_inv_time_step = 1.0f / _time_step;\n\t\t}\n\n\t\tvoid set_time_step(float in_time_step){\n\t\t\tif (in_time_step <= 0.0f)\n\t\t\t\treturn;\n\n\t\t\t_time_step = in_time_step;\n\t\t\t_inv_time_step = 1.0f / _time_step;\n\t\t}\n\n\t\tvoid compute_time_step_bound(){\n\t\t\tconst float tmp = (sq(_grid_map[0].inv_step())) + (sq(_grid_map[1].inv_step()));\n\t\t\t_time_step_bound = 0.5f * time_step_safety() * reynold() / tmp;\n\t\t}\n\n\n\t\tvoid compute_time_it();\n\t\tvoid compute_equ();\n\t\tvoid compute_poisson();\n\t\tvoid compute_v();\n\t\tvoid set_v_bound();\n\n\t\tvoid set_grid_map(const gridmap& in_grid_map0, const gridmap& in_grid_map1){\n\t\t\t_grid_map[0] = in_grid_map0;\n\t\t\t_grid_map[1] = in_grid_map1;\n\n\t\t\tinit_field();\n\t\t}\n\n\n\tprivate:\n\t\t// underlying grid for pressure and velocity\n\t\tgridmap _grid_map[2];\n\t\t// pressure\n\t\tsfield _p;\n\t\t// velocity (structure of arrays)\n\t\tsfield _v[2];\n\n\t\tsfield _tmp[3];\n\n\n\t\t// parameters\n\t\t// reynold number\n\t\tfloat _reynold;\n\t\tfloat _time;\n\t\tuint _it_step;\n\t\t// \n\t\tfloat _time_step;\n\t\t// time step safety factor\n\t\tfloat _time_step_safety;\n\t\t// force/acceleration\n\t\tvec2 _force;\n\t\t// weight for donor-cell discretization\n\t\tfloat _donor_cell_weight;\n\t\t// weight for central difference quotient\n\t\tfloat _cdq_weight;\n\n\t\tfloat _sor_weight;\n\t\tfloat _sor_eps;\n\t\tfloat _sor_it_max;\n\n\n\t\t// temporary variables\n\t\t// maximum magnitude of velocity field\n\t\tfloat _vx_max_mag, _vy_max_mag, _inv_vx_max_mag, _inv_vy_max_mag;\n\t\t// inverse reynold number\n\t\tfloat _inv_reynold;\n\t\t// inverse time step\n\t\tfloat _inv_time_step;\n\t\t// upper boundary for adaptive time stepsize control\n\t\tfloat _time_step_bound;\n\n\n\n\t// private:\n\tpublic:\n\t\tuint p_size() const{return p_width()*p_height();}\n\t\tuint p_width() const{return _grid_map[0].cell_count();}\n\t\tuint p_height() const{return _grid_map[1].cell_count();}\n\t\tuint vx_size() const{return vx_width()*vx_height();}\n\t\tuint vx_width() const{return _grid_map[0].cell_count() - 1;}\n\t\tuint vx_height() const{return _grid_map[1].cell_count();}\n\t\tuint vy_size() const{return vy_width()*vy_height();}\n\t\tuint vy_width() const{return _grid_map[0].cell_count();}\n\t\tuint vy_height() const{return _grid_map[1].cell_count() - 1;}\n\n\t\tuint p_memidx(uint idx_x, uint idx_y) const{\n\t\t\treturn quad_rm_memidx(p_width(), idx_y, idx_x);\n\t\t}\n\t\tuint p_memidx_u(uint idx) const{\n\t\t\treturn idx + p_width();\n\t\t}\n\t\tuint p_memidx_d(uint idx) const{\n\t\t\treturn idx - p_width();\n\t\t}\n\t\tuint p_memidx_r(uint idx) const{\n\t\t\treturn idx + 1;\n\t\t}\n\t\tuint p_memidx_l(uint idx) const{\n\t\t\treturn idx - 1;\n\t\t}\n\n\t\tuint vx_memidx(uint idx_x, uint idx_y) const{\n\t\t\treturn quad_rm_memidx(vx_width(), idx_y, idx_x);\n\t\t}\n\t\tuint vx_memidx_u(uint idx) const{\n\t\t\treturn idx + vx_width();\n\t\t}\n\t\tuint vx_memidx_d(uint idx) const{\n\t\t\treturn idx - vx_width();\n\t\t}\n\t\tuint vx_memidx_r(uint idx) const{\n\t\t\treturn idx + 1;\n\t\t}\n\t\tuint vx_memidx_l(uint idx) const{\n\t\t\treturn idx - 1;\n\t\t}\n\n\t\tuint vy_memidx(uint idx_x, uint idx_y) const{\n\t\t\treturn quad_rm_memidx(vy_height(), idx_y, idx_x);\n\t\t}\n\t\tuint vy_memidx_u(uint idx) const{\n\t\t\treturn idx + vy_width();\n\t\t}\n\t\tuint vy_memidx_d(uint idx) const{\n\t\t\treturn idx - vy_width();\n\t\t}\n\t\tuint vy_memidx_r(uint idx) const{\n\t\t\treturn idx + 1;\n\t\t}\n\t\tuint vy_memidx_l(uint idx) const{\n\t\t\treturn idx - 1;\n\t\t}\n\n\t\tvoid init_field(){\n\t\t\t_p.resize(p_size(), 0.0f);\n\t\t\t_tmp[2].resize(p_size(), 0.0f);\n\t\t\t_v[0].resize(vx_size(), 0.0f);\n\t\t\t_tmp[0].resize(vx_size(), 0.0f);\n\t\t\t_v[1].resize(vy_size(), 0.0f);\n\t\t\t_tmp[1].resize(vy_size(), 0.0f);\n\t\t}\n\n\t\tbool pos_out_bound_strip(float in_x, float in_y) const{\n\t\t\treturn (in_x < _grid_map[0].min() || in_x > _grid_map[0].max() || in_y < _grid_map[1].min() || in_y > _grid_map[1].max());\n\t\t}\n\n\t\tbool pos_out_bound(float in_x, float in_y) const{\n\t\t\treturn (in_x <= _grid_map[0].node_pos(1) || in_x >= _grid_map[0].node_pos(_grid_map[0].size()-1) || in_y <= _grid_map[1].node_pos(1) || in_y >= _grid_map[1].cell_pos(_grid_map[1].size()-1));\n\t\t}\n\n\t\tbool pos_out_p_bound(float in_x, float in_y) const{\n\t\t\treturn (in_x <= _grid_map[0].cell_pos(0) || in_x >= _grid_map[0].cell_pos(p_width()-1) || in_y <= _grid_map[1].cell_pos(0) || in_y >= _grid_map[1].cell_pos(p_height()-1));\n\t\t}\n\n\t\tbool pos_out_vx_bound(float in_x, float in_y) const{\n\t\t\treturn (in_x <= _grid_map[0].node_pos(1) || in_x >= _grid_map[0].node_pos(vx_width()) || in_y <= _grid_map[1].cell_pos(0) || in_y >= _grid_map[1].cell_pos(vx_height()-1));\n\t\t}\n\n\t\tbool pos_out_vy_bound(float in_x, float in_y) const{\n\t\t\treturn (in_x <= _grid_map[0].cell_pos(0) || in_x >= _grid_map[0].cell_pos(vy_width()-1) || in_y <= _grid_map[1].node_pos(1) || in_y >= _grid_map[1].node_pos(vy_height()));\n\t\t}\t\t\n};\n\n\n#endif // __CFS_H__",
 			"file": "src/cfs.h.backup",
-			"file_size": 10140,
-			"file_write_time": 131237735934125176,
 			"settings":
 			{
 				"buffer_size": 10140,
+				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
@@ -454,19 +472,17 @@
 			"file": "todo",
 			"settings":
 			{
-				"buffer_size": 278,
+				"buffer_size": 449,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"contents": "TARGET  = static\n\nTEMPLATE = app\nCONFIG += qt thread warn_on release \nQT = core gui\n\ngreaterThan(QT_MAJOR_VERSION, 4) {\n    QT += widgets\n}\n\nDEFINES += \nQMAKE_CXXFLAGS  += -O2 -fPIC -restrict -fno-fnalias -fno-rtti -fno-exceptions -static -std=c++11\nQMAKE_LFLAGS    +=\n\nINCLUDEPATH += \n\nLIBS +=\n\nHEADERS = \\\n\t../../src/render-w.h \\\n\t../../src/vec.h \\\n\t../../src/grid.h \\\n\t../../src/vec-field.h \\\n\t../../src/scalar-field.h \\\n\t../../src/nsg.h \\\n\t../../src/utils.h\n\nSOURCES = ../../src/main.cpp\n\n\nunix:OBJECTS_DIR          = obj\nunix:MOC_DIR              = moc\n\nunix:QMAKE_POST_LINK=strip $(TARGET)\n",
 			"file": "pro-files/linux/config-static.pro",
-			"file_size": 596,
-			"file_write_time": 131233438955638278,
 			"settings":
 			{
 				"buffer_size": 596,
+				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
@@ -483,7 +499,7 @@
 			"file": "src/main.cpp",
 			"settings":
 			{
-				"buffer_size": 2293,
+				"buffer_size": 2295,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -536,13 +552,11 @@
 			}
 		},
 		{
-			"contents": "#ifndef __LINMAP_H__\n#define __LINMAP_H__\n\n#include <xmath/intvl.h>\n\n\nnamespace xmath{\n\n\ntemplate <class T>\nstruct intvl{\n\tunion{\n\t\tstruct{T min, max;};\n\t\tstruct{T inf, sup;};\n\t};\n};\n\nusing intvlf = intvl<float>;\n\n\ntemplate <class T>\ninline constexpr T len(const intvl<T>& i){\n\treturn i.max - i.min;\n}\n\n\n\ntemplate <class T>\nstruct linmap{\n\tusing type = T;\n\n\n\tstatic constexpr T map(const intvl<T>& domain, const intvl<T>& range, T input){\n\t\treturn (range.min * (domain.max - input) + range.max * (input - domain.min)) / (domain.max - domain.min);\n\t}\n\n\n\tpublic:\n\t\tconstexpr linmap(const intvl<T>& domain = {T{0}, T{1}}, const intvl<T>& range = {T{0}, T{1}}):\n\t\td(domain), r(range),\n\t\tu{r.max/len(d)}, v{r.min/len(d)},\n\t\ts{len(r)/len(d)}, // should be numerical more stable than (v-u)\n\t\ti{r.min - s*d.min} // maybe use: (d.max*r.min - d.min*r.max) / len(d)\n\t\t{} // compiler should save the inverse of len(d) in a temporary variable\n\n\n\t\tconstexpr T operator()(T input) const{return v * (d.max - input) + u * (input - d.min);}\n\n\t\tconstexpr intvl<T> domain() const{return d;}\n\t\tconstexpr intvl<T> range() const{return r;}\n\t\tconstexpr T slope() const{return s;}\n\t\tconstexpr T intercept() const{return i;}\n\t\tconstexpr T coeff_min() const{return v;}\n\t\tconstexpr T coeff_max() const{return u;}\n\n\n\tprivate:\n\t\tintvl<T> d; // domain\n\t\tintvl<T> r; // range\n\t\tT s; // slope\n\t\tT i; // intercept\n\t\tT u, v; // coefficients for fast interpolation\n};\n\nusing linmapf = linmap<float>;\n\n\ntemplate <class T>\ninline constexpr linmap<T> inv(const linmap<T>& lm){return linmap<T>(lm.range(), lm.domain());}\n\n\n} // xmath\n\n\n#endif // __LINMAP_H__",
 			"file": "src/linmap.h",
-			"file_size": 1618,
-			"file_write_time": 131237850944330699,
 			"settings":
 			{
 				"buffer_size": 1618,
+				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
@@ -721,7 +735,8 @@
 		"/home/mens/pro/fluid-sim/pro-files/linux",
 		"/home/mens/pro/fluid-sim/src",
 		"/home/mens/pro/fluid-sim/src/gui",
-		"/home/mens/pro/fluid-sim/src/io"
+		"/home/mens/pro/fluid-sim/src/io",
+		"/home/mens/pro/fluid-sim/tmp-src"
 	],
 	"file_history":
 	[
@@ -818,6 +833,16 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"50",
+			"mean_p",
+			"nse_gb",
+			"reynold",
+			"compute_dt",
+			"set_wave_dt_slot",
+			"set_reynold_slot",
+			"valueChanged",
+			"set_reynold_slot",
+			"reynold_dsb",
 			"reynold",
 			"set_wave_dt_slot",
 			"sor_it_max",
@@ -935,17 +960,7 @@
 			"8",
 			"7",
 			"5",
-			"7",
-			"5",
-			"60",
-			"7",
-			"6",
-			"10",
-			"grid",
-			"i",
-			"F_tmp1",
-			"max_mag",
-			"VecField2"
+			"7"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -953,6 +968,7 @@
 		"regex": false,
 		"replace_history":
 		[
+			"nsg_gb",
 			"\\t"
 		],
 		"reverse": false,
@@ -964,7 +980,7 @@
 	"groups":
 	[
 		{
-			"selected": 10,
+			"selected": 6,
 			"sheets":
 			[
 				{
@@ -973,15 +989,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3671,
+						"buffer_size": 4053,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2479,
-								2479
+								2671,
+								2671
 							]
 						],
 						"settings":
@@ -993,8 +1009,8 @@
 								{
 									"1":
 									[
-										2540,
-										2541
+										2757,
+										2758
 									]
 								},
 								"icon":
@@ -1009,8 +1025,8 @@
 								{
 									"1":
 									[
-										1766,
-										1767
+										1808,
+										1809
 									]
 								},
 								"unmatched":
@@ -1019,26 +1035,31 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
 								"bh_single_quote",
 								"bh_single_quote_center",
 								"bh_single_quote_open",
 								"bh_single_quote_close",
 								"bh_single_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
 								"bh_default",
 								"bh_default_center",
 								"bh_default_open",
@@ -1049,41 +1070,36 @@
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
 								"bh_double_quote",
 								"bh_double_quote_center",
 								"bh_double_quote_open",
 								"bh_double_quote_close",
-								"bh_double_quote_content"
+								"bh_double_quote_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content"
 							],
 							"history_list_is_closing": true,
 							"syntax": "Packages/C++/C++.sublime-syntax",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1569.0,
+						"translation.y": 1305.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
@@ -1092,15 +1108,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 12942,
+						"buffer_size": 13772,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								12336,
-								12336
+								6101,
+								6101
 							]
 						],
 						"settings":
@@ -1112,127 +1128,8 @@
 								{
 									"1":
 									[
-										12336,
-										12337
-									]
-								},
-								"icon":
-								{
-									"1":
-									[
-										"Packages/BracketHighlighter/icons/round_bracket.png",
-										"brackethighlighter.default"
-									]
-								},
-								"open":
-								{
-									"1":
-									[
-										12334,
-										12335
-									]
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content"
-							],
-							"history_list_is_closing": true,
-							"syntax": "Packages/C++/C++.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 6099.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "src/cfs.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 11665,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3173,
-								3173
-							]
-						],
-						"settings":
-						{
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-									"1":
-									[
-										3209,
-										3210
+										6141,
+										6142
 									]
 								},
 								"icon":
@@ -1247,8 +1144,8 @@
 								{
 									"1":
 									[
-										3094,
-										3095
+										5406,
+										5407
 									]
 								},
 								"unmatched":
@@ -1257,11 +1154,26 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
 								"bh_round",
 								"bh_round_center",
 								"bh_round_open",
@@ -1272,72 +1184,294 @@
 								"bh_default_open",
 								"bh_default_close",
 								"bh_default_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
 								"bh_curly",
 								"bh_curly_center",
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
 								"bh_square",
 								"bh_square_center",
 								"bh_square_open",
 								"bh_square_close",
-								"bh_square_content"
+								"bh_square_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content"
 							],
+							"history_list_is_closing": true,
 							"syntax": "Packages/C++/C++.sublime-syntax",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 3960.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 3,
-					"file": "src/cfs.h",
-					"semi_transient": false,
+					"buffer": 2,
+					"file": "tmp-src/render-w.h",
+					"semi_transient": true,
 					"settings":
 					{
-						"buffer_size": 4240,
+						"buffer_size": 4364,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4009,
-								4009
+								3571,
+								3571
+							]
+						],
+						"settings":
+						{
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+									"1":
+									[
+										4335,
+										4336
+									]
+								},
+								"icon":
+								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/curly_bracket.png",
+										"brackethighlighter.default"
+									]
+								},
+								"open":
+								{
+									"1":
+									[
+										284,
+										285
+									]
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content"
+							],
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1620.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "src/cfs.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 12199,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								9721,
+								9721
+							]
+						],
+						"settings":
+						{
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+									"1":
+									[
+										9884,
+										9885
+									]
+								},
+								"icon":
+								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/curly_bracket.png",
+										"brackethighlighter.default"
+									]
+								},
+								"open":
+								{
+									"1":
+									[
+										7483,
+										7484
+									]
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content"
+							],
+							"syntax": "Packages/C++/C++.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 4770.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "src/cfs.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4262,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4237,
+								4237
 							]
 						],
 						"settings":
@@ -1350,8 +1484,8 @@
 								{
 									"1":
 									[
-										4216,
-										4217
+										4238,
+										4239
 									]
 								},
 								"icon":
@@ -1376,26 +1510,31 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
 								"bh_single_quote",
 								"bh_single_quote_center",
 								"bh_single_quote_open",
 								"bh_single_quote_close",
 								"bh_single_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
 								"bh_default",
 								"bh_default_center",
 								"bh_default_open",
@@ -1406,44 +1545,39 @@
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
 								"bh_double_quote",
 								"bh_double_quote_center",
 								"bh_double_quote_open",
 								"bh_double_quote_close",
-								"bh_double_quote_content"
+								"bh_double_quote_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content"
 							],
 							"history_list_is_closing": true,
 							"syntax": "Packages/C++/C++.sublime-syntax"
 						},
 						"translation.x": 0.0,
-						"translation.y": 450.0,
+						"translation.y": 1148.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 7,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
+					"buffer": 5,
 					"file": "src/cfs.h.backup",
 					"semi_transient": false,
 					"settings":
@@ -1542,24 +1676,24 @@
 						"translation.y": 52.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 10,
+					"stack_index": 9,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
+					"buffer": 6,
 					"file": "todo",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 278,
+						"buffer_size": 449,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								449,
+								449
 							]
 						],
 						"settings":
@@ -1582,6 +1716,26 @@
 							},
 							"bracket_highlighter.regions":
 							[
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
 								"bh_round",
 								"bh_round_center",
 								"bh_round_open",
@@ -1597,59 +1751,42 @@
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
 								"bh_double_quote",
 								"bh_double_quote_center",
 								"bh_double_quote_open",
 								"bh_double_quote_close",
 								"bh_double_quote_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
 								"bh_square",
 								"bh_square_center",
 								"bh_square_open",
 								"bh_square_close",
 								"bh_square_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
 								"bh_tag",
 								"bh_tag_center",
 								"bh_tag_open",
 								"bh_tag_close",
-								"bh_tag_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content"
+								"bh_tag_content"
 							],
 							"color_scheme": "Packages/PlainTasks/tasks-monokai.hidden-tmTheme",
+							"plain_tasks_remain_time_phantoms":
+							[
+							],
 							"syntax": "Packages/PlainTasks/PlainTasks.sublime-syntax"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 13,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
+					"buffer": 7,
 					"file": "pro-files/linux/config-static.pro",
 					"semi_transient": false,
 					"settings":
@@ -1698,11 +1835,6 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
 								"bh_round",
 								"bh_round_center",
 								"bh_round_open",
@@ -1713,41 +1845,46 @@
 								"bh_default_open",
 								"bh_default_close",
 								"bh_default_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
 								"bh_curly",
 								"bh_curly_center",
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
 								"bh_single_quote",
 								"bh_single_quote_center",
 								"bh_single_quote_open",
 								"bh_single_quote_close",
 								"bh_single_quote_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
 								"bh_square",
 								"bh_square_center",
 								"bh_square_open",
@@ -1760,11 +1897,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 10,
 					"type": "text"
 				},
 				{
-					"buffer": 7,
+					"buffer": 8,
 					"file": "src/util.h",
 					"semi_transient": false,
 					"settings":
@@ -1878,24 +2015,24 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 12,
 					"type": "text"
 				},
 				{
-					"buffer": 8,
+					"buffer": 9,
 					"file": "src/main.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2293,
+						"buffer_size": 2295,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1187,
-								1187
+								1336,
+								1336
 							]
 						],
 						"settings":
@@ -1908,8 +2045,8 @@
 								{
 									"1":
 									[
-										2292,
-										2293
+										2294,
+										2295
 									]
 								},
 								"icon":
@@ -1934,26 +2071,31 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
 								"bh_single_quote",
 								"bh_single_quote_center",
 								"bh_single_quote_open",
 								"bh_single_quote_close",
 								"bh_single_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
 								"bh_default",
 								"bh_default_center",
 								"bh_default_open",
@@ -1964,58 +2106,53 @@
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
 								"bh_double_quote",
 								"bh_double_quote_center",
 								"bh_double_quote_open",
 								"bh_double_quote_close",
-								"bh_double_quote_content"
+								"bh_double_quote_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content"
 							],
 							"history_list_is_closing": true,
 							"syntax": "Packages/C++/C++.sublime-syntax",
 							"translate_tabs_to_spaces": false
 						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.x": -0.0,
+						"translation.y": 225.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 11,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 8,
+					"buffer": 9,
 					"file": "src/main.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2293,
+						"buffer_size": 2295,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								1362,
+								1362
 							]
 						],
 						"settings":
@@ -2026,12 +2163,27 @@
 							{
 								"close":
 								{
+									"1":
+									[
+										1334,
+										1335
+									]
 								},
 								"icon":
 								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/round_bracket.png",
+										"brackethighlighter.default"
+									]
 								},
 								"open":
 								{
+									"1":
+									[
+										1300,
+										1301
+									]
 								},
 								"unmatched":
 								{
@@ -2039,75 +2191,75 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
 								"bh_c_define",
 								"bh_c_define_center",
 								"bh_c_define_open",
 								"bh_c_define_close",
 								"bh_c_define_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
 								"bh_single_quote",
 								"bh_single_quote_center",
 								"bh_single_quote_open",
 								"bh_single_quote_close",
 								"bh_single_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
 								"bh_unmatched",
 								"bh_unmatched_center",
 								"bh_unmatched_open",
 								"bh_unmatched_close",
 								"bh_unmatched_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
 								"bh_default",
 								"bh_default_center",
 								"bh_default_open",
 								"bh_default_close",
-								"bh_default_content"
+								"bh_default_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content"
 							],
 							"history_list_is_closing": true,
 							"syntax": "Packages/C++/C++.sublime-syntax",
 							"translate_tabs_to_spaces": false
 						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.x": -0.0,
+						"translation.y": 225.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
-					"buffer": 9,
+					"buffer": 10,
 					"semi_transient": false,
 					"settings":
 					{
@@ -2208,11 +2360,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 11,
 					"type": "text"
 				},
 				{
-					"buffer": 10,
+					"buffer": 11,
 					"file": "src/xmath/intvl.h",
 					"semi_transient": false,
 					"settings":
@@ -2311,11 +2463,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 14,
+					"stack_index": 15,
 					"type": "text"
 				},
 				{
-					"buffer": 11,
+					"buffer": 12,
 					"file": "pro-files/linux/config.pro",
 					"semi_transient": false,
 					"settings":
@@ -2432,16 +2584,16 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 12,
+					"stack_index": 14,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
+					"buffer": 6,
 					"file": "todo",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 278,
+						"buffer_size": 449,
 						"regions":
 						{
 						},
@@ -2535,11 +2687,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 17,
+					"stack_index": 18,
 					"type": "text"
 				},
 				{
-					"buffer": 12,
+					"buffer": 13,
 					"file": "src/xmath/vec.h",
 					"semi_transient": false,
 					"settings":
@@ -2653,11 +2805,11 @@
 						"translation.y": 842.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 8,
+					"stack_index": 13,
 					"type": "text"
 				},
 				{
-					"buffer": 13,
+					"buffer": 14,
 					"file": "src/colmap.h",
 					"semi_transient": false,
 					"settings":
@@ -2757,11 +2909,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 16,
+					"stack_index": 17,
 					"type": "text"
 				},
 				{
-					"buffer": 14,
+					"buffer": 15,
 					"file": "src/linmap.h",
 					"semi_transient": false,
 					"settings":
@@ -2813,61 +2965,61 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
 								"bh_round",
 								"bh_round_center",
 								"bh_round_open",
 								"bh_round_close",
 								"bh_round_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
 								"bh_default",
 								"bh_default_center",
 								"bh_default_open",
 								"bh_default_close",
 								"bh_default_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
 								"bh_double_quote",
 								"bh_double_quote_center",
 								"bh_double_quote_open",
 								"bh_double_quote_close",
-								"bh_double_quote_content"
+								"bh_double_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content"
 							],
 							"history_list_is_closing": true,
 							"syntax": "Packages/C++/C++.sublime-syntax",
@@ -2877,11 +3029,11 @@
 						"translation.y": 173.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 9,
+					"stack_index": 8,
 					"type": "text"
 				},
 				{
-					"buffer": 15,
+					"buffer": 16,
 					"file": "tmp-src/main.cpp",
 					"semi_transient": false,
 					"settings":
@@ -2994,11 +3146,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 18,
+					"stack_index": 19,
 					"type": "text"
 				},
 				{
-					"buffer": 16,
+					"buffer": 17,
 					"file": "tmp-src/vec.h",
 					"semi_transient": false,
 					"settings":
@@ -3111,11 +3263,11 @@
 						"translation.y": 780.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 15,
+					"stack_index": 16,
 					"type": "text"
 				},
 				{
-					"buffer": 17,
+					"buffer": 18,
 					"file": "tmp-src/scalar-field.h",
 					"semi_transient": false,
 					"settings":
@@ -3227,7 +3379,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 19,
+					"stack_index": 20,
 					"type": "text"
 				}
 			]
@@ -3280,7 +3432,7 @@
 	"project": "fluid-sim.sublime-project",
 	"replace":
 	{
-		"height": 38.0
+		"height": 76.0
 	},
 	"save_all_on_build": false,
 	"select_file":
