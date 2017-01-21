@@ -1,7 +1,7 @@
 TARGET  = prg.exe
 
 TEMPLATE = app
-CONFIG += qt thread warn_on release 
+CONFIG += qt thread warn_on debug
 QT = core gui
 
 greaterThan(QT_MAJOR_VERSION, 4) {

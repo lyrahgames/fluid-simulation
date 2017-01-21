@@ -41,6 +41,7 @@ class MainW : public QWidget{
 
 	public:
 		MainW(CFS* cfs_src = nullptr, QWidget *parent = nullptr);
+		MainW(fluid_sim* pfs, QWidget *parent = nullptr);
 		~MainW();
 
 
@@ -169,6 +170,7 @@ class MainW : public QWidget{
 
 	private:
 		CFS *cfs;
+		fluid_sim *fs;
 		intvlv view;
 
 		colormap colormap;

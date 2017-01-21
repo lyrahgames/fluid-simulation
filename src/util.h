@@ -7,6 +7,7 @@
 #include <xmath/intvl.h>
 #include <xmath/linmap.h>
 #include <xmath/vec.h>
+#include <xmath/field.h>
 
 
 using uint = unsigned int;
@@ -23,7 +24,9 @@ using intvlv = xmath::intvl<vecf2>;
 using linmapf = xmath::linmap<float>;
 using linmapv = xmath::linmap<vecf2>;
 
+using fieldf = xmath::field<float>;
 
+using namespace xmath::op;
 
 
 template <class T, class N>

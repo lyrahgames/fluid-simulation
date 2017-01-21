@@ -12,14 +12,14 @@ rand_pos(nullptr), rand_pos_size(0), part_pos(nullptr){
 	part_count = 10000;
 	setMouseTracking(true);
 
-	colormap.add_base({-0.1f, {0.0f,0.5f,1.0f}});
-	colormap.add_base({0.1f, {1.0f,0.5f,0.0f}});
-	colormap.add_base({-0.05f, {0.0f,1.0f,1.0f}});
-	colormap.add_base({0.05f, {1.0f,1.0f,0.0f}});
+	colormap.add_base({-6.0f, {0.0f,0.5f,1.0f}});
+	colormap.add_base({1.0f, {1.0f,0.5f,0.0f}});
+	colormap.add_base({-3.0f, {0.0f,1.0f,1.0f}});
+	colormap.add_base({0.25f, {1.0f,1.0f,0.0f}});
 	colormap.add_base({0.0f, {1,1,1}});
-	colormap.add_base({100.0f, {1,0,0}});
+	colormap.add_base({10.0f, {1,0,0}});
 	// colormap.add_base({2.0f, {1,0,1}});
-	colormap.add_base({-100.0f, {0,0,1}});
+	colormap.add_base({-10.0f, {0,0,1}});
 	// colormap.add_base({-2.0f, {0,1,0}});
 
 
@@ -45,6 +45,46 @@ rand_pos(nullptr), rand_pos_size(0), part_pos(nullptr){
 	// resize(width(), height());
 }
 
+MainW::MainW(fluid_sim* pfs, QWidget *parent = nullptr):
+QWidget(parent), ready(true), mouse(veci2{}), mouse_press(Qt::NoButton), fs(pfs), view(pfs->geom), 
+rand_pos(nullptr), rand_pos_size(0), part_pos(nullptr){
+	init_rand_pos();
+	rand_pos_size = 100;
+
+	init_part_pos();
+	part_count = 10000;
+	setMouseTracking(true);
+
+	colormap.add_base({-6.0f, {0.0f,0.5f,1.0f}});
+	colormap.add_base({1.0f, {1.0f,0.5f,0.0f}});
+	colormap.add_base({-3.0f, {0.0f,1.0f,1.0f}});
+	colormap.add_base({0.25f, {1.0f,1.0f,0.0f}});
+	colormap.add_base({0.0f, {1,1,1}});
+	colormap.add_base({10.0f, {1,0,0}});
+	// colormap.add_base({2.0f, {1,0,1}});
+	colormap.add_base({-10.0f, {0,0,1}});
+	// colormap.add_base({-2.0f, {0,1,0}});
+
+
+
+	render_w = new RenderW(this);
+
+	timer = new QTimer(this);
+	connect(timer, SIGNAL(timeout()), this, SLOT(repaint()));
+	connect(timer, SIGNAL(timeout()), this, SLOT(loop_slot()));
+	timer->start(_refresh_time_);
+
+
+	ctrl_w = new CtrlW(this);
+
+
+	QHBoxLayout *layout = new QHBoxLayout(this);
+	layout->addWidget(render_w);
+	layout->addWidget(ctrl_w);
+
+	ctrl_w->setFixedWidth(250);
+}
+
 MainW::~MainW(){
 	delete[] rand_pos;
 }
@@ -57,18 +97,18 @@ void MainW::repaint(){
 }
 
 void MainW::loop_slot(){
-	if (mouse_press == Qt::LeftButton){
-		const vecf2 pos = render_w->pix_itos(mouse);
-		const vecf2 tmp = cfs->p.stoi(pos);
-		const vecu2 idx = fl(tmp);
-		const float scale = 0.01f;
+	// if (mouse_press == Qt::LeftButton){
+	// 	const vecf2 pos = render_w->pix_itos(mouse);
+	// 	const vecf2 tmp = cfs->p.stoi(pos);
+	// 	const vecu2 idx = fl(tmp);
+	// 	const float scale = 0.01f;
 
-		if (!cfs->p.out_bound(idx)){
+		// if (!cfs->p.out_bound(idx)){
 			// cfs->p(idx) += scale * static_cast<float>(_refresh_time_);
-			cfs->vx(idx) += scale * static_cast<float>(_refresh_time_);
+			// cfs->vx(idx) += scale * static_cast<float>(_refresh_time_);
 			// cfs->add_vx_persis(idx[0], idx[1], scale * static_cast<float>(_refresh_time_));
 			// cfs->rhs[cfs->p.memidx(idx)] += scale * static_cast<float>(_refresh_time_);
-		}
+		// }
 		// if (!cfs->p.out_bound(idx + vecu2{1,0})){
 		// 	cfs->p(idx + vecu2{1,0}) += scale * static_cast<float>(_refresh_time_);
 
@@ -81,17 +121,17 @@ void MainW::loop_slot(){
 		// 	cfs->p(idx + vecu2{1,1}) += scale * static_cast<float>(_refresh_time_);
 
 		// }
-	}else if(mouse_press == Qt::RightButton){
-		const vecf2 pos = render_w->pix_itos(mouse);
-		const vecf2 tmp = cfs->p.stoi(pos);
-		const vecu2 idx = fl(tmp);
-		const float scale = -0.01f;
+	// }else if(mouse_press == Qt::RightButton){
+	// 	const vecf2 pos = render_w->pix_itos(mouse);
+	// 	const vecf2 tmp = cfs->p.stoi(pos);
+	// 	const vecu2 idx = fl(tmp);
+	// 	const float scale = -0.01f;
 
-		if (!cfs->p.out_bound(idx)){
+		// if (!cfs->p.out_bound(idx)){
 			// cfs->p(idx) += scale * static_cast<float>(_refresh_time_);
-			cfs->add_vx_persis(idx[0], idx[1], scale * static_cast<float>(_refresh_time_));
+			// cfs->add_vx_persis(idx[0], idx[1], scale * static_cast<float>(_refresh_time_));
 			// cfs->rhs[cfs->p.memidx(idx)] += scale * static_cast<float>(_refresh_time_);
-		}
+		// }
 		// if (!cfs->p.out_bound(idx + vecu2{1,0})){
 		// 	cfs->p(idx + vecu2{1,0}) += scale * static_cast<float>(_refresh_time_);
 
@@ -104,15 +144,18 @@ void MainW::loop_slot(){
 		// 	cfs->p(idx + vecu2{1,1}) += scale * static_cast<float>(_refresh_time_);
 
 		// }
-	}
+	// }
 
 	if (play){
 		// cfs->poisson_test_jacobi_it();
 		// cfs->wave_it();
 		// cfs->poisson_p_jacobi_it();
 		// cfs->grad();
-		cfs->compute_time_it();
-		printf("step:%i\ttime:%f\n", cfs->it_step, cfs->time);
+		// cfs->compute_time_it();
+		// printf("step:%i\ttime:%f\n", cfs->it_step, cfs->time);
+
+		fs->compute();
+		printf("step:\t%u\ttime:%f\n", fs->it, fs->time);
 	}
 	// cfs->poisson_p_sor_it();
 	set_ready();
@@ -129,8 +172,10 @@ void MainW::init_rand_pos(){
 
 void MainW::gen_rand_pos(){
 	for (uint i = 0; i < _rand_pos_size_max_; i++){
-		rand_pos[i][0] = (float(rand())/float(RAND_MAX)) * len(cfs->vx.space).x + cfs->vx.space.min.x;
-		rand_pos[i][1] = (float(rand())/float(RAND_MAX)) * len(cfs->vy.space).y + cfs->vy.space.min.y;
+		// rand_pos[i][0] = (float(rand())/float(RAND_MAX)) * len(cfs->vx.space).x + cfs->vx.space.min.x;
+		// rand_pos[i][1] = (float(rand())/float(RAND_MAX)) * len(cfs->vy.space).y + cfs->vy.space.min.y;
+		rand_pos[i][0] = (float(rand())/float(RAND_MAX)) * len(fs->vx.space).x + fs->vx.space.min.x;
+		rand_pos[i][1] = (float(rand())/float(RAND_MAX)) * len(fs->vy.space).y + fs->vy.space.min.y;
 	}
 }
 
@@ -238,7 +283,10 @@ void MainW::RenderW::paintEvent(QPaintEvent *event){
 				const vecf2 idx{static_cast<float>(i), static_cast<float>(j)};
 				const vecf2 pos = pix_itos(idx);
 
-				const color_rgbf tmp = 255.0f * colormap()(cfs().p(pos));
+				const float mag = sqrtf(xmath::op::sq(cfs().vx(pos)) + xmath::op::sq(cfs().vy(pos)));
+
+				// const color_rgbf tmp = 255.0f * colormap()(cfs().p(pos));
+				const color_rgbf tmp = 255.0f * colormap()(mag);
 				const QRgb col = qRgb(tmp[0],tmp[1],tmp[2]);
 				map.setPixel(i,j,col);
 			}

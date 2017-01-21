@@ -6,6 +6,7 @@
 #include <xmath/intvl.h>
 #include <xmath/linmap.h>
 #include <xmath/vec.h>
+#include <xmath/field.h>
 
 
 template <class T>
@@ -27,6 +28,19 @@ std::ostream& operator<<(std::ostream& os, const xmath::vec<T,N>& v){
 	for (std::size_t i = 1; i < N; i++)
 		os << ", " << v[i];
 	return os << ")";
+}
+
+template <class T>
+std::ostream& operator<<(std::ostream& os, const xmath::field<T>& f){
+	os << "size: " << f.size() << "\tdim: " << f.dim() << "\n";
+	for (std::size_t j = 0; j < f.dim_y(); j++){
+		for (std::size_t i = 0; i < f.dim_x(); i++){
+			os << f(i,j) << "\t";
+		}
+		os << "\n";
+	}
+
+	return os;
 }
 
 

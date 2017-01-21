@@ -1,10 +1,7 @@
 #ifndef __FIELD_H__
 #define __FIELD_H__
 
-#include <string.h>
-
 #include <util.h>
-#include <grid.h>
 
 
 struct field{

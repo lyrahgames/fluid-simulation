@@ -192,12 +192,12 @@ void CFS::set_v_bound(){
 
 
 	// los obstaclos
-	// for (uint j = 50; j < 150; j++){
-	// 	for (uint i = 100; i < 180; i++){
-	// 		vx(i+float((j-100)*(j-100))*0.07f,j) = 0.0f;
-	// 		vy(i+float((j-100)*(j-100))*0.07f,j) = 0.0f;
-	// 	}
-	// } 
+	for (uint j = 50; j < 150; j++){
+		for (uint i = 100; i < 180; i++){
+			vx(i+float((j-100)*(j-100))*0.07f,j) = 0.0f;
+			vy(i+float((j-100)*(j-100))*0.07f,j) = 0.0f;
+		}
+	} 
 
 	// for (uint i = 0; i < vx_idx_persis.size(); i++){
 	// 	vx.v[vx_idx_persis[i]] = vx_persis[i];
