@@ -117,10 +117,10 @@ void fluid_sim::set_v_bound(){
 	}
 
 
-	for (uint i = 10; i < 30; i++){
-		for (uint j = 10; j < 21; j++){
-			vx(i+sq(float(j)-15.0f)*0.5f,j) = 0.0f;
-			vy(i+sq(float(j)-15.0f)*0.5f,j) = 0.0f;
+	for (uint i = 200; i < 300; i++){
+		for (uint j = 64; j < 193; j++){
+			vx(i+sq(float(j)-128.0f)*0.05f,j) = 0.0f;
+			vy(i+sq(float(j)-128.0f)*0.05f,j) = 0.0f;
 		}
 	}
 

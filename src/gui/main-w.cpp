@@ -12,15 +12,15 @@ rand_pos(nullptr), rand_pos_size(0), part_pos(nullptr){
 	part_count = 10000;
 	setMouseTracking(true);
 
-	colormap.add_base({-6.0f, {0.0f,0.5f,1.0f}});
-	colormap.add_base({1.0f, {1.0f,0.5f,0.0f}});
-	colormap.add_base({-3.0f, {0.0f,1.0f,1.0f}});
-	colormap.add_base({0.25f, {1.0f,1.0f,0.0f}});
-	colormap.add_base({0.0f, {1,1,1}});
-	colormap.add_base({100.0f, {1,0,0}});
-	// colormap.add_base({2.0f, {1,0,1}});
-	colormap.add_base({-100.0f, {0,0,1}});
-	// colormap.add_base({-2.0f, {0,1,0}});
+	p_colormap.add_base({-6.0f, {0.0f,0.5f,1.0f}});
+	p_colormap.add_base({1.0f, {1.0f,0.5f,0.0f}});
+	p_colormap.add_base({-3.0f, {0.0f,1.0f,1.0f}});
+	p_colormap.add_base({0.25f, {1.0f,1.0f,0.0f}});
+	p_colormap.add_base({0.0f, {1,1,1}});
+	p_colormap.add_base({100.0f, {1,0,0}});
+	// p_colormap.add_base({2.0f, {1,0,1}});
+	p_colormap.add_base({-100.0f, {0,0,1}});
+	// p_colormap.add_base({-2.0f, {0,1,0}});
 
 
 	v_colormap.add_base({0.0f, {1.0f,1.0f,1.0f}});
@@ -65,27 +65,23 @@ rand_pos(nullptr), rand_pos_size(0), part_pos(nullptr){
 	part_count = 10000;
 	setMouseTracking(true);
 
-	colormap.add_base({-6.0f, {0.0f,0.5f,1.0f}});
-	colormap.add_base({1.0f, {1.0f,0.5f,0.0f}});
-	colormap.add_base({-3.0f, {0.0f,1.0f,1.0f}});
-	colormap.add_base({0.25f, {1.0f,1.0f,0.0f}});
-	colormap.add_base({0.0f, {1,1,1}});
-	colormap.add_base({10.0f, {1,0,0}});
-	// colormap.add_base({2.0f, {1,0,1}});
-	colormap.add_base({-10.0f, {0,0,1}});
-	// colormap.add_base({-2.0f, {0,1,0}});
+	p_colormap.add_base({-1.0f, {0.0f,0.0f,1.0f}});
+	p_colormap.add_base({-0.5f, {0.0f,0.5f,1.0f}});
+	p_colormap.add_base({0.0f, {1,1,1}});
+	p_colormap.add_base({0.5f, {1,0.5,0}});
+	p_colormap.add_base({1.0f, {1,0,0}});
 
+	v_colormap.add_base({0.0f, {0.0f,0.0f,1.0f}});
+	v_colormap.add_base({0.25f, {0.0f,0.5f,1.0f}});
+	v_colormap.add_base({0.5f, {1,1,1}});
+	v_colormap.add_base({0.75f, {1,0.5,0}});
+	v_colormap.add_base({1.0f, {1,0,0}});
 
-	v_colormap.add_base({0.0f, {1.0f,1.0f,1.0f}});
-	v_colormap.add_base({0.5f, {0.0f,0.5f,0.5f}});
-	v_colormap.add_base({1.0f, {0.0f,0.0f,1.0f}});
-	v_colormap.add_base({10.0f, {1.0f,0.0f,1.0f}});
-
-	res_colormap.add_base({-50.0f, {0.0f,0.0f,1.0f}});
-	res_colormap.add_base({-25.0f, {0.0f,1.0f,1.0f}});
+	res_colormap.add_base({-1.0f, {0.0f,0.0f,1.0f}});
+	res_colormap.add_base({-0.5f, {0.0f,1.0f,1.0f}});
 	res_colormap.add_base({0.0f, {1.0f,1.0f,1.0f}});
-	res_colormap.add_base({25.0f, {1.0f,1.0f,0.0f}});
-	res_colormap.add_base({50.0f, {1.0f,0.0f,0.0f}});
+	res_colormap.add_base({0.5f, {1.0f,1.0f,0.0f}});
+	res_colormap.add_base({1.0f, {1.0f,0.0f,0.0f}});
 
 
 	render_w = new RenderW(this);
@@ -219,7 +215,9 @@ void MainW::gen_part_pos(){
 }
 
 void MainW::play_slot(){
-	play = !play;
+	// play = !play;
+	const bool tmp = *fs_play;
+	*fs_play = !tmp;
 }
 
 void MainW::clear_slot(){
@@ -277,7 +275,16 @@ void MainW::set_p_render_slot(int val){
 void MainW::set_jacobi_max_it_slot(int val){
 	fs->jacobi_it_max = val;
 }
-// mens changes end
+
+void MainW::set_colormap_ref_slot(double val){
+	if (ctrl_w->p_rb->isChecked()){
+		p_ref = val;
+	}else if (ctrl_w->v_rb->isChecked() || ctrl_w->vx_rb->isChecked() || ctrl_w->vy_rb->isChecked()){
+		v_ref = val;
+	}else if (ctrl_w->res_rb->isChecked()){
+		res_ref = val;
+	}
+}
 
 MainW::RenderW::RenderW(MainW *parent): QWidget(parent), main_w(parent){
 	setMouseTracking(true);
@@ -298,8 +305,97 @@ void MainW::RenderW::paintEvent(QPaintEvent *event){
 	// const int j_min = 0;
 	// const int j_max = height()-1;
 
-	if (main_w->p_render){
-		// const vecf2 bound0 = pix_stoi( cfs().p.itos(vecf2(1,1)) );
+	if (main_w->ctrl_w->colormap_gb->isChecked()){
+
+		const vecf2 bound0 = pix_stoi( main_w->fs->geom.min + vecf2{main_w->fs->dx, main_w->fs->dy} );
+		const vecf2 bound1 = pix_stoi( main_w->fs->geom.max - vecf2{main_w->fs->dx, main_w->fs->dy} );
+
+		const int i_min = ceilf(bound0.x);
+		const int i_max = floorf(bound1.x);
+		const int j_min = ceilf(bound1.y);
+		const int j_max = floorf(bound0.y);
+
+		if (main_w->ctrl_w->p_rb->isChecked()){ // render p
+
+			for (int i = i_min; i <= i_max; i++){
+				for (int j = j_min; j <= j_max; j++){
+					const vecf2 idx{static_cast<float>(i), static_cast<float>(j)};
+					const vecf2 pos = pix_itos(idx);
+
+					const float value = main_w->fs->p(pos) * main_w->p_ref;
+
+					const color_rgbf tmp = 255.0f * p_colormap()(value);
+					const QRgb col = qRgb(tmp[0],tmp[1],tmp[2]);
+					map.setPixel(i,j,col);
+				}
+			}
+
+		}else if (main_w->ctrl_w->v_rb->isChecked()){ // render v
+
+			for (int i = i_min; i <= i_max; i++){
+				for (int j = j_min; j <= j_max; j++){
+					const vecf2 idx{static_cast<float>(i), static_cast<float>(j)};
+					const vecf2 pos = pix_itos(idx);
+
+					const float mag = sqrtf( xmath::op::sq(main_w->fs->vx(pos)) + xmath::op::sq(main_w->fs->vy(pos)) );
+					const float value = mag * main_w->v_ref;
+					const color_rgbf tmp = 255.0f * (main_w->v_colormap)(value);
+					const QRgb col = qRgb(tmp[0],tmp[1],tmp[2]);
+					map.setPixel(i,j,col);
+				}
+			}
+
+		}else if (main_w->ctrl_w->vx_rb->isChecked()){
+
+			for (int i = i_min; i <= i_max; i++){
+				for (int j = j_min; j <= j_max; j++){
+					const vecf2 idx{static_cast<float>(i), static_cast<float>(j)};
+					const vecf2 pos = pix_itos(idx);
+
+					const float value = main_w->fs->vx(pos) * main_w->v_ref;
+
+					const color_rgbf tmp = 255.0f * (main_w->v_colormap)(value);
+					const QRgb col = qRgb(tmp[0],tmp[1],tmp[2]);
+					map.setPixel(i,j,col);
+				}
+			}
+
+		}else if (main_w->ctrl_w->vy_rb->isChecked()){
+
+			for (int i = i_min; i <= i_max; i++){
+				for (int j = j_min; j <= j_max; j++){
+					const vecf2 idx{static_cast<float>(i), static_cast<float>(j)};
+					const vecf2 pos = pix_itos(idx);
+
+					const float value = main_w->fs->vy(pos) * main_w->v_ref;
+
+					const color_rgbf tmp = 255.0f * (main_w->v_colormap)(value);
+					const QRgb col = qRgb(tmp[0],tmp[1],tmp[2]);
+					map.setPixel(i,j,col);
+				}
+			}
+
+		}else if (main_w->ctrl_w->res_rb->isChecked()){
+
+			for (int i = i_min; i <= i_max; i++){
+				for (int j = j_min; j <= j_max; j++){
+					const vecf2 idx{static_cast<float>(i), static_cast<float>(j)};
+					const vecf2 pos = pix_itos(idx);
+
+					const float value = main_w->fs->res(pos) * main_w->res_ref;
+
+					const color_rgbf tmp = 255.0f * (main_w->res_colormap)(value);
+					const QRgb col = qRgb(tmp[0],tmp[1],tmp[2]);
+					map.setPixel(i,j,col);
+				}
+			}
+
+		}
+
+		const QRect rect = QRect(0, 0, width(), height());
+		painter.drawImage(rect, map, rect);
+
+		/*// const vecf2 bound0 = pix_stoi( cfs().p.itos(vecf2(1,1)) );
 		// const vecf2 bound1 = pix_stoi( cfs().p.itos(vecf2(cfs().p.size[0]-1, cfs().p.size[1]-1)) );
 
 		const vecf2 bound0 = pix_stoi( main_w->fs->geom.min + vecf2{main_w->fs->dx, main_w->fs->dy} );
@@ -318,8 +414,8 @@ void MainW::RenderW::paintEvent(QPaintEvent *event){
 				// const float mag = sqrtf(xmath::op::sq(cfs().vx(pos)) + xmath::op::sq(cfs().vy(pos)));
 				const float mag = sqrtf( xmath::op::sq(main_w->fs->vx(pos)) + xmath::op::sq(main_w->fs->vy(pos)) );
 
-				// const color_rgbf tmp = 255.0f * colormap()(cfs().p(pos));
-				// const color_rgbf tmp = 255.0f * colormap()(main_w->fs->res(pos));
+				// const color_rgbf tmp = 255.0f * p_colormap()(cfs().p(pos));
+				// const color_rgbf tmp = 255.0f * p_colormap()(main_w->fs->res(pos));
 				const color_rgbf tmp = 255.0f * (main_w->v_colormap)(mag);
 				// const color_rgbf tmp = 255.0f * (main_w->res_colormap)(main_w->fs->res(pos));
 				const QRgb col = qRgb(tmp[0],tmp[1],tmp[2]);
@@ -328,74 +424,80 @@ void MainW::RenderW::paintEvent(QPaintEvent *event){
 		}
 
 		const QRect rect = QRect(0, 0, width(), height());
-		painter.drawImage(rect, map, rect);
+		painter.drawImage(rect, map, rect);*/
 	}
 
 
-	const float path_step = 0.01f;
+	if (main_w->ctrl_w->stream_render_chb->isChecked()){
+		const float path_step = 0.01f;
 
-	for (int i = 0; i < main_w->rand_pos_size; i++){
-		// float pos_x = _pix_grid_map[0].cell_pos(mouse_x);
-		// float pos_y = _pix_grid_map[1].cell_pos(height()-mouse_y);
-		// QPainterPath path(QPointF(mouse_x, mouse_y));
-		// float pos_x = main_w->rand_pos[i][0];
-		// float pos_y = main_w->rand_pos[i][1];
-		// const float idxx = _pix_grid_map[0].cell_idx(pos_x);
-		// const float idxy = _pix_grid_map[1].cell_idx(pos_y);
-		vecf2 pos = main_w->rand_pos[i];
-		vecf2 idx = pix_stoi(pos);
-		QPainterPath path(QPointF(idx[0],idx[1]));
-
-		for (int t = 0; t < 1000; t++){
-			// const float tmp_pos_x = pos_x + path_step * cfs().vx(pos_x, pos_y);
-			// const float tmp_pos_y = pos_y + path_step * cfs().vy(pos_x, pos_y);
-			// const vecf2 tmp_pos = pos + path_step * vecf2(cfs().vx(pos), cfs().vy(pos));
-			const vecf2 tmp_pos = pos + path_step * vecf2(main_w->fs->vx(pos), main_w->fs->vy(pos));
-		
-			if (main_w->fs->vx.out_bound(tmp_pos) || main_w->fs->vy.out_bound(tmp_pos))
-				break;
-
-			// pos_x = tmp_pos_x;
-			// pos_y = tmp_pos_y;
-
-			pos = tmp_pos;
-
+		for (int i = 0; i < main_w->rand_pos_size; i++){
+			// float pos_x = _pix_grid_map[0].cell_pos(mouse_x);
+			// float pos_y = _pix_grid_map[1].cell_pos(height()-mouse_y);
+			// QPainterPath path(QPointF(mouse_x, mouse_y));
+			// float pos_x = main_w->rand_pos[i][0];
+			// float pos_y = main_w->rand_pos[i][1];
 			// const float idxx = _pix_grid_map[0].cell_idx(pos_x);
 			// const float idxy = _pix_grid_map[1].cell_idx(pos_y);
-			const vecf2 idx = pix_stoi(pos);
+			vecf2 pos = main_w->rand_pos[i];
+			vecf2 idx = pix_stoi(pos);
+			QPainterPath path(QPointF(idx[0],idx[1]));
 
-			path.lineTo(idx.x, idx.y);
+			for (int t = 0; t < 1000; t++){
+				// const float tmp_pos_x = pos_x + path_step * cfs().vx(pos_x, pos_y);
+				// const float tmp_pos_y = pos_y + path_step * cfs().vy(pos_x, pos_y);
+				// const vecf2 tmp_pos = pos + path_step * vecf2(cfs().vx(pos), cfs().vy(pos));
+				const vecf2 tmp_pos = pos + path_step * vecf2(main_w->fs->vx(pos), main_w->fs->vy(pos));
+			
+				if (main_w->fs->vx.out_bound(tmp_pos) || main_w->fs->vy.out_bound(tmp_pos))
+					break;
+
+				// pos_x = tmp_pos_x;
+				// pos_y = tmp_pos_y;
+
+				pos = tmp_pos;
+
+				// const float idxx = _pix_grid_map[0].cell_idx(pos_x);
+				// const float idxy = _pix_grid_map[1].cell_idx(pos_y);
+				const vecf2 idx = pix_stoi(pos);
+
+				path.lineTo(idx.x, idx.y);
+			}
+
+			painter.setBrush(Qt::NoBrush);
+			painter.drawPath(path);
 		}
-
-		painter.setBrush(Qt::NoBrush);
-		painter.drawPath(path);
 	}
 
-	const float part_step = 0.5f;
 
-	for (int i = 0; i < main_w->part_count; i++){
-		vecf2 pos = main_w->part_pos[i];
-		vecf2 idx = pix_stoi(pos);
+	if (main_w->ctrl_w->part_render_chb->isChecked()){
+		const float part_step = 0.5f;
 
-		painter.drawPoint(idx[0], idx[1]);
+		for (int i = 0; i < main_w->part_count; i++){
+			vecf2 pos = main_w->part_pos[i];
+			vecf2 idx = pix_stoi(pos);
 
-		// const vecf2 tmp_pos = pos + part_step * vecf2(cfs().vx(pos), cfs().vy(pos));
-		const vecf2 tmp_pos = pos + path_step * vecf2(main_w->fs->vx(pos), main_w->fs->vy(pos));
+			painter.drawPoint(idx[0], idx[1]);
 
-		// if (cfs().vx.out_bound(tmp_pos) || cfs().vy.out_bound(tmp_pos)){
-		// 	main_w->part_pos[i][0] = (float(rand())/float(RAND_MAX)) * len(cfs().vx.space).x + cfs().vx.space.min.x;
-		// 	main_w->part_pos[i][1] = (float(rand())/float(RAND_MAX)) * len(cfs().vy.space).y + cfs().vy.space.min.y;
-		// 	continue;
-		// }
+			// const vecf2 tmp_pos = pos + part_step * vecf2(cfs().vx(pos), cfs().vy(pos));
+			const vecf2 tmp_pos = pos + part_step * vecf2(main_w->fs->vx(pos), main_w->fs->vy(pos));
 
-		if (main_w->fs->vx.out_bound(tmp_pos) || main_w->fs->vy.out_bound(tmp_pos)){
-			main_w->part_pos[i][0] = (float(rand())/float(RAND_MAX)) * len(main_w->fs->geom).x + main_w->fs->geom.min.x;
-			main_w->part_pos[i][1] = (float(rand())/float(RAND_MAX)) * len(main_w->fs->geom).y + main_w->fs->geom.min.y;
-			continue;
+			// if (cfs().vx.out_bound(tmp_pos) || cfs().vy.out_bound(tmp_pos)){
+			// 	main_w->part_pos[i][0] = (float(rand())/float(RAND_MAX)) * len(cfs().vx.space).x + cfs().vx.space.min.x;
+			// 	main_w->part_pos[i][1] = (float(rand())/float(RAND_MAX)) * len(cfs().vy.space).y + cfs().vy.space.min.y;
+			// 	continue;
+			// }
+
+			if (main_w->fs->vx.out_bound(tmp_pos) || main_w->fs->vy.out_bound(tmp_pos)){
+				main_w->part_pos[i][0] = (float(rand())/float(RAND_MAX)) * len(main_w->fs->geom).x + main_w->fs->geom.min.x;
+				main_w->part_pos[i][1] = (float(rand())/float(RAND_MAX)) * len(main_w->fs->geom).y + main_w->fs->geom.min.y;
+				continue;
+			}
+			
+			main_w->part_pos[i] = tmp_pos;
 		}
-		
-		main_w->part_pos[i] = tmp_pos;
 	}
+
 
 
 	painter.end();
@@ -449,13 +551,6 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	main_sw = new QWidget(main_sa);
 	
 
-	// main controls
-	grid_sb = new QSpinBox(this);
-	grid_sb->setMinimum(3);
-	grid_sb->setMaximum(10000);
-	grid_sb->setValue(100);
-	connect(grid_sb, SIGNAL(valueChanged(int)), main_w, SLOT(set_grid(int)));
-
 	play_pb = new QPushButton("play/pause", this);
 	connect(play_pb, SIGNAL(clicked()), main_w, SLOT(play_slot()));
 
@@ -491,6 +586,7 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	wave_gb_layout->addWidget(wave_c_dsb);
 	wave_gb_layout->addWidget(wave_dt_l);
 	wave_gb_layout->addWidget(wave_dt_dsb);
+	wave_gb->setVisible(false);
 
 
 	// render group box
@@ -505,6 +601,8 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	gen_rand_pos_pb = new QPushButton("gen rand pos", this);
 	connect(gen_rand_pos_pb, SIGNAL(clicked()), main_w, SLOT(gen_rand_pos_slot()));
 
+	stream_render_chb = new QCheckBox("show streamlines", this);
+
 	part_count_sb = new QSpinBox(this);
 	part_count_sb->setMinimum(0);
 	part_count_sb->setMaximum(MainW::_part_count_max_);
@@ -514,15 +612,42 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	gen_part_pos_pb = new QPushButton("gen part pos", this);
 	connect(gen_part_pos_pb, SIGNAL(clicked()), main_w, SLOT(gen_part_pos_slot()));
 
-	p_render_chb = new QCheckBox("render p", this);
-	connect(p_render_chb, SIGNAL(stateChanged(int)), main_w, SLOT(set_p_render_slot(int)));
+	part_render_chb = new QCheckBox("show particles", this);
+
+
+	colormap_gb = new QGroupBox("p_colormap", this);
+	colormap_gb->setCheckable(true);
+
+	p_rb = new QRadioButton("p", colormap_gb);
+	p_rb->setChecked(true);
+	v_rb = new QRadioButton("v", colormap_gb);
+	vx_rb = new QRadioButton("vx", colormap_gb);
+	vy_rb = new QRadioButton("vy", colormap_gb);
+	res_rb = new QRadioButton("res", colormap_gb);
+
+	QVBoxLayout *colormap_gb_layout = new QVBoxLayout(colormap_gb);
+	colormap_gb_layout->addWidget(p_rb);
+	colormap_gb_layout->addWidget(v_rb);
+	colormap_gb_layout->addWidget(vx_rb);
+	colormap_gb_layout->addWidget(vy_rb);
+	colormap_gb_layout->addWidget(res_rb);
+
+	p_colormap_ref_dsb = new QDoubleSpinBox(this);
+	p_colormap_ref_dsb->setRange(0.0f, 100.0f);
+	p_colormap_ref_dsb->setDecimals(4);
+	p_colormap_ref_dsb->setSingleStep(0.001f);
+	connect(p_colormap_ref_dsb, SIGNAL(valueChanged(double)), main_w, SLOT(set_colormap_ref_slot(double)));
+
 
 	QVBoxLayout *render_gb_layout = new QVBoxLayout(render_gb);
+	render_gb_layout->addWidget(stream_render_chb);
 	render_gb_layout->addWidget(rand_pos_size_sb);
 	render_gb_layout->addWidget(gen_rand_pos_pb);
+	render_gb_layout->addWidget(part_render_chb);
 	render_gb_layout->addWidget(part_count_sb);
 	render_gb_layout->addWidget(gen_part_pos_pb);
-	render_gb_layout->addWidget(p_render_chb);
+	render_gb_layout->addWidget(colormap_gb);
+	render_gb_layout->addWidget(p_colormap_ref_dsb);
 	
 
 	// mens changes
@@ -567,7 +692,6 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	
 	// main layouts
 	QVBoxLayout *main_sw_layout = new QVBoxLayout(main_sw);
-	main_sw_layout->addWidget(grid_sb);
 	main_sw_layout->addWidget(play_pb);
 	main_sw_layout->addWidget(clear_pb);
 	main_sw_layout->addWidget(wave_gb);

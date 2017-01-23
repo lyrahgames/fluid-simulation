@@ -28,15 +28,30 @@ test branch:
 
 	☐	run it on laptop
 
+	☐	calculate max vx and vy for adaptive dt
+
 	implement obstacles:
 		☐	implement list for obstacles and fluid-cells
 
+
+gui:
+	☐	info window
+	☐	checkbox for rendering colormaps and particles and streamlines
+	☐	variable size of particles
+	☐	mouse interaction combobox
+	☐	pray
+	☐	copy of border conditions
+	☐	parameter boxes
+	☐	commit button for everything
+	☐	reference values for colormap
+	☐	graph for residuum
+	☐	mouse point with radius with streamlines
 
 
 presentation:
 	add advertisement of next band gig to last page of presentation:
 		☐	send christian request for image of gig
-		☐	ask clemens if this is ok
+		✔	ask clemens if this is ok @done (17-01-24 00:25)
 		☐	include it via latex
 
 	

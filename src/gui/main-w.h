@@ -20,6 +20,7 @@
 #include <QScrollArea>
 #include <QComboBox>
 #include <QCheckBox>
+#include <QRadioButton>
 
 #include <util.h>
 #include <cfs.h>
@@ -74,7 +75,7 @@ class MainW : public QWidget{
 				const bool& ready() const{return main_w->ready;}
 				void set_ready(bool a = true){main_w->ready = true;}
 				const CFS& cfs() const{return *(main_w->cfs);}
-				const colormap& colormap() const{return main_w->colormap;}
+				const colormap& p_colormap() const{return main_w->p_colormap;}
 
 
 			// private:
@@ -90,7 +91,7 @@ class MainW : public QWidget{
 			public:
 				CtrlW(MainW* parent = nullptr);
 
-			private:
+			public:
 				MainW *main_w;
 
 				QGroupBox *main_gb;
@@ -100,7 +101,6 @@ class MainW : public QWidget{
 
 
 				QGroupBox *render_gb;
-				QSpinBox *grid_sb;
 
 				QPushButton *play_pb;
 				QPushButton *clear_pb;
@@ -121,7 +121,6 @@ class MainW : public QWidget{
 				QLabel *wave_dt_l;
 				QDoubleSpinBox *wave_dt_dsb;
 
-				// mens changes
 				QGroupBox *nse_gb;
 				QLabel *reynold_l;
 				QDoubleSpinBox *reynold_dsb;
@@ -133,8 +132,17 @@ class MainW : public QWidget{
 				QComboBox *left_cb;
 				QComboBox *right_cb;
 
-				QCheckBox *p_render_chb;
-				// mens changes end
+				QCheckBox *stream_render_chb;
+				QCheckBox *part_render_chb;
+
+				QGroupBox *colormap_gb;
+				QRadioButton *p_rb;
+				QRadioButton *v_rb;
+				QRadioButton *vx_rb;
+				QRadioButton *vy_rb;
+				QRadioButton *res_rb;
+
+				QDoubleSpinBox *p_colormap_ref_dsb;
 
 				QSpinBox *jacobi_max_it_sb;
 
@@ -176,9 +184,12 @@ class MainW : public QWidget{
 		fluid_sim *fs;
 		intvlv view;
 
+		colormap p_colormap;
 		colormap v_colormap;
 		colormap res_colormap;
-		colormap colormap;
+		float p_ref;
+		float v_ref;
+		float res_ref;
 
 		vecf2 *rand_pos;
 		uint rand_pos_size;
@@ -189,14 +200,12 @@ class MainW : public QWidget{
 		bool play;
 		bool p_render;
 
+	public:
+		bool *fs_play;
+
 
 	private slots:
 		void loop_slot();
-
-		void set_grid(int n){
-			// *_cfs = CFS{gridmap(0.0f, 2.0f, n), gridmap(0.0f, 1.0f, n)};
-			set_ready();
-		}
 
 		void clear_slot();
 
@@ -220,6 +229,8 @@ class MainW : public QWidget{
 		void set_p_render_slot(int val);
 
 		void set_jacobi_max_it_slot(int val);
+
+		void set_colormap_ref_slot(double val);
 
 };
 

@@ -1,6 +1,8 @@
 #include <iostream>
 
+#include <time.h>
 #include <pthread.h>
+#include <unistd.h>
 
 #include <QApplication>
 
@@ -24,6 +26,8 @@ void* thread_fs_compute(void *data){
 	while (true){
 		if (td->play)
 			td->fs->compute();
+		else
+			usleep(10 * 1000);
 	}
 }
 
@@ -97,8 +101,8 @@ int main(int argc, char *argv[]){
 	// // }
 
 
-	fluid_sim cfs(1<<7, 1<<5, {vecf2(), vecf2(4.0f,1.0f)});
-	cfs.set_reynold(10000.0f);
+	fluid_sim cfs(1<<11, 1<<8, {vecf2(), vecf2(8.0f,1.0f)});
+	cfs.set_reynold(1000.0f);
 	cfs.jacobi_it_max = 10;
 
 	thread_data *td = new thread_data;
@@ -113,6 +117,7 @@ int main(int argc, char *argv[]){
 	QApplication app(argc, argv);
 
 	MainW *main_w = new MainW(&cfs);
+	main_w->fs_play = &(td->play);
 	main_w->resize(800, 450);
 	main_w->show();
 
