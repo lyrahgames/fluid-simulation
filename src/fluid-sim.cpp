@@ -92,17 +92,17 @@ void fluid_sim::compute_dt(){
 }
 
 void fluid_sim::set_v_bound(){
-	const float w = 1.0f;
+	const float w = 4.0f;
 
 	// vx top and bottom
 	for (uint i = 1; i < vx.dim_x()-1; i++){
-		vx(i, 0) = vx(i, 1);
-		vx(i, vx.dim_y()-1) = vx(i, vx.dim_y()-2);
+		vx(i, 0) = -vx(i, 1);
+		vx(i, vx.dim_y()-1) = -vx(i, vx.dim_y()-2);
 	}
 	// vx right and left
 	for (uint j = 1; j < vx.dim_y()-1; j++){
 		vx(0, j) = w;
-		vx(vx.dim_x()-1, j) = w;
+		vx(vx.dim_x()-1, j) = vx(vx.dim_x()-2,j);
 	}
 
 	// vy top and bottom
@@ -114,6 +114,14 @@ void fluid_sim::set_v_bound(){
 	for (uint j = 1; j < vy.dim_y()-1; j++){
 		vy(0, j) = - vy(1, j);
 		vy(vy.dim_x()-1, j) = -vy(vy.dim_x()-2, j);
+	}
+
+
+	for (uint i = 10; i < 30; i++){
+		for (uint j = 10; j < 21; j++){
+			vx(i+sq(float(j)-15.0f)*0.5f,j) = 0.0f;
+			vy(i+sq(float(j)-15.0f)*0.5f,j) = 0.0f;
+		}
 	}
 
 	vx_max = w;

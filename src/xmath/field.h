@@ -82,10 +82,10 @@ struct field{
 		const T& operator()(uint i, uint j) const{return v[memidx(i,j)];}
 
 		T operator()(const vec<T,2>& pos) const{
-			const vecf2 midx = dtog(pos);
-			const vecf2 sidx = fl(midx);
+			const vect2 midx = dtog(pos);
+			const vect2 sidx = fl(midx);
 			const vecu2 idx = sidx;
-			const vecf2 w = midx - sidx;
+			const vect2 w = midx - sidx;
 
 			const uint idx1 = memidx(idx[0], idx[1]);
 			// const uint idx2 = memidx(idx[0], idx[1]+1);
@@ -109,7 +109,7 @@ struct field{
 
 		bool out_bound(const vect2& pos) const{
 			const float eps = 0.5f;
-			const vecf2 off = eps * gtod.slope;
+			const vect2 off = eps * gtod.slope;
 			return ( pos[0] <= dd.min[0] + off.x || pos[0] >= dd.max[0] - off.x || pos[1] <= dd.min[1] + off.y || pos[1] >= dd.max[1] - off.y );
 		}
 
@@ -128,10 +128,10 @@ struct field{
 		uint memidx(const vecu2& idx) const{return idx[1] * d[0] + idx[0];}
 
 
-		template<class T>
-		friend void swap_data(field<T>& f, field<T>& g);
-		template<class T>
-		friend void swap(field<T>& f, field<T>& g);
+		template<class N>
+		friend void swap_data(field<N>& f, field<N>& g);
+		template<class N>
+		friend void swap(field<N>& f, field<N>& g);
 
 
 	private:
@@ -177,7 +177,7 @@ void swap(field<T>& f, field<T>& g){
 	g.s = f.s;
 	f.s = tmp1;
 
-	const vecu2 tmp2 = g.d;
+	const vec<unsigned int,2> tmp2 = g.d;
 	g.d = f.d;
 	f.d = tmp2;
 
