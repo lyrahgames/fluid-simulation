@@ -26,8 +26,10 @@ test branch:
 
 	☐	add video play to rendering with saved data
 
+	☐	run it on laptop
+
 	implement obstacles:
-		☐	
+		☐	implement list for obstacles and fluid-cells
 
 
 
