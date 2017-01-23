@@ -87,6 +87,7 @@ struct fluid_sim{
 		float deriv_w; // weight of normal derivative
 
 		uint jacobi_it_max; // maximum of iterations in jacobi algorithm
+		float jacobi_weight;
 		uint sor_it_max; // maximum of iterations in sor algorithm
 		float sor_relax; // relaxation constant of sor algorithm
 

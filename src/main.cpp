@@ -97,9 +97,9 @@ int main(int argc, char *argv[]){
 	// // }
 
 
-	fluid_sim cfs(1<<7, 1<<6, {vecf2(), vecf2(2.0f,1.0f)});
-	cfs.set_reynold(1000.0f);
-	cfs.jacobi_it_max = 100000;
+	fluid_sim cfs(1<<10, 1<<7, {vecf2(), vecf2(2.0f,1.0f)});
+	cfs.set_reynold(10000.0f);
+	cfs.jacobi_it_max = 100;
 
 	thread_data *td = new thread_data;
 	td->play = true;

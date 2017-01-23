@@ -26,7 +26,7 @@ rand_pos(nullptr), rand_pos_size(0), part_pos(nullptr){
 	v_colormap.add_base({0.0f, {1.0f,1.0f,1.0f}});
 	v_colormap.add_base({0.5f, {0.0f,0.5f,0.5f}});
 	v_colormap.add_base({1.0f, {0.0f,0.0f,1.0f}});
-	// v_colormap.add_base({0.25f, {1.0f,1.0f,0.0f}});
+	v_colormap.add_base({100.0f, {1.0f,0.0f,1.0f}});
 	// v_colormap.add_base({0.0f, {1,1,1}});
 	// v_colormap.add_base({1.0f, {1,0,0}});
 	// v_colormap.add_base({2.0f, {1,0,1}});
@@ -79,6 +79,7 @@ rand_pos(nullptr), rand_pos_size(0), part_pos(nullptr){
 	v_colormap.add_base({0.0f, {1.0f,1.0f,1.0f}});
 	v_colormap.add_base({0.5f, {0.0f,0.5f,0.5f}});
 	v_colormap.add_base({1.0f, {0.0f,0.0f,1.0f}});
+	v_colormap.add_base({2.0f, {1.0f,0.0f,1.0f}});
 
 	res_colormap.add_base({-50.0f, {0.0f,0.0f,1.0f}});
 	res_colormap.add_base({-25.0f, {0.0f,1.0f,1.0f}});
