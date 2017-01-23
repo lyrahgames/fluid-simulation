@@ -17,11 +17,21 @@ rand_pos(nullptr), rand_pos_size(0), part_pos(nullptr){
 	colormap.add_base({-3.0f, {0.0f,1.0f,1.0f}});
 	colormap.add_base({0.25f, {1.0f,1.0f,0.0f}});
 	colormap.add_base({0.0f, {1,1,1}});
-	colormap.add_base({10.0f, {1,0,0}});
+	colormap.add_base({100.0f, {1,0,0}});
 	// colormap.add_base({2.0f, {1,0,1}});
-	colormap.add_base({-10.0f, {0,0,1}});
+	colormap.add_base({-100.0f, {0,0,1}});
 	// colormap.add_base({-2.0f, {0,1,0}});
 
+
+	v_colormap.add_base({0.0f, {1.0f,1.0f,1.0f}});
+	v_colormap.add_base({0.5f, {0.0f,0.5f,0.5f}});
+	v_colormap.add_base({1.0f, {0.0f,0.0f,1.0f}});
+	// v_colormap.add_base({0.25f, {1.0f,1.0f,0.0f}});
+	// v_colormap.add_base({0.0f, {1,1,1}});
+	// v_colormap.add_base({1.0f, {1,0,0}});
+	// v_colormap.add_base({2.0f, {1,0,1}});
+	// v_colormap.add_base({-100.0f, {0,0,1}});
+	// v_colormap.add_base({-2.0f, {0,1,0}});
 
 
 	render_w = new RenderW(this);
@@ -45,7 +55,7 @@ rand_pos(nullptr), rand_pos_size(0), part_pos(nullptr){
 	// resize(width(), height());
 }
 
-MainW::MainW(fluid_sim* pfs, QWidget *parent = nullptr):
+MainW::MainW(fluid_sim* pfs, QWidget *parent):
 QWidget(parent), ready(true), mouse(veci2{}), mouse_press(Qt::NoButton), fs(pfs), view(pfs->geom), 
 rand_pos(nullptr), rand_pos_size(0), part_pos(nullptr){
 	init_rand_pos();
@@ -65,6 +75,16 @@ rand_pos(nullptr), rand_pos_size(0), part_pos(nullptr){
 	colormap.add_base({-10.0f, {0,0,1}});
 	// colormap.add_base({-2.0f, {0,1,0}});
 
+
+	v_colormap.add_base({0.0f, {1.0f,1.0f,1.0f}});
+	v_colormap.add_base({0.5f, {0.0f,0.5f,0.5f}});
+	v_colormap.add_base({1.0f, {0.0f,0.0f,1.0f}});
+
+	res_colormap.add_base({-50.0f, {0.0f,0.0f,1.0f}});
+	res_colormap.add_base({-25.0f, {0.0f,1.0f,1.0f}});
+	res_colormap.add_base({0.0f, {1.0f,1.0f,1.0f}});
+	res_colormap.add_base({25.0f, {1.0f,1.0f,0.0f}});
+	res_colormap.add_base({50.0f, {1.0f,0.0f,0.0f}});
 
 
 	render_w = new RenderW(this);
@@ -154,8 +174,8 @@ void MainW::loop_slot(){
 		// cfs->compute_time_it();
 		// printf("step:%i\ttime:%f\n", cfs->it_step, cfs->time);
 
-		fs->compute();
-		printf("step:\t%u\ttime:%f\n", fs->it, fs->time);
+		// fs->compute();
+		// printf("step:\t%u\ttime:%f\tdt:%f\t%f\n", fs->it, fs->t, fs->dt, fs->dy);
 	}
 	// cfs->poisson_p_sor_it();
 	set_ready();
@@ -174,8 +194,8 @@ void MainW::gen_rand_pos(){
 	for (uint i = 0; i < _rand_pos_size_max_; i++){
 		// rand_pos[i][0] = (float(rand())/float(RAND_MAX)) * len(cfs->vx.space).x + cfs->vx.space.min.x;
 		// rand_pos[i][1] = (float(rand())/float(RAND_MAX)) * len(cfs->vy.space).y + cfs->vy.space.min.y;
-		rand_pos[i][0] = (float(rand())/float(RAND_MAX)) * len(fs->vx.space).x + fs->vx.space.min.x;
-		rand_pos[i][1] = (float(rand())/float(RAND_MAX)) * len(fs->vy.space).y + fs->vy.space.min.y;
+		rand_pos[i][0] = (float(rand())/float(RAND_MAX)) * (len(fs->geom).x - 2.0f*fs->dx) + fs->geom.min.x + fs->dx;
+		rand_pos[i][1] = (float(rand())/float(RAND_MAX)) * (len(fs->geom).y - 2.0f*fs->dy) + fs->geom.min.y + fs->dy;
 	}
 }
 
@@ -190,8 +210,10 @@ void MainW::init_part_pos(){
 
 void MainW::gen_part_pos(){
 	for (uint i = 0; i < _part_count_max_; i++){
-		part_pos[i][0] = (float(rand())/float(RAND_MAX)) * len(cfs->vx.space).x + cfs->vx.space.min.x;
-		part_pos[i][1] = (float(rand())/float(RAND_MAX)) * len(cfs->vy.space).y + cfs->vy.space.min.y;
+		// part_pos[i][0] = (float(rand())/float(RAND_MAX)) * len(cfs->vx.space).x + cfs->vx.space.min.x;
+		// part_pos[i][1] = (float(rand())/float(RAND_MAX)) * len(cfs->vy.space).y + cfs->vy.space.min.y;
+		part_pos[i][0] = (float(rand())/float(RAND_MAX)) * (len(fs->geom).x - 2.0f*fs->dx) + fs->geom.min.x + fs->dx;
+		part_pos[i][1] = (float(rand())/float(RAND_MAX)) * (len(fs->geom).y - 2.0f*fs->dy) + fs->geom.min.y + fs->dy;
 	}
 }
 
@@ -200,7 +222,8 @@ void MainW::play_slot(){
 }
 
 void MainW::clear_slot(){
-	cfs->clear();
+	// cfs->clear();
+	fs->clear();
 	set_ready();
 }
 
@@ -225,20 +248,21 @@ void MainW::gen_part_pos_slot(){
 }
 
 void MainW::set_wave_damp_slot(double val){
-	cfs->wave_damp = val;
+	// cfs->wave_damp = val;
 }
 
 void MainW::set_wave_c_slot(double val){
-	cfs->wave_c = val;
+	// cfs->wave_c = val;
 }
 
 void MainW::set_wave_dt_slot(double val){
-	cfs->wave_dt = val;
+	// cfs->wave_dt = val;
 }
 
 // mens changes
 void MainW::set_reynold_slot(double val){
-	cfs->reynold = val;
+	// cfs->reynold = val;
+	fs->set_reynold(val);
 }
 
 void MainW::border_pb_slot(){
@@ -247,6 +271,10 @@ void MainW::border_pb_slot(){
 
 void MainW::set_p_render_slot(int val){
 	p_render = val;
+}
+
+void MainW::set_jacobi_max_it_slot(int val){
+	fs->jacobi_it_max = val;
 }
 // mens changes end
 
@@ -270,8 +298,11 @@ void MainW::RenderW::paintEvent(QPaintEvent *event){
 	// const int j_max = height()-1;
 
 	if (main_w->p_render){
-		const vecf2 bound0 = pix_stoi( cfs().p.itos(vecf2(1,1)) );
-		const vecf2 bound1 = pix_stoi( cfs().p.itos(vecf2(cfs().p.size[0]-1, cfs().p.size[1]-1)) );
+		// const vecf2 bound0 = pix_stoi( cfs().p.itos(vecf2(1,1)) );
+		// const vecf2 bound1 = pix_stoi( cfs().p.itos(vecf2(cfs().p.size[0]-1, cfs().p.size[1]-1)) );
+
+		const vecf2 bound0 = pix_stoi( main_w->fs->geom.min + vecf2{main_w->fs->dx, main_w->fs->dy} );
+		const vecf2 bound1 = pix_stoi( main_w->fs->geom.max - vecf2{main_w->fs->dx, main_w->fs->dy} );
 
 		const int i_min = ceilf(bound0.x);
 		const int i_max = floorf(bound1.x);
@@ -283,10 +314,13 @@ void MainW::RenderW::paintEvent(QPaintEvent *event){
 				const vecf2 idx{static_cast<float>(i), static_cast<float>(j)};
 				const vecf2 pos = pix_itos(idx);
 
-				const float mag = sqrtf(xmath::op::sq(cfs().vx(pos)) + xmath::op::sq(cfs().vy(pos)));
+				// const float mag = sqrtf(xmath::op::sq(cfs().vx(pos)) + xmath::op::sq(cfs().vy(pos)));
+				const float mag = sqrtf( xmath::op::sq(main_w->fs->vx(pos)) + xmath::op::sq(main_w->fs->vy(pos)) );
 
 				// const color_rgbf tmp = 255.0f * colormap()(cfs().p(pos));
-				const color_rgbf tmp = 255.0f * colormap()(mag);
+				// const color_rgbf tmp = 255.0f * colormap()(main_w->fs->res(pos));
+				const color_rgbf tmp = 255.0f * (main_w->v_colormap)(mag);
+				// const color_rgbf tmp = 255.0f * (main_w->res_colormap)(main_w->fs->res(pos));
 				const QRgb col = qRgb(tmp[0],tmp[1],tmp[2]);
 				map.setPixel(i,j,col);
 			}
@@ -314,9 +348,10 @@ void MainW::RenderW::paintEvent(QPaintEvent *event){
 		for (int t = 0; t < 1000; t++){
 			// const float tmp_pos_x = pos_x + path_step * cfs().vx(pos_x, pos_y);
 			// const float tmp_pos_y = pos_y + path_step * cfs().vy(pos_x, pos_y);
-			const vecf2 tmp_pos = pos + path_step * vecf2(cfs().vx(pos), cfs().vy(pos));
+			// const vecf2 tmp_pos = pos + path_step * vecf2(cfs().vx(pos), cfs().vy(pos));
+			const vecf2 tmp_pos = pos + path_step * vecf2(main_w->fs->vx(pos), main_w->fs->vy(pos));
 		
-			if (cfs().vx.out_bound(tmp_pos) || cfs().vy.out_bound(tmp_pos))
+			if (main_w->fs->vx.out_bound(tmp_pos) || main_w->fs->vy.out_bound(tmp_pos))
 				break;
 
 			// pos_x = tmp_pos_x;
@@ -343,11 +378,18 @@ void MainW::RenderW::paintEvent(QPaintEvent *event){
 
 		painter.drawPoint(idx[0], idx[1]);
 
-		const vecf2 tmp_pos = pos + part_step * vecf2(cfs().vx(pos), cfs().vy(pos));
+		// const vecf2 tmp_pos = pos + part_step * vecf2(cfs().vx(pos), cfs().vy(pos));
+		const vecf2 tmp_pos = pos + path_step * vecf2(main_w->fs->vx(pos), main_w->fs->vy(pos));
 
-		if (cfs().vx.out_bound(tmp_pos) || cfs().vy.out_bound(tmp_pos)){
-			main_w->part_pos[i][0] = (float(rand())/float(RAND_MAX)) * len(cfs().vx.space).x + cfs().vx.space.min.x;
-			main_w->part_pos[i][1] = (float(rand())/float(RAND_MAX)) * len(cfs().vy.space).y + cfs().vy.space.min.y;
+		// if (cfs().vx.out_bound(tmp_pos) || cfs().vy.out_bound(tmp_pos)){
+		// 	main_w->part_pos[i][0] = (float(rand())/float(RAND_MAX)) * len(cfs().vx.space).x + cfs().vx.space.min.x;
+		// 	main_w->part_pos[i][1] = (float(rand())/float(RAND_MAX)) * len(cfs().vy.space).y + cfs().vy.space.min.y;
+		// 	continue;
+		// }
+
+		if (main_w->fs->vx.out_bound(tmp_pos) || main_w->fs->vy.out_bound(tmp_pos)){
+			main_w->part_pos[i][0] = (float(rand())/float(RAND_MAX)) * len(main_w->fs->geom).x + main_w->fs->geom.min.x;
+			main_w->part_pos[i][1] = (float(rand())/float(RAND_MAX)) * len(main_w->fs->geom).y + main_w->fs->geom.min.y;
 			continue;
 		}
 		
@@ -491,7 +533,7 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	reynold_dsb = new QDoubleSpinBox(this);
 	reynold_dsb->setRange(0.0, 10000.0);
 	reynold_dsb->setSingleStep(10.0);
-	reynold_dsb->setValue(main_w->cfs->reynold);
+	reynold_dsb->setValue(100.0f);
 	connect(reynold_dsb, SIGNAL(valueChanged(double)), main_w, SLOT(set_reynold_slot(double)));
 
 	QVBoxLayout *nse_gb_layout = new QVBoxLayout(nse_gb);
@@ -515,6 +557,12 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	nse_gb_layout->addWidget(border_pb);
 	// mens changes end
 
+
+	jacobi_max_it_sb = new QSpinBox(this);
+	jacobi_max_it_sb->setMinimum(1);
+	jacobi_max_it_sb->setMaximum(1000);
+	connect(jacobi_max_it_sb, SIGNAL(valueChanged(int)), main_w, SLOT(set_jacobi_max_it_slot(int)));
+
 	
 	// main layouts
 	QVBoxLayout *main_sw_layout = new QVBoxLayout(main_sw);
@@ -524,6 +572,7 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	main_sw_layout->addWidget(wave_gb);
 	main_sw_layout->addWidget(render_gb);
 	main_sw_layout->addWidget(nse_gb);
+	main_sw_layout->addWidget(jacobi_max_it_sb);
 
 	main_sa->setWidget(main_sw);
 

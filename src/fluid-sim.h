@@ -20,6 +20,10 @@ struct fluid_sim{
 		void set_grid_dim(const vecu2& grid_dim);
 		void set_grid_dim(uint width, uint height);
 
+
+		void set_reynold(float reynold){ re = reynold; inv_re = 1.0f/re; compute_dt_bound(); }
+
+
 		// clear every array
 		void clear();
 
@@ -35,6 +39,10 @@ struct fluid_sim{
 		void compute_poisson_rhs();
 		// compute jacobi algorithm for poisson equation for pressure
 		void compute_poisson_p_jacobi();
+		//
+		void compute_poisson_p_sor();
+		// compute residuum
+		void compute_res();
 		// rectify pressure for preventing divergence
 		void rectify_p();
 		// compute velocity out of pressure
@@ -49,6 +57,8 @@ struct fluid_sim{
 		fieldf p; // pressure
 		fieldf p_tmp; // temporary pressure field
 		fieldf rhs; // right-handside of poisson pressure equation
+		fieldf res; // residuum
+		float res_eps;
 		fieldf vx; // velocity in x direction
 		fieldf vx_tmp;
 		fieldf vy; // velocity in y direction
@@ -76,7 +86,9 @@ struct fluid_sim{
 
 		float deriv_w; // weight of normal derivative
 
-		float jacobi_it_max; // maximum of iterations in jacobi algorithm
+		uint jacobi_it_max; // maximum of iterations in jacobi algorithm
+		uint sor_it_max; // maximum of iterations in sor algorithm
+		float sor_relax; // relaxation constant of sor algorithm
 
 
 	public:
@@ -88,6 +100,8 @@ struct fluid_sim{
 		float edge_x_const;
 		float edge_y_const;
 		float vert_const;
+		float res_l2_norm_const;
 };
+
 
 #endif // __FLUID_SIM_H__

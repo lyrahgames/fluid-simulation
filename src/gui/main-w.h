@@ -23,6 +23,7 @@
 
 #include <util.h>
 #include <cfs.h>
+#include <fluid-sim.h>
 #include <colmap.h>
 #include <io/term-out.h>
 
@@ -135,6 +136,8 @@ class MainW : public QWidget{
 				QCheckBox *p_render_chb;
 				// mens changes end
 
+				QSpinBox *jacobi_max_it_sb;
+
 
 			protected:
 				void resizeEvent(QResizeEvent *event);
@@ -173,6 +176,8 @@ class MainW : public QWidget{
 		fluid_sim *fs;
 		intvlv view;
 
+		colormap v_colormap;
+		colormap res_colormap;
 		colormap colormap;
 
 		vecf2 *rand_pos;
@@ -213,6 +218,8 @@ class MainW : public QWidget{
 		// mens changes end
 		void border_pb_slot();
 		void set_p_render_slot(int val);
+
+		void set_jacobi_max_it_slot(int val);
 
 };
 

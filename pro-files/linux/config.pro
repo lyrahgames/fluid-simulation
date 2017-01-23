@@ -1,7 +1,7 @@
 TARGET  = prg.exe
 
 TEMPLATE = app
-CONFIG += qt thread warn_on debug
+CONFIG += qt thread warn_on release
 QT = core gui
 
 greaterThan(QT_MAJOR_VERSION, 4) {
@@ -10,11 +10,11 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 DEFINES += 
 # -Wall
-QMAKE_CXXFLAGS  += -O2 -fPIC -static -std=c++14 -g -fpermissive
+QMAKE_CXXFLAGS  += -O2 -fPIC -static -std=c++14 -g -fpermissive -fms-extensions
 QMAKE_LFLAGS    +=
 
 INCLUDEPATH += ../../src
-LIBS +=
+LIBS += -lpthread
 
 HEADERS = ../../src/*.h ../../src/gui/*.h ../../src/xmath/*.h
 SOURCES = ../../src/*.cpp ../../src/gui/*.cpp ../../src/xmath/*.cpp

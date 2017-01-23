@@ -33,6 +33,9 @@ std::ostream& operator<<(std::ostream& os, const xmath::vec<T,N>& v){
 template <class T>
 std::ostream& operator<<(std::ostream& os, const xmath::field<T>& f){
 	os << "size: " << f.size() << "\tdim: " << f.dim() << "\n";
+	os << "domain: " << f.domain() << "\n";
+	os << "gtod: " << f.grid_to_domain() << "\n";
+	os << "dtog: " << f.domain_to_grid() << "\n";
 	for (std::size_t j = 0; j < f.dim_y(); j++){
 		for (std::size_t i = 0; i < f.dim_x(); i++){
 			os << f(i,j) << "\t";

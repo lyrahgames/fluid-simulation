@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include <pthread.h>
+
 #include <QApplication>
 
 #include <io/term-out.h>
@@ -8,6 +10,22 @@
 
 #include <xmath/field.h>
 #include <util.h>
+
+
+struct thread_data{
+	bool play;
+	fluid_sim *fs;
+};
+
+
+void* thread_fs_compute(void *data){
+	thread_data *td = (thread_data*)data;
+
+	while (true){
+		if (td->play)
+			td->fs->compute();
+	}
+}
 
 
 int main(int argc, char *argv[]){
@@ -79,7 +97,17 @@ int main(int argc, char *argv[]){
 	// // }
 
 
-	fluid_sim cfs(200, 20, {vecf2(), vecf2(10.0f,1.0f)});
+	fluid_sim cfs(1<<7, 1<<6, {vecf2(), vecf2(2.0f,1.0f)});
+	cfs.set_reynold(1000.0f);
+	cfs.jacobi_it_max = 100000;
+
+	thread_data *td = new thread_data;
+	td->play = true;
+	td->fs = &cfs;
+
+	pthread_t fs_thread;
+
+	pthread_create(&fs_thread, NULL, thread_fs_compute, (void*)td);
 
 
 	QApplication app(argc, argv);
@@ -91,6 +119,42 @@ int main(int argc, char *argv[]){
 	app.exec();
 	
 	delete main_w;
+
+
+	// intvlv domain{vecf2{0,1}, vecf2{2,3}};
+
+	// fieldf f(10, 5, domain);
+
+	// for (uint i = 0; i < f.size(); i++){
+	// 	f[i] = i*i;
+	// }
+
+	// cout << f << endl;
+
+
+	// fieldf *g = new fieldf(f);
+
+	// for (uint i = 0; i < op::min(f.dim_x(),f.dim_y()); i++){
+	// 	(*g)(i,i) = 0.0f;
+	// }
+
+	// cout << *g << endl;
+
+	// fieldf h(2,2,domain);
+	// h = *g;
+
+	// cout << h << endl;
+
+	// delete g;
+
+	// cout << f << endl;
+	// cout << h << endl;
+
+
+	// f = fieldf(5,5,domain);
+	// f.setzero();
+
+	// cout << f << endl;
 
 
 	return 0;
