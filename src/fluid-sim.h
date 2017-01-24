@@ -36,6 +36,8 @@ struct fluid_sim{
 		//
 		void set_v_bound();
 		//
+		void compute_v_mag_max();
+		//
 		void compute_poisson_rhs();
 		// compute jacobi algorithm for poisson equation for pressure
 		void compute_poisson_p_jacobi();
@@ -65,8 +67,10 @@ struct fluid_sim{
 		fieldf vy_tmp;
 		float vx_max;
 		float vx_min;
+		float vx_mag_max;
 		float vy_max;
 		float vy_min;
+		float vy_mag_max;
 
 		float t; // time
 		uint it; // current iteration

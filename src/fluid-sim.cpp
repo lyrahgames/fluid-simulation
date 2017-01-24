@@ -86,7 +86,7 @@ void fluid_sim::compute_dt(){
 	const float vx_abs_max = max(fabsf(vx_max), fabsf(vx_min));
 	const float vy_abs_max = max(fabsf(vy_max), fabsf(vy_min));
 
-	const float tmp = min(dx/vx_abs_max, dy/vy_abs_max);
+	const float tmp = min(dx/vx_mag_max, dy/vy_mag_max);
 	dt = min(dt_bound, dt_safe*tmp);
 	inv_dt = 1.0f / dt;
 }
@@ -123,9 +123,16 @@ void fluid_sim::set_v_bound(){
 			vy(i+sq(float(j)-128.0f)*0.05f,j) = 0.0f;
 		}
 	}
+}
 
-	vx_max = w;
-	vy_max = 0.0f;
+void fluid_sim::compute_v_mag_max(){
+	vx_mag_max = 0.0f;
+	vy_mag_max = 0.0f;
+
+	for (uint i = 0; i < vx.size(); i++){
+		vx_mag_max = max(vx_mag_max, fabsf(vx[i]));
+		vy_mag_max = max(vy_mag_max, fabsf(vy[i]));
+	}
 }
 
 void fluid_sim::compute_poisson_rhs(){
@@ -526,6 +533,7 @@ void fluid_sim::compute(){
 	// compute_poisson_p_sor();
 	rectify_p();
 	compute_v();
+	compute_v_mag_max();
 	// set_v_bound();
 
 	t += dt;
