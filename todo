@@ -30,6 +30,8 @@ test branch:
 
 	☐	calculate max vx and vy for adaptive dt
 
+	☐	equi distant distribution for colormap for faster rendering
+
 	implement obstacles:
 		☐	implement list for obstacles and fluid-cells
 
