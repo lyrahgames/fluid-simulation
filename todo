@@ -32,8 +32,18 @@ test branch:
 
 	☐	equi distant distribution for colormap for faster rendering
 
+	☐	syncing of theads
+
+	☐	add namespace to gui tools
+
+	☐	measure performance
+
 	implement obstacles:
 		☐	implement list for obstacles and fluid-cells
+
+
+implement video recording:
+	☐	save all important data
 
 
 gui:

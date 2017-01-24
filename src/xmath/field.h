@@ -127,6 +127,10 @@ struct field{
 		uint memidx(uint i, uint j) const{return j * d[0] + i;}
 		uint memidx(const vecu2& idx) const{return idx[1] * d[0] + idx[0];}
 
+		void copy_data(const T* data){
+			memcpy(v, data, s*sizeof(T));
+		}
+
 
 		template<class N>
 		friend void swap_data(field<N>& f, field<N>& g);

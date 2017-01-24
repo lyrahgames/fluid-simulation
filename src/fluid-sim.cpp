@@ -342,7 +342,7 @@ void fluid_sim::compute_poisson_p_jacobi(){
 		// 	break;
 	}
 
-	printf("jacobi:\tit: %u\tres: %f\n", n, res_max_norm);
+	// printf("jacobi:\tit: %u\tres: %f\n", n, res_max_norm);
 }
 
 void fluid_sim::compute_poisson_p_sor(){

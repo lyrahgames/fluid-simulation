@@ -2,6 +2,7 @@
 #define __MAIN_W_H__
 
 #include <iostream>
+#include <fstream>
 // #include <vector>
 // #include <stdlib.h>
 
@@ -21,12 +22,16 @@
 #include <QComboBox>
 #include <QCheckBox>
 #include <QRadioButton>
+#include <QDockWidget>
+#include <QMainWindow>
 
 #include <util.h>
 #include <cfs.h>
 #include <fluid-sim.h>
 #include <colmap.h>
 #include <io/term-out.h>
+
+#include <gui/toggle-w.h>
 
 
 class MainW : public QWidget{
@@ -136,6 +141,7 @@ class MainW : public QWidget{
 				QCheckBox *part_render_chb;
 
 				QGroupBox *colormap_gb;
+				ToggleW *colormap_tw;
 				QRadioButton *p_rb;
 				QRadioButton *v_rb;
 				QRadioButton *vx_rb;
@@ -149,6 +155,14 @@ class MainW : public QWidget{
 
 			protected:
 				void resizeEvent(QResizeEvent *event);
+		};
+
+		class InfoW : public QDockWidget{
+			public:
+				InfoW(QWidget *parent = nullptr);
+
+
+				ToggleW *test;
 		};
 
 
@@ -171,6 +185,7 @@ class MainW : public QWidget{
 	private:
 		RenderW *render_w;
 		CtrlW *ctrl_w;
+		InfoW *info_w;
 
 		bool ready;
 		QTimer *timer;
@@ -203,8 +218,40 @@ class MainW : public QWidget{
 	public:
 		bool *fs_play;
 
+		// fstream p_file;
+		// fstream vx_file;
+		// fstream vy_file;
+
+		bool play_recording;
+		// bool record_p;
+		// uint record_count;
+		// uint cur_it;
+		// fieldf p_record;
+
+
+		// recording
+		uint max_frame_count;
+		uint cur_frame_count;
+		uint cur_rec_frame;
+		uint cur_play_frame;
+		float *frame_data;
+		float *vx_frame_data;
+		float *vy_frame_data;
+		fieldf frame;
+		fieldf vx_frame;
+		fieldf vy_frame;
+		QTimer *rec_timer;
+
+
+	public slots:
+		void record_frame();
+		void init_frame_data();
+		void init_frame();
+		void init_recording();
+
 
 	private slots:
+
 		void loop_slot();
 
 		void clear_slot();
