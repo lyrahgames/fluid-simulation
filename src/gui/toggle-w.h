@@ -13,12 +13,21 @@ class ToggleW : public QWidget{
 	public:
 		ToggleW(QWidget *parent = nullptr);
 		ToggleW(const char *name, QWidget *parent = nullptr);
-		// ~ToggleW();
+
+		void addWidget(QWidget *w);
 
 
-	public:
+	signals:
+		void toggled();
+
+
+	protected:
+
+
+	private:
 		QCheckBox *toggle_chb;
 		QGroupBox *main_gb;
+		QVBoxLayout *layout;
 
 
 	private slots:

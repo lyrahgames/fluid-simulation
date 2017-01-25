@@ -14,6 +14,24 @@ struct fluid_sim{
 	public:
 		void init();
 
+
+		const intvlv& geometry() const{return geom;}
+		float time() const{return t;}
+		float time_step() const{return dt;}
+		float time_step_safe() const{return dt_safe;}
+		float time_step_bound() const{return dt_bound;}
+		float max_speed_x() const{return vx_mag_max;}
+		float max_speed_y() const{return vy_mag_max;}
+		float max_speed() const{return sqrtf(sq( max_speed_x()) + sq(max_speed_y()) );}
+		float reynold() const{return re;}
+		const vecf2& force() const{return f;}
+
+		const vecu2& grid_dim() const{return dim;}
+		float x_step() const{return dx;}
+		float y_step() const{return dy;}
+		uint iteration() const{return it;}
+
+
 		// set geometry of box
 		void set_geometry(const intvlv& geometry);
 		// set grid dimension
@@ -86,7 +104,7 @@ struct fluid_sim{
 		float re; // reynold number
 		float inv_re; // inverse reynold number
 
-		vecf2 force;
+		vecf2 f; // force
 
 		float deriv_w; // weight of normal derivative
 

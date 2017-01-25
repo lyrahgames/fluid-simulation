@@ -24,6 +24,7 @@
 #include <QRadioButton>
 #include <QDockWidget>
 #include <QMainWindow>
+#include <QMenu>
 
 #include <util.h>
 #include <cfs.h>
@@ -32,14 +33,19 @@
 #include <io/term-out.h>
 
 #include <gui/toggle-w.h>
+#include <gui/scroll-w.h>
+#include <gui/info-label-w.h>
 
 
-class MainW : public QWidget{
+class MainW : public QMainWindow{
 	Q_OBJECT
 
 
 	static constexpr uint _fps_ = 60;
 	static constexpr uint _refresh_time_ = 1000 / _fps_;
+
+	static constexpr uint _info_fps_ = 20;
+	static constexpr uint _info_refresh_time_ = 1000 / _info_fps_;
 
 	static constexpr uint _rand_pos_size_max_ = 1 << 15;
 	static constexpr uint _part_count_max_ = 1<<18;
@@ -74,6 +80,7 @@ class MainW : public QWidget{
 				void mouseMoveEvent(QMouseEvent *event){event->ignore();}
 				void mouseReleaseEvent(QMouseEvent *event){event->ignore();}
 				void mousePressEvent(QMouseEvent *event){event->ignore();}
+				void contextMenuEvent(QContextMenuEvent *event){ event->ignore(); }
 
 
 			private:
@@ -157,12 +164,40 @@ class MainW : public QWidget{
 				void resizeEvent(QResizeEvent *event);
 		};
 
-		class InfoW : public QDockWidget{
+		class InfoW : public QWidget{
 			public:
-				InfoW(QWidget *parent = nullptr);
+				InfoW(MainW *parent = nullptr);
+
+				void updateInfo();
 
 
-				ToggleW *test;
+			private:	
+				MainW *main_w;
+				ScrollW *scroll_w;
+
+				// physical data
+				ToggleW *phd_tw;
+				InfoLabelW *geom_ilw;
+				InfoLabelW *reynold_ilw;
+				InfoLabelW *force_ilw;
+				InfoLabelW *time_ilw;
+				InfoLabelW *max_vx_ilw;
+				InfoLabelW *max_vy_ilw;
+				InfoLabelW *max_v_ilw;
+
+				// numerical data
+				ToggleW *nd_tw;
+				InfoLabelW *grid_dim_ilw;
+				InfoLabelW *x_step_ilw;
+				InfoLabelW *y_step_ilw;
+				InfoLabelW *it_ilw;
+				InfoLabelW *time_step_ilw;
+				InfoLabelW *time_step_safe_ilw;
+				InfoLabelW *time_step_bound_ilw;
+
+
+			private:
+				fluid_sim* fs(){return main_w->fs;}
 		};
 
 
@@ -180,12 +215,22 @@ class MainW : public QWidget{
 		void resizeEvent(QResizeEvent *event){
 			set_ready();
 		}
+		void contextMenuEvent(QContextMenuEvent *event){
+			main_menu->exec(event->globalPos());
+		}
 
 
 	private:
+		QMenu *main_menu;
 		RenderW *render_w;
 		CtrlW *ctrl_w;
+		QDockWidget *ctrl_dw;
+
+
 		InfoW *info_w;
+		QDockWidget *info_dw;
+		QTimer *info_update_t;
+
 
 		bool ready;
 		QTimer *timer;
@@ -195,6 +240,9 @@ class MainW : public QWidget{
 
 
 	private:
+
+
+
 		CFS *cfs;
 		fluid_sim *fs;
 		intvlv view;
@@ -251,6 +299,9 @@ class MainW : public QWidget{
 
 
 	private slots:
+
+		void info_update_info_slot(){info_w->updateInfo();}
+
 
 		void loop_slot();
 

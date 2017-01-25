@@ -8,17 +8,27 @@ ToggleW::ToggleW(QWidget *parent): QWidget(parent){
 	connect(toggle_chb, SIGNAL(stateChanged(int)), this, SLOT(toggle_slot(int)));
 	toggle_chb->setChecked(false);
 
-	QVBoxLayout *layout = new QVBoxLayout(this);
+	layout = new QVBoxLayout(this);
 	layout->addWidget(toggle_chb);
 	layout->addWidget(main_gb);
-	
-	// main_gb->setVisible(false);
+
+	main_gb->setVisible(false);
+
+	updateGeometry();
+
+	layout = new QVBoxLayout(main_gb);
 }
 
 ToggleW::ToggleW(const char* name, QWidget *parent): ToggleW(parent){
 	toggle_chb->setText(name);
 }
 
+void ToggleW::addWidget(QWidget *w){
+	layout->addWidget(w);
+}
+
 void ToggleW::toggle_slot(int val){
 	main_gb->setVisible(val);
+	updateGeometry();
+	toggled();
 }

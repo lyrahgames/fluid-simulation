@@ -2,7 +2,7 @@
 
 
 MainW::MainW(CFS* cfs_src, QWidget *parent):
-QWidget(parent), ready(true), mouse(veci2{}), mouse_press(Qt::NoButton), cfs(cfs_src), view(cfs_src->space), 
+QMainWindow(parent), ready(true), mouse(veci2{}), mouse_press(Qt::NoButton), cfs(cfs_src), view(cfs_src->space), 
 rand_pos(nullptr), rand_pos_size(0), part_pos(nullptr),
 frame(0,0,cfs->space), vx_frame(0,0,cfs->space), vy_frame(0,0,cfs->space){
 
@@ -50,16 +50,20 @@ frame(0,0,cfs->space), vx_frame(0,0,cfs->space), vy_frame(0,0,cfs->space){
 	layout->addWidget(render_w);
 	layout->addWidget(ctrl_w);
 
-	ctrl_w->setFixedWidth(250);
+	// ctrl_w->setFixedWidth(250);
 	// ctrl_w->adjustSize();
 
 	// resize(width(), height());
 }
 
 MainW::MainW(fluid_sim* pfs, QWidget *parent):
-QWidget(parent), ready(true), mouse(veci2{}), mouse_press(Qt::NoButton), fs(pfs), view(pfs->geom), 
+QMainWindow(parent), ready(true), mouse(veci2{}), mouse_press(Qt::NoButton), fs(pfs), view(pfs->geom), 
 rand_pos(nullptr), rand_pos_size(0), part_pos(nullptr),
 frame(pfs->p), vx_frame(pfs->vx), vy_frame(pfs->vy){
+
+	setMouseTracking(true);
+	setFocusPolicy(Qt::StrongFocus);
+
 	init_rand_pos();
 	rand_pos_size = 100;
 
@@ -73,11 +77,13 @@ frame(pfs->p), vx_frame(pfs->vx), vy_frame(pfs->vy){
 	p_colormap.add_base({0.5f, {1,0.5,0}});
 	p_colormap.add_base({1.0f, {1,0,0}});
 
+	v_colormap.add_base({-100.0f, {0.0f,0.0f,1.0f}});
 	v_colormap.add_base({0.0f, {0.0f,0.0f,1.0f}});
-	v_colormap.add_base({0.25f, {0.0f,0.5f,1.0f}});
-	v_colormap.add_base({0.5f, {1,1,1}});
-	v_colormap.add_base({0.75f, {1,0.5,0}});
-	v_colormap.add_base({1.0f, {1,0,0}});
+	// v_colormap.add_base({0.25f, {0.5f,1.0f,0.0f}});
+	v_colormap.add_base({0.5f, {0,0.8,1}});
+	// v_colormap.add_base({0.75f, {1,0.5,0}});
+	v_colormap.add_base({1.0f, {1,1,1}});
+	v_colormap.add_base({10000.0f, {1.0f,1.0f,1.0f}});
 
 	res_colormap.add_base({-1.0f, {0.0f,0.0f,1.0f}});
 	res_colormap.add_base({-0.5f, {0.0f,1.0f,1.0f}});
@@ -86,7 +92,6 @@ frame(pfs->p), vx_frame(pfs->vx), vy_frame(pfs->vy){
 	res_colormap.add_base({1.0f, {1.0f,0.0f,0.0f}});
 
 
-	info_w = new InfoW(this);
 
 
 	render_w = new RenderW(this);
@@ -97,13 +102,39 @@ frame(pfs->p), vx_frame(pfs->vx), vy_frame(pfs->vy){
 	timer->start(_refresh_time_);
 
 
+
+	setCentralWidget(render_w);
+
+
+	ctrl_dw = new QDockWidget("controls", this);
+	ctrl_dw->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
+
+
 	ctrl_w = new CtrlW(this);
 
+	ctrl_dw->setWidget(ctrl_w);
+	addDockWidget(Qt::RightDockWidgetArea, ctrl_dw);
 
-	QHBoxLayout *layout = new QHBoxLayout(this);
-	layout->addWidget(info_w);
-	layout->addWidget(render_w);
-	layout->addWidget(ctrl_w);
+
+
+	// info_w
+	info_dw = new QDockWidget("info", this);
+	info_dw->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
+
+	info_w = new InfoW(this);
+
+	info_dw->setWidget(info_w);
+	addDockWidget(Qt::LeftDockWidgetArea, info_dw);
+
+	info_update_t = new QTimer(this);
+	connect(info_update_t, SIGNAL(timeout()), this, SLOT(info_update_info_slot()));
+	info_update_t->start(_info_refresh_time_);
+
+
+	// QHBoxLayout *layout = new QHBoxLayout(this);
+	// layout->addWidget(info_w);
+	// layout->addWidget(render_w);
+	// layout->addWidget(ctrl_w);
 
 	ctrl_w->setFixedWidth(250);
 
@@ -115,6 +146,10 @@ frame(pfs->p), vx_frame(pfs->vx), vy_frame(pfs->vy){
 	connect(rec_timer, SIGNAL(timeout()), this, SLOT(record_frame()));
 	rec_timer->start(5000);
 
+
+	main_menu = new QMenu(this);
+	main_menu->addAction(ctrl_dw->toggleViewAction());
+	main_menu->addAction(info_dw->toggleViewAction());
 }
 
 MainW::~MainW(){
@@ -466,7 +501,7 @@ void MainW::RenderW::paintEvent(QPaintEvent *event){
 
 
 		if (main_w->ctrl_w->part_render_chb->isChecked()){
-			const float part_step = 0.05f;
+			const float part_step = 0.005f;
 
 			for (int i = 0; i < main_w->part_count; i++){
 				vecf2 pos = main_w->part_pos[i];
@@ -826,18 +861,18 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	res_rb = new QRadioButton("res", colormap_gb);
 
 	QVBoxLayout *colormap_gb_layout = new QVBoxLayout(colormap_gb);
-	// colormap_gb_layout->addWidget(p_rb);
-	// colormap_gb_layout->addWidget(v_rb);
-	// colormap_gb_layout->addWidget(vx_rb);
-	// colormap_gb_layout->addWidget(vy_rb);
-	// colormap_gb_layout->addWidget(res_rb);
+	colormap_gb_layout->addWidget(p_rb);
+	colormap_gb_layout->addWidget(v_rb);
+	colormap_gb_layout->addWidget(vx_rb);
+	colormap_gb_layout->addWidget(vy_rb);
+	colormap_gb_layout->addWidget(res_rb);
 
-	QVBoxLayout *colormap_tw_layout = new QVBoxLayout(colormap_tw->main_gb);
-	colormap_tw_layout->addWidget(p_rb);
-	colormap_tw_layout->addWidget(v_rb);
-	colormap_tw_layout->addWidget(vx_rb);
-	colormap_tw_layout->addWidget(vy_rb);
-	colormap_tw_layout->addWidget(res_rb);
+	// QVBoxLayout *colormap_tw_layout = new QVBoxLayout(colormap_tw->main_gb);
+	// colormap_tw_layout->addWidget(p_rb);
+	// colormap_tw_layout->addWidget(v_rb);
+	// colormap_tw_layout->addWidget(vx_rb);
+	// colormap_tw_layout->addWidget(vy_rb);
+	// colormap_tw_layout->addWidget(res_rb);
 
 	p_colormap_ref_dsb = new QDoubleSpinBox(this);
 	p_colormap_ref_dsb->setRange(0.0f, 100.0f);
@@ -920,10 +955,131 @@ void MainW::CtrlW::resizeEvent(QResizeEvent* event){
 	
 }
 
-MainW::InfoW::InfoW(QWidget *parent){
+MainW::InfoW::InfoW(MainW *parent): QWidget(parent), main_w(parent){
+	scroll_w = new ScrollW(this);	
 
-	test = new ToggleW("test",this);
+
+
+	phd_tw = new ToggleW("physical data", this);
+
+		geom_ilw = new InfoLabelW(phd_tw);
+		geom_ilw->setName("geometry:");
+
+		reynold_ilw = new InfoLabelW(phd_tw);
+		reynold_ilw->setName("reynold:");
+
+		force_ilw = new InfoLabelW(phd_tw);
+		force_ilw->setName("force:");
+
+		time_ilw = new InfoLabelW(phd_tw);
+		time_ilw->setName("time:");
+
+		max_vx_ilw = new InfoLabelW(phd_tw);
+		max_vx_ilw->setName("max. x-speed:");
+
+		max_vy_ilw = new InfoLabelW(phd_tw);
+		max_vy_ilw->setName("max. y-speed:");
+
+		max_v_ilw = new InfoLabelW(phd_tw);
+		max_v_ilw->setName("max. speed:");
+
+	phd_tw->addWidget(geom_ilw);
+	phd_tw->addWidget(reynold_ilw);
+	phd_tw->addWidget(force_ilw);
+	phd_tw->addWidget(time_ilw);
+	phd_tw->addWidget(max_vx_ilw);
+	phd_tw->addWidget(max_vy_ilw);
+	phd_tw->addWidget(max_v_ilw);
+
+
+
+	nd_tw = new ToggleW("numerical data",this);
+
+		grid_dim_ilw = new InfoLabelW(nd_tw);
+		grid_dim_ilw->setName("grid size:");
+
+		x_step_ilw = new InfoLabelW(nd_tw);
+		x_step_ilw->setName("x step:");
+
+		y_step_ilw = new InfoLabelW(nd_tw);
+		y_step_ilw->setName("y step:");
+
+		it_ilw = new InfoLabelW(nd_tw);
+		it_ilw->setName("iteration:");
+
+		time_step_ilw = new InfoLabelW(nd_tw);
+		time_step_ilw->setName("time step:");
+
+		time_step_safe_ilw = new InfoLabelW(nd_tw);
+		time_step_safe_ilw->setName("time step safety:");
+
+		time_step_bound_ilw = new InfoLabelW(nd_tw);
+		time_step_bound_ilw->setName("time step bound:");
+
+
+	nd_tw->addWidget(grid_dim_ilw);	
+	nd_tw->addWidget(x_step_ilw);
+	nd_tw->addWidget(y_step_ilw);
+	nd_tw->addWidget(it_ilw);
+	nd_tw->addWidget(time_step_ilw);
+	nd_tw->addWidget(time_step_safe_ilw);
+	nd_tw->addWidget(time_step_bound_ilw);
+
+
+
+	scroll_w->addToggleW(phd_tw);
+	scroll_w->addToggleW(nd_tw);
+
 
 	QVBoxLayout *layout = new QVBoxLayout(this);
-	layout->addWidget(test);
+	layout->addWidget(scroll_w);
+
+	updateInfo();
+}
+
+void MainW::InfoW::updateInfo(){
+	QString geom_str;
+	geom_str += "[";
+	geom_str += QString::number(fs()->geometry().min.x);
+	geom_str += ", ";
+	geom_str += QString::number(fs()->geometry().max.x);
+	geom_str += "] x [";
+	geom_str += QString::number(fs()->geometry().min.y);
+	geom_str += ", ";
+	geom_str += QString::number(fs()->geometry().max.y);
+	geom_str += "]";
+	geom_ilw->setInfo(geom_str);
+
+
+	reynold_ilw->setInfo(QString::number(fs()->reynold(), 'f', 2));
+
+	QString force_str;
+	force_str += "(";
+	force_str += QString::number(fs()->force().x);
+	force_str += ", ";
+	force_str += QString::number(fs()->force().y);
+	force_str += ")";
+	force_ilw->setInfo(force_str);
+
+
+	time_ilw->setInfo(QString::number(fs()->time(), 'f', 6));
+
+	max_vx_ilw->setInfo(QString::number(fs()->max_speed_x(), 'f', 6));
+	max_vy_ilw->setInfo(QString::number(fs()->max_speed_y(), 'f', 6));
+	max_v_ilw->setInfo(QString::number(fs()->max_speed(), 'f', 6));
+
+
+
+	QString grid_dim_str;
+	grid_dim_str += QString::number(fs()->grid_dim()[0]);
+	grid_dim_str += " x ";
+	grid_dim_str += QString::number(fs()->grid_dim()[1]);
+	grid_dim_ilw->setInfo(grid_dim_str);
+
+	x_step_ilw->setInfo(QString::number(fs()->x_step()));
+	y_step_ilw->setInfo(QString::number(fs()->y_step()));
+	it_ilw->setInfo(QString::number(fs()->iteration()));
+	time_step_ilw->setInfo(QString::number(fs()->time_step(), 'f', 6));
+	time_step_safe_ilw->setInfo(QString::number(fs()->time_step_safe(), 'f', 6));
+	time_step_bound_ilw->setInfo(QString::number(fs()->time_step_bound(), 'f', 6));
 }

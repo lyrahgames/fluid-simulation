@@ -48,17 +48,25 @@ OBJECTS_DIR   = obj/
 SOURCES       = ../../src/cfs.cpp \
 		../../src/fluid-sim.cpp \
 		../../src/main.cpp \
+		../../src/gui/info-label-w.cpp \
 		../../src/gui/main-w.cpp \
+		../../src/gui/scroll-w.cpp \
 		../../src/gui/toggle-w.cpp \
-		../../src/xmath/op.cpp moc/moc_main-w.cpp \
+		../../src/xmath/op.cpp moc/moc_info-label-w.cpp \
+		moc/moc_main-w.cpp \
+		moc/moc_scroll-w.cpp \
 		moc/moc_toggle-w.cpp
 OBJECTS       = obj/cfs.o \
 		obj/fluid-sim.o \
 		obj/main.o \
+		obj/info-label-w.o \
 		obj/main-w.o \
+		obj/scroll-w.o \
 		obj/toggle-w.o \
 		obj/op.o \
+		obj/moc_info-label-w.o \
 		obj/moc_main-w.o \
+		obj/moc_scroll-w.o \
 		obj/moc_toggle-w.o
 DIST          = ../../../../tool/qt/5.3.2/mkspecs/features/spec_pre.prf \
 		../../../../tool/qt/5.3.2/mkspecs/common/shell-unix.conf \
@@ -159,7 +167,9 @@ DIST          = ../../../../tool/qt/5.3.2/mkspecs/features/spec_pre.prf \
 		config.pro ../../src/cfs.cpp \
 		../../src/fluid-sim.cpp \
 		../../src/main.cpp \
+		../../src/gui/info-label-w.cpp \
 		../../src/gui/main-w.cpp \
+		../../src/gui/scroll-w.cpp \
 		../../src/gui/toggle-w.cpp \
 		../../src/xmath/op.cpp
 QMAKE_TARGET  = prg.exe
@@ -402,7 +412,7 @@ qmake_all: FORCE
 
 dist: 
 	@test -d obj/prg.exe1.0.0 || mkdir -p obj/prg.exe1.0.0
-	$(COPY_FILE) --parents $(DIST) obj/prg.exe1.0.0/ && $(COPY_FILE) --parents ../../src/cfs.h ../../src/colmap.h ../../src/field.h ../../src/fluid-sim.h ../../src/linmap.h ../../src/util.h ../../src/gui/main-w.h ../../src/gui/toggle-w.h ../../src/xmath/field.h ../../src/xmath/intvl.h ../../src/xmath/linmap.h ../../src/xmath/op.h ../../src/xmath/vec.h obj/prg.exe1.0.0/ && $(COPY_FILE) --parents ../../src/cfs.cpp ../../src/fluid-sim.cpp ../../src/main.cpp ../../src/gui/main-w.cpp ../../src/gui/toggle-w.cpp ../../src/xmath/op.cpp obj/prg.exe1.0.0/ && (cd `dirname obj/prg.exe1.0.0` && $(TAR) prg.exe1.0.0.tar prg.exe1.0.0 && $(COMPRESS) prg.exe1.0.0.tar) && $(MOVE) `dirname obj/prg.exe1.0.0`/prg.exe1.0.0.tar.gz . && $(DEL_FILE) -r obj/prg.exe1.0.0
+	$(COPY_FILE) --parents $(DIST) obj/prg.exe1.0.0/ && $(COPY_FILE) --parents ../../src/cfs.h ../../src/colmap.h ../../src/field.h ../../src/fluid-sim.h ../../src/linmap.h ../../src/util.h ../../src/gui/info-label-w.h ../../src/gui/main-w.h ../../src/gui/scroll-w.h ../../src/gui/toggle-w.h ../../src/xmath/field.h ../../src/xmath/intvl.h ../../src/xmath/linmap.h ../../src/xmath/op.h ../../src/xmath/vec.h obj/prg.exe1.0.0/ && $(COPY_FILE) --parents ../../src/cfs.cpp ../../src/fluid-sim.cpp ../../src/main.cpp ../../src/gui/info-label-w.cpp ../../src/gui/main-w.cpp ../../src/gui/scroll-w.cpp ../../src/gui/toggle-w.cpp ../../src/xmath/op.cpp obj/prg.exe1.0.0/ && (cd `dirname obj/prg.exe1.0.0` && $(TAR) prg.exe1.0.0.tar prg.exe1.0.0 && $(COMPRESS) prg.exe1.0.0.tar) && $(MOVE) `dirname obj/prg.exe1.0.0`/prg.exe1.0.0.tar.gz . && $(DEL_FILE) -r obj/prg.exe1.0.0
 
 
 clean:compiler_clean 
@@ -426,9 +436,120 @@ check: first
 
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: moc/moc_main-w.cpp moc/moc_toggle-w.cpp
+compiler_moc_header_make_all: moc/moc_info-label-w.cpp moc/moc_main-w.cpp moc/moc_scroll-w.cpp moc/moc_toggle-w.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc/moc_main-w.cpp moc/moc_toggle-w.cpp
+	-$(DEL_FILE) moc/moc_info-label-w.cpp moc/moc_main-w.cpp moc/moc_scroll-w.cpp moc/moc_toggle-w.cpp
+moc/moc_info-label-w.cpp: ../../../../tool/qt/5.3.2/include/QtWidgets/QWidget \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qwidget.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qwindowdefs.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qglobal.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qconfig.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qfeatures.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qsystemdetection.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qprocessordetection.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qcompilerdetection.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qtypeinfo.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qtypetraits.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qsysinfo.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qlogging.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qflags.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qbasicatomic.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_bootstrap.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qgenericatomic.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_msvc.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_armv7.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_armv6.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_armv5.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_ia64.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_mips.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_x86.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_cxx11.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_gcc.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_unix.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qglobalstatic.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qmutex.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qnumeric.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qobjectdefs.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qnamespace.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qobjectdefs_impl.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qwindowdefs_win.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qobject.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qstring.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qchar.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qbytearray.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qrefcount.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qarraydata.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qstringbuilder.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qlist.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qalgorithms.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qiterator.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qcoreevent.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qscopedpointer.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qmetatype.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qvarlengtharray.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qcontainerfwd.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qisenum.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qobject_impl.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qmargins.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qpaintdevice.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qrect.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qsize.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qpoint.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qpalette.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qcolor.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qrgb.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qstringlist.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qdatastream.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qiodevice.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qpair.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qregexp.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qstringmatcher.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qbrush.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qvector.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qmatrix.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qpolygon.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qregion.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qline.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qtransform.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qpainterpath.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qimage.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qpixmap.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qsharedpointer.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qshareddata.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qsharedpointer_impl.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qhash.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qfont.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qfontmetrics.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qfontinfo.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qsizepolicy.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qcursor.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qkeysequence.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qevent.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qvariant.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qmap.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qdebug.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qtextstream.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qlocale.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qset.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qcontiguouscache.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qurl.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qurlquery.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qfile.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qfiledevice.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qvector2d.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qtouchdevice.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/QLabel \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qlabel.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qframe.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/QHBoxLayout \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qboxlayout.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qlayout.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qlayoutitem.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qgridlayout.h \
+		../../src/gui/info-label-w.h
+	/home/lyrahgames/tool/qt/5.3.2/bin/moc $(DEFINES) -I/home/lyrahgames/tool/qt/5.3.2/mkspecs/linux-icc-64 -I/home/lyrahgames/pro/fluid-sim/pro-files/linux -I/home/lyrahgames/pro/fluid-sim/src -I/home/lyrahgames/tool/qt/5.3.2/include -I/home/lyrahgames/tool/qt/5.3.2/include/QtWidgets -I/home/lyrahgames/tool/qt/5.3.2/include/QtGui -I/home/lyrahgames/tool/qt/5.3.2/include/QtCore -I/home/lyrahgames/tool/parallel-studio-xe/2016/compilers_and_libraries_2016.1.150/linux/ipp/include -I/home/lyrahgames/tool/parallel-studio-xe/2016/compilers_and_libraries_2016.1.150/linux/mkl/include -I/home/lyrahgames/tool/parallel-studio-xe/2016/compilers_and_libraries_2016.1.150/linux/tbb/include -I/home/lyrahgames/tool/parallel-studio-xe/2016/compilers_and_libraries_2016.1.150/linux/daal/include -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../../src/gui/info-label-w.h -o moc/moc_info-label-w.cpp
+
 moc/moc_main-w.cpp: ../../../../tool/qt/5.3.2/include/QtCore/QTimer \
 		../../../../tool/qt/5.3.2/include/QtCore/qtimer.h \
 		../../../../tool/qt/5.3.2/include/QtCore/qglobal.h \
@@ -581,6 +702,10 @@ moc/moc_main-w.cpp: ../../../../tool/qt/5.3.2/include/QtCore/QTimer \
 		../../../../tool/qt/5.3.2/include/QtWidgets/qdockwidget.h \
 		../../../../tool/qt/5.3.2/include/QtWidgets/QMainWindow \
 		../../../../tool/qt/5.3.2/include/QtWidgets/qmainwindow.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/QMenu \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qmenu.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qaction.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qactiongroup.h \
 		../../src/util.h \
 		../../src/xmath/intvl.h \
 		../../src/xmath/linmap.h \
@@ -592,8 +717,131 @@ moc/moc_main-w.cpp: ../../../../tool/qt/5.3.2/include/QtCore/QTimer \
 		../../src/colmap.h \
 		../../src/io/term-out.h \
 		../../src/gui/toggle-w.h \
+		../../src/gui/scroll-w.h \
+		../../../../tool/qt/5.3.2/include/QtGui/QResizeEvent \
+		../../src/gui/info-label-w.h \
 		../../src/gui/main-w.h
 	/home/lyrahgames/tool/qt/5.3.2/bin/moc $(DEFINES) -I/home/lyrahgames/tool/qt/5.3.2/mkspecs/linux-icc-64 -I/home/lyrahgames/pro/fluid-sim/pro-files/linux -I/home/lyrahgames/pro/fluid-sim/src -I/home/lyrahgames/tool/qt/5.3.2/include -I/home/lyrahgames/tool/qt/5.3.2/include/QtWidgets -I/home/lyrahgames/tool/qt/5.3.2/include/QtGui -I/home/lyrahgames/tool/qt/5.3.2/include/QtCore -I/home/lyrahgames/tool/parallel-studio-xe/2016/compilers_and_libraries_2016.1.150/linux/ipp/include -I/home/lyrahgames/tool/parallel-studio-xe/2016/compilers_and_libraries_2016.1.150/linux/mkl/include -I/home/lyrahgames/tool/parallel-studio-xe/2016/compilers_and_libraries_2016.1.150/linux/tbb/include -I/home/lyrahgames/tool/parallel-studio-xe/2016/compilers_and_libraries_2016.1.150/linux/daal/include -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../../src/gui/main-w.h -o moc/moc_main-w.cpp
+
+moc/moc_scroll-w.cpp: ../../../../tool/qt/5.3.2/include/QtWidgets/QWidget \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qwidget.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qwindowdefs.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qglobal.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qconfig.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qfeatures.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qsystemdetection.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qprocessordetection.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qcompilerdetection.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qtypeinfo.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qtypetraits.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qsysinfo.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qlogging.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qflags.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qbasicatomic.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_bootstrap.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qgenericatomic.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_msvc.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_armv7.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_armv6.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_armv5.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_ia64.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_mips.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_x86.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_cxx11.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_gcc.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_unix.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qglobalstatic.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qmutex.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qnumeric.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qobjectdefs.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qnamespace.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qobjectdefs_impl.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qwindowdefs_win.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qobject.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qstring.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qchar.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qbytearray.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qrefcount.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qarraydata.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qstringbuilder.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qlist.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qalgorithms.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qiterator.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qcoreevent.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qscopedpointer.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qmetatype.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qvarlengtharray.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qcontainerfwd.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qisenum.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qobject_impl.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qmargins.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qpaintdevice.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qrect.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qsize.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qpoint.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qpalette.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qcolor.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qrgb.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qstringlist.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qdatastream.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qiodevice.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qpair.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qregexp.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qstringmatcher.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qbrush.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qvector.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qmatrix.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qpolygon.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qregion.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qline.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qtransform.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qpainterpath.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qimage.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qpixmap.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qsharedpointer.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qshareddata.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qsharedpointer_impl.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qhash.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qfont.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qfontmetrics.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qfontinfo.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qsizepolicy.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qcursor.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qkeysequence.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qevent.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qvariant.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qmap.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qdebug.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qtextstream.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qlocale.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qset.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qcontiguouscache.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qurl.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qurlquery.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qfile.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qfiledevice.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qvector2d.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qtouchdevice.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/QScrollArea \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qscrollarea.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qabstractscrollarea.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qframe.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/QVBoxLayout \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qboxlayout.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qlayout.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qlayoutitem.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qgridlayout.h \
+		../../../../tool/qt/5.3.2/include/QtGui/QResizeEvent \
+		../../src/gui/toggle-w.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/QCheckBox \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qcheckbox.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qabstractbutton.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qicon.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/QGroupBox \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qgroupbox.h \
+		../../src/gui/scroll-w.h
+	/home/lyrahgames/tool/qt/5.3.2/bin/moc $(DEFINES) -I/home/lyrahgames/tool/qt/5.3.2/mkspecs/linux-icc-64 -I/home/lyrahgames/pro/fluid-sim/pro-files/linux -I/home/lyrahgames/pro/fluid-sim/src -I/home/lyrahgames/tool/qt/5.3.2/include -I/home/lyrahgames/tool/qt/5.3.2/include/QtWidgets -I/home/lyrahgames/tool/qt/5.3.2/include/QtGui -I/home/lyrahgames/tool/qt/5.3.2/include/QtCore -I/home/lyrahgames/tool/parallel-studio-xe/2016/compilers_and_libraries_2016.1.150/linux/ipp/include -I/home/lyrahgames/tool/parallel-studio-xe/2016/compilers_and_libraries_2016.1.150/linux/mkl/include -I/home/lyrahgames/tool/parallel-studio-xe/2016/compilers_and_libraries_2016.1.150/linux/tbb/include -I/home/lyrahgames/tool/parallel-studio-xe/2016/compilers_and_libraries_2016.1.150/linux/daal/include -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../../src/gui/scroll-w.h -o moc/moc_scroll-w.cpp
 
 moc/moc_toggle-w.cpp: ../../../../tool/qt/5.3.2/include/QtWidgets/QWidget \
 		../../../../tool/qt/5.3.2/include/QtWidgets/qwidget.h \
@@ -908,12 +1156,130 @@ obj/main.o: ../../src/main.cpp ../../../../tool/qt/5.3.2/include/QtWidgets/QAppl
 		../../../../tool/qt/5.3.2/include/QtWidgets/qdockwidget.h \
 		../../../../tool/qt/5.3.2/include/QtWidgets/QMainWindow \
 		../../../../tool/qt/5.3.2/include/QtWidgets/qmainwindow.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/QMenu \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qmenu.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qaction.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qactiongroup.h \
 		../../src/util.h \
 		../../src/cfs.h \
 		../../src/fluid-sim.h \
 		../../src/colmap.h \
-		../../src/gui/toggle-w.h
+		../../src/gui/toggle-w.h \
+		../../src/gui/scroll-w.h \
+		../../../../tool/qt/5.3.2/include/QtGui/QResizeEvent \
+		../../src/gui/info-label-w.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/main.o ../../src/main.cpp
+
+obj/info-label-w.o: ../../src/gui/info-label-w.cpp ../../src/gui/info-label-w.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/QWidget \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qwidget.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qwindowdefs.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qglobal.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qconfig.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qfeatures.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qsystemdetection.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qprocessordetection.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qcompilerdetection.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qtypeinfo.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qtypetraits.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qsysinfo.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qlogging.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qflags.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qbasicatomic.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_bootstrap.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qgenericatomic.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_msvc.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_armv7.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_armv6.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_armv5.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_ia64.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_mips.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_x86.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_cxx11.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_gcc.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_unix.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qglobalstatic.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qmutex.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qnumeric.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qobjectdefs.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qnamespace.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qobjectdefs_impl.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qwindowdefs_win.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qobject.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qstring.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qchar.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qbytearray.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qrefcount.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qarraydata.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qstringbuilder.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qlist.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qalgorithms.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qiterator.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qcoreevent.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qscopedpointer.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qmetatype.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qvarlengtharray.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qcontainerfwd.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qisenum.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qobject_impl.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qmargins.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qpaintdevice.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qrect.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qsize.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qpoint.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qpalette.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qcolor.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qrgb.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qstringlist.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qdatastream.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qiodevice.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qpair.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qregexp.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qstringmatcher.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qbrush.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qvector.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qmatrix.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qpolygon.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qregion.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qline.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qtransform.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qpainterpath.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qimage.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qpixmap.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qsharedpointer.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qshareddata.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qsharedpointer_impl.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qhash.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qfont.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qfontmetrics.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qfontinfo.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qsizepolicy.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qcursor.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qkeysequence.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qevent.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qvariant.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qmap.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qdebug.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qtextstream.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qlocale.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qset.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qcontiguouscache.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qurl.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qurlquery.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qfile.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qfiledevice.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qvector2d.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qtouchdevice.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/QLabel \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qlabel.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qframe.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/QHBoxLayout \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qboxlayout.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qlayout.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qlayoutitem.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qgridlayout.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/info-label-w.o ../../src/gui/info-label-w.cpp
 
 obj/main-w.o: ../../src/gui/main-w.cpp ../../src/gui/main-w.h \
 		../../../../tool/qt/5.3.2/include/QtCore/QTimer \
@@ -1068,6 +1434,10 @@ obj/main-w.o: ../../src/gui/main-w.cpp ../../src/gui/main-w.h \
 		../../../../tool/qt/5.3.2/include/QtWidgets/qdockwidget.h \
 		../../../../tool/qt/5.3.2/include/QtWidgets/QMainWindow \
 		../../../../tool/qt/5.3.2/include/QtWidgets/qmainwindow.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/QMenu \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qmenu.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qaction.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qactiongroup.h \
 		../../src/util.h \
 		../../src/xmath/intvl.h \
 		../../src/xmath/linmap.h \
@@ -1078,8 +1448,131 @@ obj/main-w.o: ../../src/gui/main-w.cpp ../../src/gui/main-w.h \
 		../../src/fluid-sim.h \
 		../../src/colmap.h \
 		../../src/io/term-out.h \
-		../../src/gui/toggle-w.h
+		../../src/gui/toggle-w.h \
+		../../src/gui/scroll-w.h \
+		../../../../tool/qt/5.3.2/include/QtGui/QResizeEvent \
+		../../src/gui/info-label-w.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/main-w.o ../../src/gui/main-w.cpp
+
+obj/scroll-w.o: ../../src/gui/scroll-w.cpp ../../src/gui/scroll-w.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/QWidget \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qwidget.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qwindowdefs.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qglobal.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qconfig.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qfeatures.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qsystemdetection.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qprocessordetection.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qcompilerdetection.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qtypeinfo.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qtypetraits.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qsysinfo.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qlogging.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qflags.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qbasicatomic.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_bootstrap.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qgenericatomic.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_msvc.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_armv7.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_armv6.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_armv5.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_ia64.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_mips.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_x86.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_cxx11.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_gcc.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qatomic_unix.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qglobalstatic.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qmutex.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qnumeric.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qobjectdefs.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qnamespace.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qobjectdefs_impl.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qwindowdefs_win.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qobject.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qstring.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qchar.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qbytearray.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qrefcount.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qarraydata.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qstringbuilder.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qlist.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qalgorithms.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qiterator.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qcoreevent.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qscopedpointer.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qmetatype.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qvarlengtharray.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qcontainerfwd.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qisenum.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qobject_impl.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qmargins.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qpaintdevice.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qrect.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qsize.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qpoint.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qpalette.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qcolor.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qrgb.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qstringlist.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qdatastream.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qiodevice.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qpair.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qregexp.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qstringmatcher.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qbrush.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qvector.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qmatrix.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qpolygon.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qregion.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qline.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qtransform.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qpainterpath.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qimage.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qpixmap.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qsharedpointer.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qshareddata.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qsharedpointer_impl.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qhash.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qfont.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qfontmetrics.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qfontinfo.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qsizepolicy.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qcursor.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qkeysequence.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qevent.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qvariant.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qmap.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qdebug.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qtextstream.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qlocale.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qset.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qcontiguouscache.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qurl.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qurlquery.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qfile.h \
+		../../../../tool/qt/5.3.2/include/QtCore/qfiledevice.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qvector2d.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qtouchdevice.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/QScrollArea \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qscrollarea.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qabstractscrollarea.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qframe.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/QVBoxLayout \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qboxlayout.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qlayout.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qlayoutitem.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qgridlayout.h \
+		../../../../tool/qt/5.3.2/include/QtGui/QResizeEvent \
+		../../src/gui/toggle-w.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/QCheckBox \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qcheckbox.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qabstractbutton.h \
+		../../../../tool/qt/5.3.2/include/QtGui/qicon.h \
+		../../../../tool/qt/5.3.2/include/QtWidgets/QGroupBox \
+		../../../../tool/qt/5.3.2/include/QtWidgets/qgroupbox.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/scroll-w.o ../../src/gui/scroll-w.cpp
 
 obj/toggle-w.o: ../../src/gui/toggle-w.cpp ../../src/gui/toggle-w.h \
 		../../../../tool/qt/5.3.2/include/QtWidgets/QWidget \
@@ -1199,8 +1692,14 @@ obj/toggle-w.o: ../../src/gui/toggle-w.cpp ../../src/gui/toggle-w.h \
 obj/op.o: ../../src/xmath/op.cpp ../../src/xmath/op.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/op.o ../../src/xmath/op.cpp
 
+obj/moc_info-label-w.o: moc/moc_info-label-w.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/moc_info-label-w.o moc/moc_info-label-w.cpp
+
 obj/moc_main-w.o: moc/moc_main-w.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/moc_main-w.o moc/moc_main-w.cpp
+
+obj/moc_scroll-w.o: moc/moc_scroll-w.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/moc_scroll-w.o moc/moc_scroll-w.cpp
 
 obj/moc_toggle-w.o: moc/moc_toggle-w.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obj/moc_toggle-w.o moc/moc_toggle-w.cpp

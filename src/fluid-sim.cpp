@@ -12,7 +12,7 @@ vx_max(0.0f), vx_min(0.0f), vy_max(0.0f), vy_min(0.0f),
 t(0.0f), it(0),
 dt_safe(0.5f),
 re(1000.0f),
-force(vecf2()),
+f(vecf2()),
 deriv_w(0.5f),
 jacobi_it_max(100),
 jacobi_weight(1.0f),
@@ -92,7 +92,7 @@ void fluid_sim::compute_dt(){
 }
 
 void fluid_sim::set_v_bound(){
-	const float w = 4.0f;
+	const float w = 20.0f;
 
 	// vx top and bottom
 	for (uint i = 1; i < vx.dim_x()-1; i++){
@@ -117,10 +117,27 @@ void fluid_sim::set_v_bound(){
 	}
 
 
-	for (uint i = 200; i < 300; i++){
-		for (uint j = 64; j < 193; j++){
-			vx(i+sq(float(j)-128.0f)*0.05f,j) = 0.0f;
-			vy(i+sq(float(j)-128.0f)*0.05f,j) = 0.0f;
+	// jet
+	// for (uint i = 200; i < 300; i++){
+	// 	for (uint j = 64; j < 193; j++){
+	// 		vx(i+sq(float(j)-128.0f)*0.05f,j) = 0.0f;
+	// 		vy(i+sq(float(j)-128.0f)*0.05f,j) = 0.0f;
+	// 	}
+	// }
+
+	// box
+	// for (uint i = 200; i < 300; i++){
+	// 	for (uint j = 0; j < 150; j++){
+	// 		vx(i,j) = 0.0f;
+	// 		vy(i,j) = 0.0f;
+	// 	}
+	// }
+
+	// step
+	for (uint i = 0; i < 300; i++){
+		for (uint j = 0; j < 100; j++){
+			vx(i,j) = 0.0f;
+			vy(i,j) = 0.0f;
 		}
 	}
 }
@@ -178,7 +195,7 @@ void fluid_sim::compute_poisson_rhs(){
 				)
 			);
 
-			vx_tmp(i,j) = vx(i,j) + dt * (inv_re * tmp1 - tmp2 - tmp3 + force.x);			
+			vx_tmp(i,j) = vx(i,j) + dt * (inv_re * tmp1 - tmp2 - tmp3 + f.x);			
 		}
 	}
 
@@ -224,7 +241,7 @@ void fluid_sim::compute_poisson_rhs(){
 
 			);
 
-			vy_tmp(i,j) = vy(i,j) + dt * (inv_re * tmp1 - tmp2 - tmp3 + force.y);
+			vy_tmp(i,j) = vy(i,j) + dt * (inv_re * tmp1 - tmp2 - tmp3 + f.y);
 		}
 	}
 
