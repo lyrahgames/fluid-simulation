@@ -15,7 +15,7 @@ re(1000.0f),
 f(vecf2()),
 deriv_w(0.5f),
 jacobi_it_max(100),
-jacobi_weight(1.0f),
+jacobi_w(1.0f),
 sor_it_max(100),
 sor_relax(0.5f){
 
@@ -263,29 +263,29 @@ void fluid_sim::compute_poisson_p_jacobi(){
 
 	for	(; n < jacobi_it_max; n++){
 		// vertices
-		p_tmp(0,0) =(1.0f-jacobi_weight) * p(0,0) + 
-		jacobi_weight * vert_const * (
+		p_tmp(0,0) =(1.0f-jacobi_w) * p(0,0) + 
+		jacobi_w * vert_const * (
 			sq_inv_dx * p(1,0) +
 			sq_inv_dy * p(0,1) -
 			rhs(0,0)
 		);
 
-		p_tmp(p.dim_x()-1,0) =(1.0f-jacobi_weight) * p(p.dim_x()-1,0) + 
-		jacobi_weight * vert_const * (
+		p_tmp(p.dim_x()-1,0) =(1.0f-jacobi_w) * p(p.dim_x()-1,0) + 
+		jacobi_w * vert_const * (
 			sq_inv_dx * p(p.dim_x()-2,0) +
 			sq_inv_dy * p(p.dim_x()-1,1) -
 			rhs(p.dim_x()-1,0)
 		);
 
-		p_tmp(0,p.dim_y()-1) =(1.0f-jacobi_weight) * p(0,p.dim_y()-1) + 
-		jacobi_weight * vert_const * (
+		p_tmp(0,p.dim_y()-1) =(1.0f-jacobi_w) * p(0,p.dim_y()-1) + 
+		jacobi_w * vert_const * (
 			sq_inv_dx * p(1,p.dim_y()-1) +
 			sq_inv_dy * p(0,p.dim_y()-2) -
 			rhs(0,p.dim_y()-1)
 		);
 
-		p_tmp(p.dim_x()-1,p.dim_y()-1) =(1.0f-jacobi_weight) * p(p.dim_x()-1,p.dim_y()-1) + 
-		jacobi_weight *	vert_const * (
+		p_tmp(p.dim_x()-1,p.dim_y()-1) =(1.0f-jacobi_w) * p(p.dim_x()-1,p.dim_y()-1) + 
+		jacobi_w *	vert_const * (
 			sq_inv_dx * p(p.dim_x()-2,p.dim_y()-1) +
 			sq_inv_dy * p(p.dim_x()-1,p.dim_y()-2) -
 			rhs(p.dim_x()-1,p.dim_y()-1)
@@ -294,15 +294,15 @@ void fluid_sim::compute_poisson_p_jacobi(){
 
 		// edge right and left
 		for (uint j = 1; j < p.dim_y()-1; j++){
-			p_tmp(0,j) = (1.0f-jacobi_weight) * p(0,j) + 
-			jacobi_weight * edge_x_const * (
+			p_tmp(0,j) = (1.0f-jacobi_w) * p(0,j) + 
+			jacobi_w * edge_x_const * (
 				sq_inv_dx * p(1,j) +
 				sq_inv_dy * ( p(0,j+1) + p(0,j-1) ) -
 				rhs(0,j)
 			);
 
-			p_tmp(p.dim_x()-1,j) = (1.0f-jacobi_weight) * p(p.dim_x()-1,j) + 
-			jacobi_weight * edge_x_const * (
+			p_tmp(p.dim_x()-1,j) = (1.0f-jacobi_w) * p(p.dim_x()-1,j) + 
+			jacobi_w * edge_x_const * (
 				sq_inv_dx * p(p.dim_x()-2,j) +
 				sq_inv_dy * ( p(p.dim_x()-1,j+1) + p(p.dim_x()-1,j-1) ) -
 				rhs(p.dim_x()-1,j)
@@ -311,15 +311,15 @@ void fluid_sim::compute_poisson_p_jacobi(){
 
 		// edge top and bottom
 		for (uint i = 1; i < p.dim_x()-1; i++){
-			p_tmp(i,0) = (1.0f-jacobi_weight) * p(i,0) + 
-			jacobi_weight *	edge_y_const * (
+			p_tmp(i,0) = (1.0f-jacobi_w) * p(i,0) + 
+			jacobi_w *	edge_y_const * (
 				sq_inv_dx * ( p(i+1,0) + p(i-1,0) ) +
 				sq_inv_dy * p(i,1) -
 				rhs(i,0)
 			);
 
-			p_tmp(i,p.dim_y()-1) = (1.0f-jacobi_weight) * p(i,p.dim_y()-1) + 
-			jacobi_weight *	edge_y_const * (
+			p_tmp(i,p.dim_y()-1) = (1.0f-jacobi_w) * p(i,p.dim_y()-1) + 
+			jacobi_w *	edge_y_const * (
 				sq_inv_dx * ( p(i+1,p.dim_y()-1) + p(i-1,p.dim_y()-1) ) +
 				sq_inv_dy * p(i,p.dim_y()-2) -
 				rhs(i,p.dim_y()-1)
@@ -329,8 +329,8 @@ void fluid_sim::compute_poisson_p_jacobi(){
 		// inner cells
 		for (uint j = 1; j < p.dim_y()-1; j++){
 			for (uint i = 1; i < p.dim_x()-1; i++){
-				p_tmp(i,j) = (1.0f-jacobi_weight) * p(i,j) + 
-				jacobi_weight * inner_const * (
+				p_tmp(i,j) = (1.0f-jacobi_w) * p(i,j) + 
+				jacobi_w * inner_const * (
 					sq_inv_dx * (p(i+1,j) + p(i-1,j)) +
 					sq_inv_dy * (p(i,j+1) + p(i,j-1)) -
 					rhs(i,j)

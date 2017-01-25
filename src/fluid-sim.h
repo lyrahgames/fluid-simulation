@@ -30,6 +30,8 @@ struct fluid_sim{
 		float x_step() const{return dx;}
 		float y_step() const{return dy;}
 		uint iteration() const{return it;}
+		uint jacobi_max_iteration() const{return jacobi_it_max;}
+		float jacobi_weight() const{return jacobi_w;}
 
 
 		// set geometry of box
@@ -109,7 +111,7 @@ struct fluid_sim{
 		float deriv_w; // weight of normal derivative
 
 		uint jacobi_it_max; // maximum of iterations in jacobi algorithm
-		float jacobi_weight;
+		float jacobi_w; // weight
 		uint sor_it_max; // maximum of iterations in sor algorithm
 		float sor_relax; // relaxation constant of sor algorithm
 

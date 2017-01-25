@@ -194,6 +194,8 @@ class MainW : public QMainWindow{
 				InfoLabelW *time_step_ilw;
 				InfoLabelW *time_step_safe_ilw;
 				InfoLabelW *time_step_bound_ilw;
+				InfoLabelW *jacobi_max_iteration_ilw;
+				InfoLabelW *jacobi_weight_ilw;
 
 
 			private:

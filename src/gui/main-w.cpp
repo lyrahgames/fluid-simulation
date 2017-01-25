@@ -1016,6 +1016,11 @@ MainW::InfoW::InfoW(MainW *parent): QWidget(parent), main_w(parent){
 		time_step_bound_ilw = new InfoLabelW(nd_tw);
 		time_step_bound_ilw->setName("time step bound:");
 
+		jacobi_max_iteration_ilw = new InfoLabelW(nd_tw);
+		jacobi_max_iteration_ilw->setName("jacobi iterations:");
+
+		jacobi_weight_ilw = new InfoLabelW(nd_tw);
+		jacobi_weight_ilw->setName("jacobi weight:");
 
 	nd_tw->addWidget(grid_dim_ilw);	
 	nd_tw->addWidget(x_step_ilw);
@@ -1024,6 +1029,8 @@ MainW::InfoW::InfoW(MainW *parent): QWidget(parent), main_w(parent){
 	nd_tw->addWidget(time_step_ilw);
 	nd_tw->addWidget(time_step_safe_ilw);
 	nd_tw->addWidget(time_step_bound_ilw);
+	nd_tw->addWidget(jacobi_max_iteration_ilw);
+	nd_tw->addWidget(jacobi_weight_ilw);
 
 
 
@@ -1082,4 +1089,6 @@ void MainW::InfoW::updateInfo(){
 	time_step_ilw->setInfo(QString::number(fs()->time_step(), 'f', 6));
 	time_step_safe_ilw->setInfo(QString::number(fs()->time_step_safe(), 'f', 6));
 	time_step_bound_ilw->setInfo(QString::number(fs()->time_step_bound(), 'f', 6));
+	jacobi_max_iteration_ilw->setInfo(QString::number(fs()->jacobi_max_iteration()));
+	jacobi_weight_ilw->setInfo(QString::number(fs()->jacobi_weight(), 'f', 2));
 }
