@@ -91,7 +91,10 @@ frame(pfs->p), vx_frame(pfs->vx), vy_frame(pfs->vy){
 	res_colormap.add_base({0.5f, {1.0f,1.0f,0.0f}});
 	res_colormap.add_base({1.0f, {1.0f,0.0f,0.0f}});
 
-
+	obs_colormap.add_base({-1.0f, {1.0f,1.0f,1.0f}});
+	obs_colormap.add_base({0.0f, {1.0f,1.0f,1.0f}});
+	obs_colormap.add_base({1.0f, {0.0f,0.0f,0.0f}});
+	obs_colormap.add_base({2.0f, {0.0f,0.0f,0.0f}});
 
 
 	render_w = new RenderW(this);
@@ -136,11 +139,11 @@ frame(pfs->p), vx_frame(pfs->vx), vy_frame(pfs->vy){
 	// layout->addWidget(render_w);
 	// layout->addWidget(ctrl_w);
 
-	ctrl_w->setFixedWidth(250);
+	// ctrl_w->setFixedWidth(250);
 
 
 	init_recording();
-	play_recording = true;
+	play_recording = false;
 
 	rec_timer = new QTimer(this);
 	connect(rec_timer, SIGNAL(timeout()), this, SLOT(record_frame()));
@@ -164,11 +167,67 @@ void MainW::repaint(){
 }
 
 void MainW::loop_slot(){
-	// if (mouse_press == Qt::LeftButton){
-	// 	const vecf2 pos = render_w->pix_itos(mouse);
-	// 	const vecf2 tmp = cfs->p.stoi(pos);
-	// 	const vecu2 idx = fl(tmp);
-	// 	const float scale = 0.01f;
+	if (mouse_press == Qt::LeftButton){
+		const vecf2 pos = render_w->pix_itos(mouse);
+		const vecf2 tmp = fs->p.domain_to_grid()(pos);
+		const vecu2 idx = fl(tmp);
+		const float scale = 10.f;
+		vecf2 move = scale * vecf2(mouse - mouse_old);
+		// move.y = -move.y;
+		move = move * render_w->pix_itos.slope;
+
+
+
+		if (ctrl_pressed){
+			// for (int j = 1-(int)radius; j <= (int)radius; j++){
+			// 	for (int i = 1-(int)radius; i <= (int)radius; i++){
+			// 		const uint idxx = ((int)idx[0] + i);
+			// 		const uint idxy = ((int)idx[1] + j);
+
+			// 		if ((idxx < fs->vx.dim_x()) && (idxy < fs->vy.dim_y())){
+			// 			fs->obs(idxx, idxy) = 1.0f;
+			// 		}
+			// 	}
+			// }
+
+			for (int j = 1-(int)radius; j <= (int)radius; j++){
+				for (int i = -(int)sqrtf(sq(radius)-sq(j)); i <= (int)sqrtf(sq(radius)-sq(j)); i++){
+					const uint idxx = ((int)idx[0] + i);
+					const uint idxy = ((int)idx[1] + j);
+
+					if ((idxx < fs->vx.dim_x()) && (idxy < fs->vy.dim_y())){
+						fs->obs(idxx, idxy) = 1.0f;
+					}
+				}
+			}
+		}else if (shift_pressed){
+			for (int j = 1-(int)radius; j <= (int)radius; j++){
+				for (int i = 1-(int)radius; i <= (int)radius; i++){
+					const uint idxx = ((int)idx[0] + i);
+					const uint idxy = ((int)idx[1] + j);
+
+					if ((idxx < fs->vx.dim_x()) && (idxy < fs->vy.dim_y())){
+						fs->obs(idxx, idxy) = 0.0f;
+					}
+				}
+			}
+		}else{
+			fs->user_idx = min(idx, vecu2{fs->vx.dim_x()-1, fs->vy.dim_y()-1});
+			fs->user_v = move;
+		}
+		
+
+		// if (pthread_mutex_lock(fs_mutex) == 0){
+			// fs->vx(idx[0], idx[1]) = move.x;
+			// fs->vy(idx[0], idx[1]) = move.y;
+
+			// fs->vx(idx[0], idx[1]) = scale;
+			// fs->vy(idx[0], idx[1]) = scale;
+
+
+		// 	pthread_mutex_unlock(fs_mutex);
+		// }
+
 
 		// if (!cfs->p.out_bound(idx)){
 			// cfs->p(idx) += scale * static_cast<float>(_refresh_time_);
@@ -188,7 +247,7 @@ void MainW::loop_slot(){
 		// 	cfs->p(idx + vecu2{1,1}) += scale * static_cast<float>(_refresh_time_);
 
 		// }
-	// }else if(mouse_press == Qt::RightButton){
+	}else if(mouse_press == Qt::RightButton){
 	// 	const vecf2 pos = render_w->pix_itos(mouse);
 	// 	const vecf2 tmp = cfs->p.stoi(pos);
 	// 	const vecu2 idx = fl(tmp);
@@ -211,7 +270,10 @@ void MainW::loop_slot(){
 		// 	cfs->p(idx + vecu2{1,1}) += scale * static_cast<float>(_refresh_time_);
 
 		// }
-	// }
+	}else{
+		fs->user_idx = vecu2{0,0};
+		fs->user_v = vecf2();
+	}
 
 	if (play){
 		// cfs->poisson_test_jacobi_it();
@@ -226,6 +288,8 @@ void MainW::loop_slot(){
 	}
 	// cfs->poisson_p_sor_it();
 	set_ready();
+
+	mouse_old = mouse;
 }
 
 void MainW::init_rand_pos(){
@@ -324,6 +388,10 @@ void MainW::clear_slot(){
 	set_ready();
 }
 
+void MainW::radius_sb_slot(int val){
+	radius = val;
+}
+
 void MainW::set_rand_pos_size_slot(int i){
 	rand_pos_size = i;
 	set_ready();
@@ -356,23 +424,11 @@ void MainW::set_wave_dt_slot(double val){
 	// cfs->wave_dt = val;
 }
 
-// mens changes
-void MainW::set_reynold_slot(double val){
-	// cfs->reynold = val;
-	fs->set_reynold(val);
-}
-
-void MainW::border_pb_slot(){
-	// cfs->down_bound = down_cb.currentIndex();
-}
 
 void MainW::set_p_render_slot(int val){
 	p_render = val;
 }
 
-void MainW::set_jacobi_max_it_slot(int val){
-	fs->jacobi_it_max = val;
-}
 
 void MainW::set_colormap_ref_slot(double val){
 	if (ctrl_w->p_rb->isChecked()){
@@ -383,6 +439,38 @@ void MainW::set_colormap_ref_slot(double val){
 		res_ref = val;
 	}
 }
+
+
+
+
+void MainW::nse_commit_slot(){
+
+	pthread_mutex_lock(fs_mutex);
+
+	fs->set_reynold(ctrl_w->reynold_dsb->value()); 
+	fs->deriv_w = ctrl_w->deriv_weight_dsb->value();
+	fs->border_v = ctrl_w->border_v_dsb->value();
+	fs->jacobi_it_max = ctrl_w->jacobi_it_max_sb->value();
+	fs->jacobi_w = ctrl_w->jacobi_weight_dsb->value();
+
+	fs->down_boundx = ctrl_w->downx_cb->currentIndex() +1;
+	fs->down_boundy = ctrl_w->downy_cb->currentIndex() +1;
+	fs->up_boundx = ctrl_w->upx_cb->currentIndex() +1;
+	fs->up_boundy = ctrl_w->upy_cb->currentIndex() +1;
+	fs->left_boundx = ctrl_w->leftx_cb->currentIndex() +1;
+	fs->left_boundy = ctrl_w->lefty_cb->currentIndex() +1;
+	fs->right_boundx = ctrl_w->rightx_cb->currentIndex() +1;
+	fs->right_boundy = ctrl_w->righty_cb->currentIndex() +1;
+
+	fs->obs_number = ctrl_w->obs_cb->currentIndex();
+	
+
+	pthread_mutex_unlock(fs_mutex);
+}
+
+
+
+
 
 MainW::RenderW::RenderW(MainW *parent): QWidget(parent), main_w(parent){
 	setMouseTracking(true);
@@ -625,6 +713,18 @@ void MainW::RenderW::paintEvent(QPaintEvent *event){
 
 		}
 
+		for (int i = i_min; i <= i_max; i++){
+			for (int j = j_min; j <= j_max; j++){
+				const vecf2 idx{static_cast<float>(i), static_cast<float>(j)};
+				const vecf2 pos = pix_itos(idx);
+
+				const color_rgbf tmp = main_w->obs_colormap(main_w->fs->obs(pos));
+				const QColor map_col = map.pixel(i,j);
+				const QRgb col = qRgb(map_col.red() * tmp[0],map_col.green() * tmp[1], map_col.blue() * tmp[2]);
+				map.setPixel(i,j,col);
+			}
+		}
+
 		const QRect rect = QRect(0, 0, width(), height());
 		painter.drawImage(rect, map, rect);
 
@@ -732,6 +832,8 @@ void MainW::RenderW::paintEvent(QPaintEvent *event){
 	}
 
 
+	
+
 
 	painter.end();
 
@@ -774,14 +876,16 @@ void MainW::RenderW::resizeEvent(QResizeEvent *event){
 
 MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	// main group box and scroll area with scroll widget
-	main_gb = new QGroupBox("controls:", this);
+	// main_gb = new QGroupBox("controls:", this);
 
-	main_sa = new QScrollArea(main_gb);
-	main_sa->setBackgroundRole(QPalette::Midlight);
-	main_sa->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	main_sa->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	// main_sa = new QScrollArea(main_gb);
+	// main_sa->setBackgroundRole(QPalette::Midlight);
+	// main_sa->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	// main_sa->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
-	main_sw = new QWidget(main_sa);
+	// main_sw = new QWidget(main_sa);
+
+	scroll_w = new ScrollW(this);
 	
 
 	play_pb = new QPushButton("play/pause", this);
@@ -789,6 +893,33 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 
 	clear_pb = new QPushButton("clear", this);
 	connect(clear_pb, SIGNAL(clicked()), main_w, SLOT(clear_slot()));
+
+
+	mouse_int_gb = new QGroupBox("mouse interaction", this);
+
+	mouse_int_cb = new QComboBox(this);
+	mouse_int_cb->addItem("off");
+	// mouse_int_cb->addItem("get current vx here");
+	// mouse_int_cb->addItem("get current vy here");
+	// mouse_int_cb->addItem("get current p here");
+	mouse_int_cb->addItem("raise vx temp");
+	mouse_int_cb->addItem("raise vy temp");
+	mouse_int_cb->addItem("raise p temp");
+	mouse_int_cb->addItem("set vx persis");
+	mouse_int_cb->addItem("set vy persis");
+	mouse_int_cb->addItem("set p persis");
+	mouse_int_cb->addItem("set obstacle persis");
+	mouse_int_cb->addItem("erase persistents");
+
+	radius_l = new QLabel("interaction radius", this);
+	radius_sb = new QSpinBox(this);
+	radius_sb->setRange(0, 100);
+	radius_sb->setValue(1);
+	connect(radius_sb, SIGNAL(valueChanged(int)), main_w, SLOT(radius_sb_slot(int)));
+
+
+	QVBoxLayout *mouse_int_layout = new QVBoxLayout(mouse_int_gb);
+	mouse_int_layout->addWidget(mouse_int_cb);
 
 
 	// wave group box
@@ -823,7 +954,9 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 
 
 	// render group box
-	render_gb = new QGroupBox("render:", this);
+	// render_gb = new QGroupBox("render:", this);
+
+	render_tw = new ToggleW("render settings", scroll_w);
 
 	rand_pos_size_sb = new QSpinBox(this);
 	rand_pos_size_sb->setMinimum(0);
@@ -848,10 +981,10 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	part_render_chb = new QCheckBox("show particles", this);
 
 
-	colormap_gb = new QGroupBox("p_colormap", this);
+	colormap_gb = new QGroupBox("colormap", this);
 	colormap_gb->setCheckable(true);
 
-	colormap_tw = new ToggleW("colormap settings", this);
+	// colormap_tw = new ToggleW("colormap settings", this);
 
 	p_rb = new QRadioButton("p", colormap_gb);
 	p_rb->setChecked(true);
@@ -881,74 +1014,203 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	connect(p_colormap_ref_dsb, SIGNAL(valueChanged(double)), main_w, SLOT(set_colormap_ref_slot(double)));
 
 
-	QVBoxLayout *render_gb_layout = new QVBoxLayout(render_gb);
-	render_gb_layout->addWidget(stream_render_chb);
-	render_gb_layout->addWidget(rand_pos_size_sb);
-	render_gb_layout->addWidget(gen_rand_pos_pb);
-	render_gb_layout->addWidget(part_render_chb);
-	render_gb_layout->addWidget(part_count_sb);
-	render_gb_layout->addWidget(gen_part_pos_pb);
-	render_gb_layout->addWidget(colormap_gb);
-	render_gb_layout->addWidget(colormap_tw);
-	render_gb_layout->addWidget(p_colormap_ref_dsb);
+	// QVBoxLayout *render_gb_layout = new QVBoxLayout(render_gb);
+	render_tw->addWidget(stream_render_chb);
+	render_tw->addWidget(rand_pos_size_sb);
+	render_tw->addWidget(gen_rand_pos_pb);
+	render_tw->addWidget(part_render_chb);
+	render_tw->addWidget(part_count_sb);
+	render_tw->addWidget(gen_part_pos_pb);
+	render_tw->addWidget(colormap_gb);
+	// render_tw->addWidget(colormap_tw);
+	render_tw->addWidget(p_colormap_ref_dsb);
 	
 
-	// mens changes
-	// nse group box
-	nse_gb = new QGroupBox("navier-stokes-equation:", this);
+	// nse tw
+	nse_tw = new ToggleW("nse settings", scroll_w);
+
+
+	nse_commit_pb = new QPushButton("commit parameters", nse_tw);
+	connect(nse_commit_pb, SIGNAL(clicked()), main_w, SLOT(nse_commit_slot()));
 
 	reynold_l = new QLabel("reynold number", this);
-
 	reynold_dsb = new QDoubleSpinBox(this);
 	reynold_dsb->setRange(0.0, 10000.0);
 	reynold_dsb->setSingleStep(10.0);
 	reynold_dsb->setValue(100.0f);
-	connect(reynold_dsb, SIGNAL(valueChanged(double)), main_w, SLOT(set_reynold_slot(double)));
 
-	QVBoxLayout *nse_gb_layout = new QVBoxLayout(nse_gb);
-	nse_gb_layout->addWidget(reynold_l);
-	nse_gb_layout->addWidget(reynold_dsb);
+	deriv_weight_l = new QLabel("derivative weight:", nse_tw);
+	deriv_weight_dsb = new QDoubleSpinBox(nse_tw);
+	deriv_weight_dsb->setDecimals(2);
+	deriv_weight_dsb->setRange(0, 1.0);
+	deriv_weight_dsb->setSingleStep(0.01);
+	deriv_weight_dsb->setValue(main_w->fs->deriv_weight());
 
-	border_l = new QLabel("border cond [DULR]", this);
-	nse_gb_layout->addWidget(border_l);
+	jacobi_it_max_l = new QLabel("jacobi max it", nse_tw);
+	jacobi_it_max_sb = new QSpinBox(nse_tw);
+	jacobi_it_max_sb->setRange(1, 10000);
+	jacobi_it_max_sb->setValue(main_w->fs->jacobi_max_iteration());
 
-	down_cb = new QComboBox(this);
-	down_cb->addItem("Haftbedingung");
-	down_cb->addItem("slip");
-	down_cb->addItem("p stream +");
-	down_cb->addItem("p stream -");
-	down_cb->addItem("o stream +");
-	down_cb->addItem("o stream -");
+	jacobi_weight_l = new QLabel("jacobi weight", this);
+	jacobi_weight_dsb = new QDoubleSpinBox(this);
+	jacobi_weight_dsb->setDecimals(2);
+	jacobi_weight_dsb->setRange(0, 1.0);
+	jacobi_weight_dsb->setSingleStep(0.01);
+	jacobi_weight_dsb->setValue(main_w->fs->jacobi_weight());
 
-	border_pb = new QPushButton("commit border cond", this);
+	border_v_l = new QLabel("border velocity:", nse_tw);
+	border_v_dsb = new QDoubleSpinBox(this);
+	border_v_dsb->setDecimals(2);
+	border_v_dsb->setRange(0, 1000.0);
+	border_v_dsb->setSingleStep(0.01);
+	border_v_dsb->setValue(main_w->fs->border_speed());
 
-	nse_gb_layout->addWidget(down_cb);
-	nse_gb_layout->addWidget(border_pb);
-	// mens changes end
 
 
-	jacobi_max_it_sb = new QSpinBox(this);
-	jacobi_max_it_sb->setMinimum(1);
-	jacobi_max_it_sb->setMaximum(1000);
-	connect(jacobi_max_it_sb, SIGNAL(valueChanged(int)), main_w, SLOT(set_jacobi_max_it_slot(int)));
+
+
+
+
+	// border conditions
+	downx_cb = new QComboBox(nse_tw);
+	downx_cb->addItem("no slip");
+	downx_cb->addItem("driven +w");
+	downx_cb->addItem("driven -w");
+	downx_cb->addItem("slip");
+	downx_cb->addItem("periodic");
+
+	downy_cb = new QComboBox(nse_tw);
+	downy_cb->addItem("closed");
+	downy_cb->addItem("inflow");
+	downy_cb->addItem("outflow");
+	downy_cb->addItem("open");
+	downy_cb->addItem("periodic");
+
+	border_down_l = new QLabel("Down vx vy", nse_tw);
+	border_down_w = new QWidget(nse_tw);
+	QHBoxLayout *border_down_w_layout = new QHBoxLayout(border_down_w);
+	border_down_w_layout->addWidget(downx_cb);
+	border_down_w_layout->addWidget(downy_cb);
+
+	upx_cb = new QComboBox(nse_tw);
+	upx_cb->addItem("no slip");
+	upx_cb->addItem("driven +w");
+	upx_cb->addItem("driven -w");
+	upx_cb->addItem("slip");
+	upx_cb->addItem("periodic");
+
+	upy_cb = new QComboBox(nse_tw);
+	upy_cb->addItem("closed");
+	upy_cb->addItem("inflow");
+	upy_cb->addItem("outflow");
+	upy_cb->addItem("open");
+	upy_cb->addItem("periodic");
+
+	border_up_l = new QLabel("Up vx vy", nse_tw);
+	border_up_w = new QWidget(nse_tw);
+	QHBoxLayout *border_up_w_layout = new QHBoxLayout(border_up_w);
+	border_up_w_layout->addWidget(upx_cb);
+	border_up_w_layout->addWidget(upy_cb);
+
+	lefty_cb = new QComboBox(nse_tw);
+	lefty_cb->addItem("no slip");
+	lefty_cb->addItem("driven +w");
+	lefty_cb->addItem("driven -w");
+	lefty_cb->addItem("slip");
+	lefty_cb->addItem("periodic");
+
+	leftx_cb = new QComboBox(nse_tw);
+	leftx_cb->addItem("closed");
+	leftx_cb->addItem("inflow");
+	leftx_cb->addItem("outflow");
+	leftx_cb->addItem("open");
+	leftx_cb->addItem("periodic");
+
+	border_left_l = new QLabel("Left vx vy", nse_tw);
+	border_left_w = new QWidget(nse_tw);
+	QHBoxLayout *border_left_w_layout = new QHBoxLayout(border_left_w);
+	border_left_w_layout->addWidget(leftx_cb);
+	border_left_w_layout->addWidget(lefty_cb);
+
+	righty_cb = new QComboBox(nse_tw);
+	righty_cb->addItem("no slip");
+	righty_cb->addItem("driven +w");
+	righty_cb->addItem("driven -w");
+	righty_cb->addItem("slip");
+	righty_cb->addItem("periodic");
+
+	rightx_cb = new QComboBox(nse_tw);
+	rightx_cb->addItem("closed");
+	rightx_cb->addItem("inflow");
+	rightx_cb->addItem("outflow");
+	rightx_cb->addItem("open");
+	rightx_cb->addItem("periodic");
+
+	border_right_l = new QLabel("Right vx vy", nse_tw);
+	border_right_w = new QWidget(nse_tw);
+	QHBoxLayout *border_right_w_layout = new QHBoxLayout(border_right_w);
+	border_right_w_layout->addWidget(rightx_cb);
+	border_right_w_layout->addWidget(righty_cb);
+	// border cond end
+
+	// los obstaclos
+	obs_l = new QLabel("Los Obstaclos", nse_tw);
+	obs_w = new QGroupBox(nse_tw);
+	QVBoxLayout *obs_w_layout = new QVBoxLayout(obs_w);
+	obs_cb = new QComboBox(nse_tw);
+	obs_cb->addItem("none");
+	obs_cb->addItem("sphere");
+	obs_cb->addItem("box");
+	obs_cb->addItem("triangel");
+	obs_cb->addItem("parabol");
+	obs_cb->addItem("diagonal box");
+	obs_w_layout->addWidget(obs_cb);
+
+
+
+	
+
+	nse_tw->addWidget(nse_commit_pb);
+	nse_tw->addWidget(reynold_l);
+	nse_tw->addWidget(reynold_dsb);
+	nse_tw->addWidget(deriv_weight_l);
+	nse_tw->addWidget(deriv_weight_dsb);
+	nse_tw->addWidget(jacobi_it_max_l);
+	nse_tw->addWidget(jacobi_it_max_sb);
+	nse_tw->addWidget(jacobi_weight_l);
+	nse_tw->addWidget(jacobi_weight_dsb);
+	nse_tw->addWidget(border_v_l);
+	nse_tw->addWidget(border_v_dsb);
+	nse_tw->addWidget(border_down_l);
+	nse_tw->addWidget(border_down_w);
+	nse_tw->addWidget(border_up_l);
+	nse_tw->addWidget(border_up_w);
+	nse_tw->addWidget(border_left_l);
+	nse_tw->addWidget(border_left_w);
+	nse_tw->addWidget(border_right_l);
+	nse_tw->addWidget(border_right_w);
+	nse_tw->addWidget(obs_l);
+	nse_tw->addWidget(obs_w);
+
+
 
 	
 	// main layouts
-	QVBoxLayout *main_sw_layout = new QVBoxLayout(main_sw);
-	main_sw_layout->addWidget(play_pb);
-	main_sw_layout->addWidget(clear_pb);
-	main_sw_layout->addWidget(wave_gb);
-	main_sw_layout->addWidget(render_gb);
-	main_sw_layout->addWidget(nse_gb);
-	main_sw_layout->addWidget(jacobi_max_it_sb);
+	scroll_w->addWidget(play_pb);
+	scroll_w->addWidget(clear_pb);
+	scroll_w->addWidget(mouse_int_gb);
+	scroll_w->addWidget(wave_gb);
+	scroll_w->addToggleW(render_tw);
+	scroll_w->addWidget(nse_tw);
 
-	main_sa->setWidget(main_sw);
 
-	QVBoxLayout *main_gb_layout = new QVBoxLayout(main_gb);
-	main_gb_layout->addWidget(main_sa);
+	// main_sa->setWidget(main_sw);
+
+	// QVBoxLayout *main_gb_layout = new QVBoxLayout(main_gb);
+	// main_gb_layout->addWidget(main_sa);
 
 	QVBoxLayout *layout = new QVBoxLayout(this);
-	layout->addWidget(main_gb);
+	layout->addWidget(scroll_w);
 }
 
 void MainW::CtrlW::resizeEvent(QResizeEvent* event){
@@ -983,6 +1245,12 @@ MainW::InfoW::InfoW(MainW *parent): QWidget(parent), main_w(parent){
 		max_v_ilw = new InfoLabelW(phd_tw);
 		max_v_ilw->setName("max. speed:");
 
+		mouse_p_ilw = new InfoLabelW("mouse pressure:", phd_tw);
+		mouse_vx_ilw = new InfoLabelW("mouse x-speed:", phd_tw);
+		mouse_vy_ilw = new InfoLabelW("mouse y-speed:", phd_tw);
+		mouse_v_ilw = new InfoLabelW("mouse speed:", phd_tw);
+
+
 	phd_tw->addWidget(geom_ilw);
 	phd_tw->addWidget(reynold_ilw);
 	phd_tw->addWidget(force_ilw);
@@ -990,7 +1258,10 @@ MainW::InfoW::InfoW(MainW *parent): QWidget(parent), main_w(parent){
 	phd_tw->addWidget(max_vx_ilw);
 	phd_tw->addWidget(max_vy_ilw);
 	phd_tw->addWidget(max_v_ilw);
-
+	phd_tw->addWidget(mouse_p_ilw);
+	phd_tw->addWidget(mouse_vx_ilw);
+	phd_tw->addWidget(mouse_vy_ilw);
+	phd_tw->addWidget(mouse_v_ilw);
 
 
 	nd_tw = new ToggleW("numerical data",this);
@@ -1075,8 +1346,22 @@ void MainW::InfoW::updateInfo(){
 	max_vy_ilw->setInfo(QString::number(fs()->max_speed_y(), 'f', 6));
 	max_v_ilw->setInfo(QString::number(fs()->max_speed(), 'f', 6));
 
+	const float mp = fs()->p(main_w->render_w->pix_itos((vecf2)main_w->mouse));
+	mouse_p_ilw->setInfo(QString::number(mp, 'f', 6));
+
+	const float mvx = fs()->vx(main_w->render_w->pix_itos((vecf2)main_w->mouse));
+	mouse_vx_ilw->setInfo(QString::number(mvx, 'f', 6));
+
+	const float mvy = fs()->vy(main_w->render_w->pix_itos((vecf2)main_w->mouse));
+	mouse_vy_ilw->setInfo(QString::number(mvy, 'f', 6));
+
+	const float mv = sqrtf(sq(mvx)+sq(mvy));
+	mouse_v_ilw->setInfo(QString::number(mv, 'f', 6));
 
 
+
+
+	// numerical data
 	QString grid_dim_str;
 	grid_dim_str += QString::number(fs()->grid_dim()[0]);
 	grid_dim_str += " x ";

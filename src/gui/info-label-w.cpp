@@ -13,6 +13,10 @@ InfoLabelW::InfoLabelW(QWidget *parent): QWidget(parent){
 	layout->addWidget(info_l);
 }
 
+InfoLabelW::InfoLabelW(const char *name, QWidget *parent): InfoLabelW(parent){
+	setName(name);
+}
+
 void InfoLabelW::setName(const QString& name){
 	name_l->setText(name);
 }
