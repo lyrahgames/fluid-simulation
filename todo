@@ -28,7 +28,7 @@ test branch:
 
 	☐	run it on laptop
 
-	☐	calculate max vx and vy for adaptive dt
+	✔	calculate max vx and vy for adaptive dt @done (17-01-25 17:46)
 
 	☐	equi distant distribution for colormap for faster rendering
 
@@ -47,7 +47,7 @@ implement video recording:
 
 
 gui:
-	☐	info window
+	✔	info window @done (17-01-25 17:46)
 	☐	checkbox for rendering colormaps and particles and streamlines
 	☐	variable size of particles
 	☐	mouse interaction combobox
@@ -58,6 +58,7 @@ gui:
 	☐	reference values for colormap
 	☐	graph for residuum
 	☐	mouse point with radius with streamlines
+	☐	dynamic interaction
 
 
 presentation:
