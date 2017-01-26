@@ -1,6 +1,8 @@
 #ifndef __MAIN_W_H__
 #define __MAIN_W_H__
 
+#include <pthread.h>
+
 #include <iostream>
 #include <fstream>
 // #include <vector>
@@ -106,16 +108,24 @@ class MainW : public QMainWindow{
 			public:
 				MainW *main_w;
 
-				QGroupBox *main_gb;
+				// QGroupBox *main_gb;
 
-				QScrollArea *main_sa;
-				QWidget *main_sw;
+				// QScrollArea *main_sa;
+				// QWidget *main_sw;
+
+				ScrollW *scroll_w;
 
 
-				QGroupBox *render_gb;
+				// QGroupBox *render_gb;
 
 				QPushButton *play_pb;
 				QPushButton *clear_pb;
+
+				QGroupBox *mouse_int_gb;
+				QComboBox *mouse_int_cb;
+
+
+				ToggleW *render_tw;
 
 				QSpinBox *rand_pos_size_sb;
 				QPushButton *gen_rand_pos_pb;
@@ -133,22 +143,13 @@ class MainW : public QMainWindow{
 				QLabel *wave_dt_l;
 				QDoubleSpinBox *wave_dt_dsb;
 
-				QGroupBox *nse_gb;
-				QLabel *reynold_l;
-				QDoubleSpinBox *reynold_dsb;
 
-				QLabel *border_l;
-				QPushButton *border_pb;
-				QComboBox *down_cb;
-				QComboBox *up_cb;
-				QComboBox *left_cb;
-				QComboBox *right_cb;
 
 				QCheckBox *stream_render_chb;
 				QCheckBox *part_render_chb;
 
 				QGroupBox *colormap_gb;
-				ToggleW *colormap_tw;
+				// ToggleW *colormap_tw;
 				QRadioButton *p_rb;
 				QRadioButton *v_rb;
 				QRadioButton *vx_rb;
@@ -157,7 +158,42 @@ class MainW : public QMainWindow{
 
 				QDoubleSpinBox *p_colormap_ref_dsb;
 
-				QSpinBox *jacobi_max_it_sb;
+				
+				// QGroupBox *nse_gb;
+				ToggleW *nse_tw;
+				QPushButton *nse_commit_pb;
+				QLabel *reynold_l;
+				QDoubleSpinBox *reynold_dsb;
+				QLabel *deriv_weight_l;
+				QDoubleSpinBox *deriv_weight_dsb;
+				QLabel *jacobi_it_max_l;
+				QSpinBox *jacobi_it_max_sb;
+				QLabel *jacobi_weight_l;
+				QDoubleSpinBox *jacobi_weight_dsb;
+				QLabel *border_v_l;
+				QDoubleSpinBox *border_v_dsb;
+
+				QWidget *border_down_w;
+				QWidget *border_up_w;
+				QWidget *border_left_w;
+				QWidget *border_right_w;
+				QLabel *border_down_l;
+				QLabel *border_up_l;
+				QLabel *border_left_l;
+				QLabel *border_right_l;
+
+				QComboBox *downx_cb;
+				QComboBox *downy_cb;
+				QComboBox *upx_cb;
+				QComboBox *upy_cb;
+				QComboBox *leftx_cb;
+				QComboBox *lefty_cb;
+				QComboBox *rightx_cb;
+				QComboBox *righty_cb;
+
+				QLabel *obs_l;
+				QWidget *obs_w;
+				QComboBox *obs_cb;
 
 
 			protected:
@@ -185,6 +221,11 @@ class MainW : public QMainWindow{
 				InfoLabelW *max_vy_ilw;
 				InfoLabelW *max_v_ilw;
 
+				InfoLabelW *mouse_p_ilw;
+				InfoLabelW *mouse_vx_ilw;
+				InfoLabelW *mouse_vy_ilw;
+				InfoLabelW *mouse_v_ilw;
+
 				// numerical data
 				ToggleW *nd_tw;
 				InfoLabelW *grid_dim_ilw;
@@ -205,6 +246,7 @@ class MainW : public QMainWindow{
 
 	protected:
 		void mouseMoveEvent(QMouseEvent *event){
+			// mouse_old = mouse;
 			mouse[0] = event->x() - render_w->pos().x();
 			mouse[1] = event->y() - render_w->pos().y();
 		}
@@ -219,6 +261,27 @@ class MainW : public QMainWindow{
 		}
 		void contextMenuEvent(QContextMenuEvent *event){
 			main_menu->exec(event->globalPos());
+		}
+
+		void keyReleaseEvent(QKeyEvent *event){
+			if(event->key() == Qt::Key_Control){
+				ctrl_pressed = false;
+			}
+
+			if(event->key() == Qt::Key_Shift){
+				shift_pressed = false;
+			}
+
+			// ctrl_pressed = !(event->key() == Qt::Key_Control);
+			// shift_pressed = !(event->key() == Qt::Key_Shift);
+			printf("%i %i\n", ctrl_pressed, shift_pressed);
+		}
+
+		void keyPressEvent(QKeyEvent *event){
+			ctrl_pressed = (event->key() == Qt::Key_Control);
+			shift_pressed = (event->key() == Qt::Key_Shift);
+
+			printf("%i %i\n", ctrl_pressed, shift_pressed);
 		}
 
 
@@ -238,7 +301,11 @@ class MainW : public QMainWindow{
 		QTimer *timer;
 
 		veci2 mouse;
+		veci2 mouse_old;
 		Qt::MouseButtons mouse_press;
+
+		bool ctrl_pressed;
+		bool shift_pressed;
 
 
 	private:
@@ -252,6 +319,7 @@ class MainW : public QMainWindow{
 		colormap p_colormap;
 		colormap v_colormap;
 		colormap res_colormap;
+		colormap obs_colormap;
 		float p_ref;
 		float v_ref;
 		float res_ref;
@@ -267,6 +335,7 @@ class MainW : public QMainWindow{
 
 	public:
 		bool *fs_play;
+		pthread_mutex_t *fs_mutex;
 
 		// fstream p_file;
 		// fstream vx_file;
@@ -321,16 +390,11 @@ class MainW : public QMainWindow{
 		void set_wave_c_slot(double val);
 		void set_wave_dt_slot(double val);
 
-		// mens changes
-		void set_reynold_slot(double val);
-
-		// mens changes end
-		void border_pb_slot();
 		void set_p_render_slot(int val);
 
-		void set_jacobi_max_it_slot(int val);
-
 		void set_colormap_ref_slot(double val);
+
+		void nse_commit_slot();
 
 };
 

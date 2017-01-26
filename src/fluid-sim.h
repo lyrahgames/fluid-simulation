@@ -24,12 +24,14 @@ struct fluid_sim{
 		float max_speed_y() const{return vy_mag_max;}
 		float max_speed() const{return sqrtf(sq( max_speed_x()) + sq(max_speed_y()) );}
 		float reynold() const{return re;}
+		float border_speed() const{return border_v;}
 		const vecf2& force() const{return f;}
 
 		const vecu2& grid_dim() const{return dim;}
 		float x_step() const{return dx;}
 		float y_step() const{return dy;}
 		uint iteration() const{return it;}
+		float deriv_weight() const{return deriv_w;}
 		uint jacobi_max_iteration() const{return jacobi_it_max;}
 		float jacobi_weight() const{return jacobi_w;}
 
@@ -81,6 +83,7 @@ struct fluid_sim{
 		fieldf rhs; // right-handside of poisson pressure equation
 		fieldf res; // residuum
 		float res_eps;
+		fieldf obs;
 		fieldf vx; // velocity in x direction
 		fieldf vx_tmp;
 		fieldf vy; // velocity in y direction
@@ -91,6 +94,7 @@ struct fluid_sim{
 		float vy_max;
 		float vy_min;
 		float vy_mag_max;
+		float border_v;
 
 		float t; // time
 		uint it; // current iteration
@@ -126,6 +130,22 @@ struct fluid_sim{
 		float edge_y_const;
 		float vert_const;
 		float res_l2_norm_const;
+
+
+		uint down_boundx;
+		uint down_boundy;
+		uint up_boundx;
+		uint up_boundy;
+		uint left_boundx;
+		uint left_boundy;
+		uint right_boundx;
+		uint right_boundy;
+		uint obs_number;
+
+
+	public:
+		vecu2 user_idx;
+		vecf2 user_v;
 };
 
 

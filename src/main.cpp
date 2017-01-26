@@ -19,15 +19,20 @@ struct thread_data{
 	fluid_sim *fs;
 };
 
+pthread_mutex_t thread_data_mutex;
 
 void* thread_fs_compute(void *data){
 	thread_data *td = (thread_data*)data;
 
 	while (true){
+		pthread_mutex_lock(&thread_data_mutex);
+
 		if (td->play)
 			td->fs->compute();
 		else
 			usleep(10 * 1000);
+
+		pthread_mutex_unlock(&thread_data_mutex);
 	}
 }
 
@@ -101,8 +106,8 @@ int main(int argc, char *argv[]){
 	// // }
 
 
-	fluid_sim cfs(1<<11, 1<<8, {vecf2(), vecf2(8.0f,1.0f)});
-	cfs.set_reynold(10000.0f);
+	fluid_sim cfs(1<<7, 1<<6, {vecf2(), vecf2(2.0f,1.0f)});
+	cfs.set_reynold(100.0f);
 	cfs.jacobi_it_max = 10;
 
 	thread_data *td = new thread_data;
@@ -110,7 +115,7 @@ int main(int argc, char *argv[]){
 	td->fs = &cfs;
 
 	pthread_t fs_thread;
-
+	pthread_mutex_init(&thread_data_mutex, NULL);
 	pthread_create(&fs_thread, NULL, thread_fs_compute, (void*)td);
 
 
@@ -118,12 +123,16 @@ int main(int argc, char *argv[]){
 
 	MainW *main_w = new MainW(&cfs);
 	main_w->fs_play = &(td->play);
+	main_w->fs_mutex = &thread_data_mutex;
 	main_w->resize(800, 450);
 	main_w->show();
 
 	app.exec();
 	
 	delete main_w;
+
+	pthread_mutex_destroy(&thread_data_mutex);
+	pthread_exit(NULL);
 
 
 	// intvlv domain{vecf2{0,1}, vecf2{2,3}};

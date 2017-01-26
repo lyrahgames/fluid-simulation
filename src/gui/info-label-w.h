@@ -11,6 +11,8 @@ class InfoLabelW : public QWidget{
 
 	public:
 		InfoLabelW(QWidget *parent = nullptr);
+		InfoLabelW(const char *name, QWidget *parent = nullptr);
+
 
 		void setName(const QString& name);
 		void setInfo(const QString& info);

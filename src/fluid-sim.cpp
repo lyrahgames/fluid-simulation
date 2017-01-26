@@ -6,6 +6,7 @@ geom(geometry), dim(vecu2{width, height}),
 p(fieldf(width,height,geometry)), p_tmp(fieldf(width,height,geometry)),
 rhs(fieldf(width,height,geometry)), res(fieldf(width,height,geometry)),
 res_eps(3.0f),
+obs(fieldf(width,height,geometry)),
 vx(fieldf(width-1,height,geometry)), vx_tmp(fieldf(width-1,height,geometry)),
 vy(fieldf(width,height-1,geometry)), vy_tmp(fieldf(width,height-1,geometry)),
 vx_max(0.0f), vx_min(0.0f), vy_max(0.0f), vy_min(0.0f),
@@ -17,7 +18,20 @@ deriv_w(0.5f),
 jacobi_it_max(100),
 jacobi_w(1.0f),
 sor_it_max(100),
-sor_relax(0.5f){
+sor_relax(0.5f),
+user_idx{},
+user_v(vecf2()),
+border_v(2),
+down_boundx(1),
+down_boundy(1),
+up_boundx(1),
+up_boundy(1),
+left_boundx(1),
+left_boundy(1),
+right_boundx(1),
+right_boundy(1),
+obs_number(0)
+{
 
 	const intvlv vx_domain = {
 		vecf2{geometry.min.x + 0.5f * p.grid_to_domain().slope.x, geometry.min.y},
@@ -60,6 +74,7 @@ void fluid_sim::clear(){
 	vx_tmp.setzero();
 	vy.setzero();
 	vy_tmp.setzero();
+	obs.setzero();
 	vx_max = vx_min = 0.0f;
 	vy_max = vy_min = 0.0f;
 	t = 0.0f;
@@ -91,30 +106,355 @@ void fluid_sim::compute_dt(){
 	inv_dt = 1.0f / dt;
 }
 
+
 void fluid_sim::set_v_bound(){
-	const float w = 20.0f;
+	const float w = border_v;
 
-	// vx top and bottom
-	for (uint i = 1; i < vx.dim_x()-1; i++){
-		vx(i, 0) = -vx(i, 1);
-		vx(i, vx.dim_y()-1) = -vx(i, vx.dim_y()-2);
+	
+
+	// down border
+	switch (down_boundx){
+		case 1:
+		for (uint i = 0; i < vx.dim_x(); i++){
+
+			// no slip down
+			vx(i,0) = -vx(i,1);
+		}
+		break;
+		case 2:
+		for (uint i = 0; i < vx.dim_x(); i++){
+
+			// driven +w down
+			vx(i,0) = 2.0f*w - vx(i,1);
+		}
+		break;
+		case 3:
+		for (uint i = 0; i < vx.dim_x(); i++){
+			
+			// driven -w down
+			vx(i,0) = -2.0f*w - vx(i,1);
+		}
+		break;
+		case 4:
+		for (uint i = 0; i < vx.dim_x(); i++){
+
+			// slip down
+			vx(i,0) = vx(i,1);
+		}
+		break;
+		case 5:
+		for (uint i = 0; i < vx.dim_x(); i++){
+
+			// periodic
+			vx(i,0) = vx(i,vx.dim_y()-2);
+		}
+		break;
 	}
-	// vx right and left
-	for (uint j = 1; j < vx.dim_y()-1; j++){
-		vx(0, j) = w;
-		vx(vx.dim_x()-1, j) = vx(vx.dim_x()-2,j);
+	switch (down_boundy){
+		case 1:
+		for (uint i = 0; i < vy.dim_x(); i++){
+
+			// closed down
+			vy(i,0) = 0.0f;
+		}
+		break;
+		case 2:
+		for (uint i = 0; i < vy.dim_x(); i++){
+
+			// inflow down
+			vy(i,0) = w;
+		}
+		break;
+		case 3:
+		for (uint i = 0; i < vy.dim_x(); i++){
+
+			// outflow down
+			vy(i,0) = -w;
+		}
+		break;
+		case 4:
+		for (uint i = 0; i < vy.dim_x(); i++){
+
+			// open down
+			vy(i,0) = vy(i,1);
+		}
+		break;
+		case 5:
+		for (uint i = 0; i < vy.dim_x(); i++){
+
+			// periodic
+			vy(i,0) = vy(i,vy.dim_y()-2);
+		}
+		break;
 	}
 
-	// vy top and bottom
-	for (uint i = 1; i < vy.dim_x()-1; i++){
-		vy(i, 0) = 0.0f;
-		vy(i, vy.dim_y()-1) = 0.0f;
+		
+	// up border
+	switch (up_boundx){
+		case 1:
+		for (uint i = 1; i < vx.dim_x()-1; i++){
+
+			// no slip up
+			vx(i,vx.dim_y()-1)= -vx(i,vx.dim_y()-2);
+		}
+		break;
+		case 2:
+		for (uint i = 1; i < vx.dim_x()-1; i++){
+
+			// driven +w up
+			vx(i,vx.dim_y()-1) = 2.0f*w - vx(i,vx.dim_y()-2);
+		}
+		break;
+		case 3:
+		for (uint i = 1; i < vx.dim_x()-1; i++){
+			
+			// driven -w up
+			vx(i,vx.dim_y()-1) = -2.0f*w - vx(i,vx.dim_y()-2);
+		}
+		break;
+		case 4:
+		for (uint i = 1; i < vx.dim_x()-1; i++){
+
+			// slip up
+			vx(i,vx.dim_y()-1) = vx(i,vx.dim_y()-2);
+		}
+		break;
+		case 5:
+		for (uint i = 1; i < vx.dim_x()-1; i++){
+
+			// periodic
+			vx(i,vx.dim_y()-1) = vx(i,1);
+		}
+		break;
 	}
-	// vy right and left
-	for (uint j = 1; j < vy.dim_y()-1; j++){
-		vy(0, j) = - vy(1, j);
-		vy(vy.dim_x()-1, j) = -vy(vy.dim_x()-2, j);
+	switch (up_boundy){
+		case 1:
+		for (uint i = 1; i < vy.dim_x()-1; i++){
+
+			// closed up
+			vy(i,vy.dim_y()-1) = 0.0f;
+		}
+		break;
+		case 2:
+		for (uint i = 1; i < vy.dim_x()-1; i++){
+
+			// inflow up
+			vy(i,vy.dim_y()-1) = -w;
+		}
+		break;
+		case 3:
+		for (uint i = 1; i < vy.dim_x()-1; i++){
+
+			// outflow up
+			vy(i,vy.dim_y()-1) = w;
+		}
+		break;
+		case 4:
+		for (uint i = 1; i < vy.dim_x()-1; i++){
+
+			// open up
+			vy(i,vy.dim_y()-1) = vy(i,vy.dim_y()-2);
+		}
+		break;
+		case 5:
+		for (uint i = 1; i < vy.dim_x()-1; i++){
+
+			// periodic
+			vy(i,vy.dim_y()-1) = vy(i,1);
+		}
+		break;
 	}
+
+
+	// left border
+	switch (left_boundx){
+		case 1:
+		for (uint j = 1; j < vx.dim_y()-1; j++){
+
+			// closed left
+			vx(0,j) = 0;
+		}
+		break;
+		case 2:
+
+		for (uint j = 1; j < vx.dim_y()-1; j++){
+
+			// inflow left
+			vx(0,j) = w;
+		}
+		break;
+		case 3:
+		for (uint j = 1; j < vx.dim_y()-1; j++){
+
+			// outflow left
+			vx(0,j) = -w;
+		}
+		break;
+		case 4:
+		for (uint j = 1; j < vx.dim_y()-1; j++){
+
+			// open left
+			vx(0,j) = vx(1,j);
+		}
+		break;
+		case 5:
+		for (uint j = 1; j < vx.dim_y()-1; j++){
+
+			// periodic
+			vx(0,j) = vx(vx.dim_x()-2,j);
+		}
+		break;
+	}
+	switch (left_boundy){
+		case 1:
+		for (uint j = 1; j < vy.dim_y()-1; j++){
+
+			// no slip left
+			vy(0,j) = -vy(1,j);
+		}
+		break;
+		case 2:
+		for (uint j = 1; j < vy.dim_y()-1; j++){
+
+			// driven +w left
+			vy(0,j) = w;
+		}
+		break;
+		case 3:
+		for (uint j = 1; j < vy.dim_y()-1; j++){
+
+			// driven -w left
+			vy(0,j) = -w;
+		}
+		break;
+		case 4:
+		for (uint j = 1; j < vx.dim_y()-1; j++){
+
+			// slip left
+			vy(0,j) = vy(1,j);
+		}
+		break;
+		case 5:
+		for (uint j = 1; j < vx.dim_y()-1; j++){
+
+			// periodic
+			vy(0,j) = vy(vy.dim_x()-2,j);
+		}
+		break;
+	}
+
+
+	// right border
+	switch (right_boundx){
+		case 1:
+		for (uint j = 1; j < vx.dim_y()-1; j++){
+
+			// closed right
+			vx(vx.dim_x()-1,j) = 0;
+		}
+		break;
+		case 2:
+		for (uint j = 1; j < vx.dim_y()-1; j++){
+
+			// inflow right
+			vx(vx.dim_x()-1,j) = -w;
+		}
+		break;
+		case 3:
+		for (uint j = 1; j < vx.dim_y()-1; j++){
+
+			// outlfow right
+			vx(vx.dim_x()-1,j) = w;
+		}
+		break;
+		case 4:
+		for (uint j = 1; j < vx.dim_y()-1; j++){
+
+			// open right
+			vx(vx.dim_x()-1,j) = vx(vx.dim_x()-2,j);
+		}
+		break;
+		case 5:
+		for (uint j = 1; j < vx.dim_y()-1; j++){
+
+			// periodic
+			vx(vx.dim_x()-1,j) = vx(1,j);
+		}
+		break;
+	}
+	switch (right_boundy){
+		case 1:
+		for (uint j = 1; j < vy.dim_y()-1; j++){
+
+			// no slip right
+			vy(vy.dim_x()-1,j) = -vy(vy.dim_x()-2,j);
+		}
+		break;
+		case 2:
+		for (uint j = 1; j < vy.dim_y()-1; j++){
+
+			// driven +w right
+			vy(vy.dim_x()-1,j) = w;
+		}
+		break;
+		case 3:
+		for (uint j = 1; j < vy.dim_y()-1; j++){
+
+			// driven -w right
+			vy(vy.dim_x()-1,j) = -w;
+		}
+		break;
+		case 4:
+		for (uint j = 1; j < vx.dim_y()-1; j++){
+
+			// slip right
+			vy(vy.dim_x()-1,j) = vy(vy.dim_x()-2,j);
+		}
+		break;
+		case 5:
+		for (uint j = 1; j < vx.dim_y()-1; j++){
+
+			// periodic
+			vy(vy.dim_x()-1,j) = vy(1,j);
+		}
+		break;
+	}
+
+
+	vx[user_idx] = user_v.x;
+	vy[user_idx] = user_v.y;
+
+
+	for (uint j = 0; j < vy.dim_y(); j++){
+		for (uint i = 0; i < vx.dim_x(); i++){
+			vx(i,j) *= (1.0f - obs(i,j));
+			vy(i,j) *= (1.0f - obs(i,j));
+		}
+	}
+
+	// // vx top and bottom
+	// for (uint i = 1; i < vx.dim_x()-1; i++){
+	// 	vx(i, 0) = -vx(i, 1);
+	// 	vx(i, vx.dim_y()-1) = -vx(i, vx.dim_y()-2);
+	// }
+	// // vx right and left
+	// for (uint j = 1; j < vx.dim_y()-1; j++){
+	// 	vx(0, j) = 0.0f;
+	// 	vx(vx.dim_x()-1, j) = 0.0f;
+	// }
+
+	// // vy top and bottom
+	// for (uint i = 1; i < vy.dim_x()-1; i++){
+	// 	vy(i, 0) = 0.0f;
+	// 	vy(i, vy.dim_y()-1) = 0.0f;
+	// }
+	// // vy right and left
+	// for (uint j = 1; j < vy.dim_y()-1; j++){
+	// 	vy(0, j) = - vy(1, j);
+	// 	vy(vy.dim_x()-1, j) = -vy(vy.dim_x()-2, j);
+	// }
+
+
 
 
 	// jet
@@ -134,12 +474,12 @@ void fluid_sim::set_v_bound(){
 	// }
 
 	// step
-	for (uint i = 0; i < 300; i++){
-		for (uint j = 0; j < 100; j++){
-			vx(i,j) = 0.0f;
-			vy(i,j) = 0.0f;
-		}
-	}
+	// for (uint i = 0; i < 300; i++){
+	// 	for (uint j = 0; j < 100; j++){
+	// 		vx(i,j) = 0.0f;
+	// 		vy(i,j) = 0.0f;
+	// 	}
+	// }
 }
 
 void fluid_sim::compute_v_mag_max(){
