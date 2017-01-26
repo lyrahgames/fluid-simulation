@@ -115,35 +115,35 @@ void fluid_sim::set_v_bound(){
 	// down border
 	switch (down_boundx){
 		case 1:
-		for (uint i = 0; i < vx.dim_x(); i++){
+		for (uint i = 1; i < vx.dim_x()-1; i++){
 
 			// no slip down
 			vx(i,0) = -vx(i,1);
 		}
 		break;
 		case 2:
-		for (uint i = 0; i < vx.dim_x(); i++){
+		for (uint i = 1; i < vx.dim_x()-1; i++){
 
 			// driven +w down
 			vx(i,0) = 2.0f*w - vx(i,1);
 		}
 		break;
 		case 3:
-		for (uint i = 0; i < vx.dim_x(); i++){
+		for (uint i = 1; i < vx.dim_x()-1; i++){
 			
 			// driven -w down
 			vx(i,0) = -2.0f*w - vx(i,1);
 		}
 		break;
 		case 4:
-		for (uint i = 0; i < vx.dim_x(); i++){
+		for (uint i = 1; i < vx.dim_x()-1; i++){
 
 			// slip down
 			vx(i,0) = vx(i,1);
 		}
 		break;
 		case 5:
-		for (uint i = 0; i < vx.dim_x(); i++){
+		for (uint i = 1; i < vx.dim_x()-1; i++){
 
 			// periodic
 			vx(i,0) = vx(i,vx.dim_y()-2);
@@ -152,35 +152,35 @@ void fluid_sim::set_v_bound(){
 	}
 	switch (down_boundy){
 		case 1:
-		for (uint i = 0; i < vy.dim_x(); i++){
+		for (uint i = 1; i < vy.dim_x()-1; i++){
 
 			// closed down
 			vy(i,0) = 0.0f;
 		}
 		break;
 		case 2:
-		for (uint i = 0; i < vy.dim_x(); i++){
+		for (uint i = 1; i < vy.dim_x()-1; i++){
 
 			// inflow down
 			vy(i,0) = w;
 		}
 		break;
 		case 3:
-		for (uint i = 0; i < vy.dim_x(); i++){
+		for (uint i = 1; i < vy.dim_x()-1; i++){
 
 			// outflow down
 			vy(i,0) = -w;
 		}
 		break;
 		case 4:
-		for (uint i = 0; i < vy.dim_x(); i++){
+		for (uint i = 1; i < vy.dim_x()-1; i++){
 
 			// open down
 			vy(i,0) = vy(i,1);
 		}
 		break;
 		case 5:
-		for (uint i = 0; i < vy.dim_x(); i++){
+		for (uint i = 1; i < vy.dim_x()-1; i++){
 
 			// periodic
 			vy(i,0) = vy(i,vy.dim_y()-2);

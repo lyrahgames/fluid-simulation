@@ -106,7 +106,7 @@ int main(int argc, char *argv[]){
 	// // }
 
 
-	fluid_sim cfs(1<<7, 1<<6, {vecf2(), vecf2(2.0f,1.0f)});
+	fluid_sim cfs(1<<8, 1<<7, {vecf2(), vecf2(2.0f,1.0f)});
 	cfs.set_reynold(100.0f);
 	cfs.jacobi_it_max = 10;
 

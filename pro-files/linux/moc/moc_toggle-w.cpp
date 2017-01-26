@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'toggle-w.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.5.1)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.3.2)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -12,7 +12,7 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'toggle-w.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.5.1. It"
+#error "This file was generated using the moc from 5.3.2. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -20,20 +20,19 @@
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_ToggleW_t {
     QByteArrayData data[4];
-    char stringdata0[29];
+    char stringdata[29];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
-    qptrdiff(offsetof(qt_meta_stringdata_ToggleW_t, stringdata0) + ofs \
+    qptrdiff(offsetof(qt_meta_stringdata_ToggleW_t, stringdata) + ofs \
         - idx * sizeof(QByteArrayData)) \
     )
 static const qt_meta_stringdata_ToggleW_t qt_meta_stringdata_ToggleW = {
     {
-QT_MOC_LITERAL(0, 0, 7), // "ToggleW"
-QT_MOC_LITERAL(1, 8, 7), // "toggled"
-QT_MOC_LITERAL(2, 16, 0), // ""
-QT_MOC_LITERAL(3, 17, 11) // "toggle_slot"
-
+QT_MOC_LITERAL(0, 0, 7),
+QT_MOC_LITERAL(1, 8, 7),
+QT_MOC_LITERAL(2, 16, 0),
+QT_MOC_LITERAL(3, 17, 11)
     },
     "ToggleW\0toggled\0\0toggle_slot"
 };
@@ -71,7 +70,6 @@ void ToggleW::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, voi
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
         ToggleW *_t = static_cast<ToggleW *>(_o);
-        Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->toggled(); break;
         case 1: _t->toggle_slot((*reinterpret_cast< int(*)>(_a[1]))); break;
@@ -91,7 +89,7 @@ void ToggleW::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, voi
 
 const QMetaObject ToggleW::staticMetaObject = {
     { &QWidget::staticMetaObject, qt_meta_stringdata_ToggleW.data,
-      qt_meta_data_ToggleW,  qt_static_metacall, Q_NULLPTR, Q_NULLPTR}
+      qt_meta_data_ToggleW,  qt_static_metacall, 0, 0}
 };
 
 
@@ -102,8 +100,8 @@ const QMetaObject *ToggleW::metaObject() const
 
 void *ToggleW::qt_metacast(const char *_clname)
 {
-    if (!_clname) return Q_NULLPTR;
-    if (!strcmp(_clname, qt_meta_stringdata_ToggleW.stringdata0))
+    if (!_clname) return 0;
+    if (!strcmp(_clname, qt_meta_stringdata_ToggleW.stringdata))
         return static_cast<void*>(const_cast< ToggleW*>(this));
     return QWidget::qt_metacast(_clname);
 }
@@ -128,6 +126,6 @@ int ToggleW::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 // SIGNAL 0
 void ToggleW::toggled()
 {
-    QMetaObject::activate(this, &staticMetaObject, 0, Q_NULLPTR);
+    QMetaObject::activate(this, &staticMetaObject, 0, 0);
 }
 QT_END_MOC_NAMESPACE
