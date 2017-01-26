@@ -123,6 +123,8 @@ class MainW : public QMainWindow{
 
 				QGroupBox *mouse_int_gb;
 				QComboBox *mouse_int_cb;
+				QLabel *radius_l;
+				QSpinBox *radius_sb;
 
 
 				ToggleW *render_tw;
@@ -306,6 +308,7 @@ class MainW : public QMainWindow{
 
 		bool ctrl_pressed;
 		bool shift_pressed;
+		uint radius;
 
 
 	private:
@@ -377,6 +380,8 @@ class MainW : public QMainWindow{
 		void loop_slot();
 
 		void clear_slot();
+
+		void radius_sb_slot(int val);
 
 		void set_rand_pos_size_slot(int i);
 		void gen_rand_pos_slot();

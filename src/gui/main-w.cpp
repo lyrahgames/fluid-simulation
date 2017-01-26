@@ -179,9 +179,38 @@ void MainW::loop_slot(){
 
 
 		if (ctrl_pressed){
-			fs->obs(idx) = 1.0f;
+			// for (int j = 1-(int)radius; j <= (int)radius; j++){
+			// 	for (int i = 1-(int)radius; i <= (int)radius; i++){
+			// 		const uint idxx = ((int)idx[0] + i);
+			// 		const uint idxy = ((int)idx[1] + j);
+
+			// 		if ((idxx < fs->vx.dim_x()) && (idxy < fs->vy.dim_y())){
+			// 			fs->obs(idxx, idxy) = 1.0f;
+			// 		}
+			// 	}
+			// }
+
+			for (int j = 1-(int)radius; j <= (int)radius; j++){
+				for (int i = -(int)sqrtf(sq(radius)-sq(j)); i <= (int)sqrtf(sq(radius)-sq(j)); i++){
+					const uint idxx = ((int)idx[0] + i);
+					const uint idxy = ((int)idx[1] + j);
+
+					if ((idxx < fs->vx.dim_x()) && (idxy < fs->vy.dim_y())){
+						fs->obs(idxx, idxy) = 1.0f;
+					}
+				}
+			}
 		}else if (shift_pressed){
-			fs->obs(idx) = 0.0f;
+			for (int j = 1-(int)radius; j <= (int)radius; j++){
+				for (int i = 1-(int)radius; i <= (int)radius; i++){
+					const uint idxx = ((int)idx[0] + i);
+					const uint idxy = ((int)idx[1] + j);
+
+					if ((idxx < fs->vx.dim_x()) && (idxy < fs->vy.dim_y())){
+						fs->obs(idxx, idxy) = 0.0f;
+					}
+				}
+			}
 		}else{
 			fs->user_idx = min(idx, vecu2{fs->vx.dim_x()-1, fs->vy.dim_y()-1});
 			fs->user_v = move;
@@ -357,6 +386,10 @@ void MainW::clear_slot(){
 	// cfs->clear();
 	fs->clear();
 	set_ready();
+}
+
+void MainW::radius_sb_slot(int val){
+	radius = val;
 }
 
 void MainW::set_rand_pos_size_slot(int i){
@@ -877,6 +910,13 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	mouse_int_cb->addItem("set p persis");
 	mouse_int_cb->addItem("set obstacle persis");
 	mouse_int_cb->addItem("erase persistents");
+
+	radius_l = new QLabel("interaction radius", this);
+	radius_sb = new QSpinBox(this);
+	radius_sb->setRange(0, 100);
+	radius_sb->setValue(1);
+	connect(radius_sb, SIGNAL(valueChanged(int)), main_w, SLOT(radius_sb_slot(int)));
+
 
 	QVBoxLayout *mouse_int_layout = new QVBoxLayout(mouse_int_gb);
 	mouse_int_layout->addWidget(mouse_int_cb);

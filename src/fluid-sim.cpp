@@ -432,6 +432,13 @@ void fluid_sim::set_v_bound(){
 		}
 	}
 
+	// pre defined obstacles
+	// for (uint j = 18; j < 45; j++){
+	// 	for (uint i = 20; i < 35; i++){
+	// 		obs(i,j) = 1.0f;
+	// 	}
+	// }
+
 	// // vx top and bottom
 	// for (uint i = 1; i < vx.dim_x()-1; i++){
 	// 	vx(i, 0) = -vx(i, 1);
