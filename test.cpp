@@ -190,7 +190,7 @@ void MainW::loop_slot(){
 			// 	}
 			// }
 
-			for (int j = -(int)radius; j <= (int)radius; j++){
+			for (int j = 1-(int)radius; j <= (int)radius; j++){
 				for (int i = -(int)sqrtf(sq(radius)-sq(j)); i <= (int)sqrtf(sq(radius)-sq(j)); i++){
 					const uint idxx = ((int)idx[0] + i);
 					const uint idxy = ((int)idx[1] + j);
@@ -445,7 +445,7 @@ void MainW::set_colormap_ref_slot(double val){
 
 void MainW::nse_commit_slot(){
 
-	// pthread_mutex_lock(fs_mutex);
+	pthread_mutex_lock(fs_mutex);
 
 	fs->set_reynold(ctrl_w->reynold_dsb->value()); 
 	fs->deriv_w = ctrl_w->deriv_weight_dsb->value();
@@ -463,59 +463,9 @@ void MainW::nse_commit_slot(){
 	fs->right_boundy = ctrl_w->righty_cb->currentIndex() +1;
 
 	fs->obs_number = ctrl_w->obs_cb->currentIndex();
-
-
-	// // pre defined obstacles
-	const int boxbeginy = float(18)*float(fs->p.dim_y())/float(64);
-	const int boxbeginx = float(20)*float(fs->p.dim_x())/float(128);
-	const int box_height = float(25)*float(fs->p.dim_y())/float(64);
-	const int box_length = float(15)*float(fs->p.dim_x())/float(128);
-	const int Radius = float(6)*float(fs->p.dim_y())/float(64);
-	const int jetbeginy = float(64)*float(fs->p.dim_y())/float(256);
-	const int jetbeginx = float(200)*float(fs->p.dim_x())/float(2048);
-	const int jet_height = float(129)*float(fs->p.dim_y())/float(256);
-	const int jet_length = float(100)*float(fs->p.dim_x())/float(2048);
-	const int jet_offset = float(128)*float(fs->p.dim_y())/float(256);
-
-	if (ctrl_w->obs_cb->currentIndex()==0){
-
-	}else if (ctrl_w->obs_cb->currentIndex()==1){
-		// box
-		for (uint j = boxbeginy; j < boxbeginy+box_height; j++){
-			for (uint i = boxbeginx; i < boxbeginx+box_length; i++){
-				fs->obs(i,j) = 1.0f;
-			}
-		}
-	}else if (ctrl_w->obs_cb->currentIndex()==2){
-		// sphere
-		for (int j = -(int)Radius; j <= (int)Radius; j++){
-			for (int i = -(int)sqrtf(sq(Radius)-sq(j)); i <= (int)sqrtf(sq(Radius)-sq(j)); i++){
-				fs->obs(fs->p.dim_x()/6 + i, fs->p.dim_y()/2 + j) = 1.0f;			}
-		}
-	}else if(ctrl_w->obs_cb->currentIndex()==3){
-		// jet
-		for (uint j = jetbeginy; j < jetbeginy+jet_height; j++){
-			for (uint i = jetbeginx; i < jetbeginx+jet_length; i++){
-				const int a = i+sq(float(j)-jet_offset)*0.05f;
-				fs->obs(a, j) = 1.0f;
-			}
-		}
-	}
-
-
 	
 
-	
-
-	// 		if ((idxx < fs->vx.dim_x()) && (idxy < fs->vy.dim_y())){
-	// 			fs->obs(idxx, idxy) = 1.0f;
-	// 		}
-	// 	}
-	// }
-	
-	
-
-	// pthread_mutex_unlock(fs_mutex);
+	pthread_mutex_unlock(fs_mutex);
 }
 
 
@@ -970,8 +920,6 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 
 	QVBoxLayout *mouse_int_layout = new QVBoxLayout(mouse_int_gb);
 	mouse_int_layout->addWidget(mouse_int_cb);
-	mouse_int_layout->addWidget(radius_l);
-	mouse_int_layout->addWidget(radius_sb);
 
 
 	// wave group box
@@ -1211,11 +1159,11 @@ MainW::CtrlW::CtrlW(MainW *parent): QWidget(parent), main_w(parent){
 	QVBoxLayout *obs_w_layout = new QVBoxLayout(obs_w);
 	obs_cb = new QComboBox(nse_tw);
 	obs_cb->addItem("none");
-	obs_cb->addItem("box");
 	obs_cb->addItem("sphere");
-	obs_cb->addItem("jet");
-	// obs_cb->addItem("parabol");
-	// obs_cb->addItem("diagonal box");
+	obs_cb->addItem("box");
+	obs_cb->addItem("triangel");
+	obs_cb->addItem("parabol");
+	obs_cb->addItem("diagonal box");
 	obs_w_layout->addWidget(obs_cb);
 
 

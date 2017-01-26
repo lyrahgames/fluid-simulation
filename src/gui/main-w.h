@@ -308,7 +308,7 @@ class MainW : public QMainWindow{
 
 		bool ctrl_pressed;
 		bool shift_pressed;
-		uint radius;
+		int radius = 1;
 
 
 	private:
